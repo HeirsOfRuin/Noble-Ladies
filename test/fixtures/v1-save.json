@@ -1,0 +1,83 @@
+{
+  "v": 1,
+  "seed": 12345,
+  "difficulty": "normal",
+  "turn": 4,
+  "money": 32,
+  "strength": 2,
+  "ledger": [
+    {
+      "turn": 0,
+      "amount": 20,
+      "reason": "start"
+    },
+    {
+      "turn": 1,
+      "amount": 6,
+      "reason": "work"
+    },
+    {
+      "turn": 1,
+      "amount": -2,
+      "reason": "upkeep"
+    },
+    {
+      "turn": 2,
+      "amount": 6,
+      "reason": "work"
+    },
+    {
+      "turn": 2,
+      "amount": -2,
+      "reason": "upkeep"
+    },
+    {
+      "turn": 3,
+      "amount": 6,
+      "reason": "work"
+    },
+    {
+      "turn": 3,
+      "amount": -2,
+      "reason": "upkeep"
+    }
+  ],
+  "history": [
+    {
+      "turn": 1,
+      "action": "work",
+      "money": 24,
+      "strength": 4,
+      "account": {
+        "work": 6,
+        "upkeep": -2
+      },
+      "notes": []
+    },
+    {
+      "turn": 2,
+      "action": "work",
+      "money": 28,
+      "strength": 3,
+      "account": {
+        "work": 6,
+        "upkeep": -2
+      },
+      "notes": []
+    },
+    {
+      "turn": 3,
+      "action": "work",
+      "money": 32,
+      "strength": 2,
+      "account": {
+        "work": 6,
+        "upkeep": -2
+      },
+      "notes": []
+    }
+  ],
+  "over": false,
+  "outcome": null,
+  "nextId": 1
+}
