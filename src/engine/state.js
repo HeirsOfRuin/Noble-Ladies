@@ -8,24 +8,85 @@
 // variables, or one seed gives different games in a batch (Centennial Farm).
 
 import { CONFIG, DIFFICULTY } from '../data/config.data.js';
+import { CAST, SUITORS, LADY } from '../data/cast.data.js';
+import { streamFor } from './rng.js';
 
 export const SAVE_KEY = 'the-lady-of-saint-pol.save.v1'; // never rename
 export const SAVE_VERSION = 1;
 export const CODE_PREFIX = 'LSP1.';
 
+const draw = (rng, v, dp = 0) => {
+  if (!Array.isArray(v)) return v;
+  const x = rng.float(v[0], v[1]);
+  return dp ? Math.round(x * 10 ** dp) / 10 ** dp : Math.round(x);
+};
+
+export function makeNpc(id, rng) {
+  const c = CAST[id];
+  return {
+    id, alive: true, gone: null,
+    trust: draw(rng, c.trust), use: draw(rng, c.use),
+    rel: draw(rng, c.rel, 2), loyalty: draw(rng, c.loyalty, 2),
+    faction: c.faction,
+    seen: c.real ? 0 : (c.role === 'family' || c.role === 'confessor' ? 3 : 0), // long-known people are already known
+    gifts: [],
+  };
+}
+
+function makeSuitor(t, rng) {
+  const nudge = (x) => Math.max(1, Math.min(5, x + rng.range(-1, 1)));
+  return { ...t, competence: nudge(t.competence), loyalty: nudge(t.loyalty), temper: nudge(t.temper), spending: nudge(t.spending) };
+}
+
 export function newGame({ seed = 1, difficulty = 'normal' } = {}) {
   if (!DIFFICULTY[difficulty]) throw new Error(`unknown difficulty: ${difficulty}`);
+  const rng = streamFor(seed >>> 0, 0, 'setup');
+  const npcs = {};
+  for (const id of Object.keys(CAST)) npcs[id] = makeNpc(id, rng);
+
+  // Two suitors with different leanings: the faction bet starts at the contract.
+  const pool = rng.shuffle(SUITORS.slice());
+  const a = pool[0];
+  const b = pool.find((x) => x.lean !== a.lean);
+  const suitors = [makeSuitor(a, rng), makeSuitor(b, rng)];
+  const fatherPick = suitors[0].lands >= suitors[1].lands ? 0 : 1;
+
   return {
     v: SAVE_VERSION,
     seed: seed >>> 0,
     difficulty,
+    lady: { ...LADY },
     turn: 1,
-    money: CONFIG.startMoney,
-    strength: CONFIG.startStrength,
-    ledger: [{ turn: 0, amount: CONFIG.startMoney, reason: 'start' }],
+    phase: 'scene',
+    money: 0,
+    ledger: [],
+    rep: CONFIG.startRep,
+    fav: { queen: 5, arm: 5, bur: 5 },
+    info: CONFIG.startInfo,
+    hh: CONFIG.startHousehold,
+    health: CONFIG.startHealth,
+    lands: 0, landsStart: 0,
+    confiscated: [],
+    pensions: [],
+    place: 'estates',
+    counsel: 'none',
+    npcs,
+    husband: null,
+    widowed: false,
+    children: [],
+    births: 0,
+    pregnant: null,
+    guard: 0,
+    cause: null,
+    queue: [],
+    cards: [],
+    news: [],
     history: [],
+    flags: {},
+    act1: { suitors, fatherPick, prefer: -1 /* -1 not yet asked; null left to her father; 0 or 1 a suitor */, press: 0, dowryBonus: 0, reports: [] },
     over: false,
     outcome: null,
+    ending: null,
     nextId: 1,
   };
 }

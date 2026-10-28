@@ -10,20 +10,41 @@
 // ---- ADAPT THESE to the game's screens (the rest is generic) ---------------
 export const START = ['[data-act="new"]'];           // clicks that begin a game
 export const CLOCK = '.hud .turn';                    // element whose text is the game clock
-export const TABS = ['[data-tab="play"]', '[data-tab="ledger"]', '[data-tab="menu"]'];
-export const TURNS = Number(process.env.TURNS || 10);
+export const TABS = ['[data-tab="play"]', '[data-tab="house"]', '[data-tab="people"]', '[data-tab="news"]', '[data-tab="menu"]'];
+export const TURNS = Number(process.env.TURNS || 14);
 
-/** Take one turn the way a player would; return true if the clock moved. */
+/** Take one turn the way a player would; return true if the clock moved.
+ *  Act 1 scenes and event cards: take the first choice. A half-year: pick the
+ *  first two enabled actions that need no target, then end the half-year. */
 export async function advanceOnce(page) {
   const before = (await page.locator(CLOCK).textContent())?.trim();
-  const btn = page.locator('[data-action]:not([disabled])').first();
-  if (!(await btn.count())) return false;
-  await btn.click();
-  for (let g = 0; g < 4 && (await page.locator('.scrim [data-act="close"]').count()); g++) {
-    await page.locator('.scrim [data-act="close"]').first().click();
+  for (let g = 0; g < 12; g++) {
+    if (await page.locator('.scrim [data-act="close"]').count()) { await page.locator('.scrim [data-act="close"]').first().click(); continue; }
+    if (await page.locator('[data-act="new"]').count() && !(await page.locator(CLOCK).count())) return true;
+    if (await page.locator('.panel [data-act="new"]').count()) return true; // the game ended: also progress
+    const choice = page.locator('[data-choice]');
+    if (await choice.count()) await choice.first().click();
+    else if (await page.locator('[data-action="commit"]').count()) {
+      for (let k = 0; k < 2; k++) {
+        const picks = page.locator('[data-pick]:not([disabled])');
+        const n = await picks.count();
+        let done = false;
+        for (let i = 0; i < n && !done; i++) {
+          await picks.nth(i).click();
+          if (await page.locator('.scrim [data-target]:not([disabled])').count()) await page.locator('.scrim [data-target]:not([disabled])').first().click();
+          done = true;
+        }
+      }
+      if (await page.locator('[data-action="commit"]:not([disabled])').count()) await page.locator('[data-action="commit"]').click();
+      else return false;
+    } else return false;
+    const now = (await page.locator(CLOCK).textContent().catch(() => ''))?.trim();
+    if (now !== before) {
+      while (await page.locator('.scrim [data-act="close"]').count()) await page.locator('.scrim [data-act="close"]').first().click();
+      return true;
+    }
   }
-  if (await page.locator('[data-act="new"]').count()) return true; // the game ended: also progress
-  return (await page.locator(CLOCK).textContent())?.trim() !== before;
+  return false;
 }
 // -----------------------------------------------------------------------------
 

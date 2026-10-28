@@ -1,0 +1,62 @@
+// The actions. Logic-free: numbers and words. src/engine/actions.js resolves
+// them, and src/engine/derive.js computes every number a button shows.
+//
+// where: court | estates | any.   target: what the player picks, if anything.
+// via: the intermediary who carries it out (design rule 1: indirect power). Their
+// reliability decides how often it happens as asked and on time.
+// delay: turns before the result is known (0 = this half-year).
+
+export const ACTIONS = {
+  attend: { label: 'Attend the queen', where: 'court', cost: 60, via: null, delay: 0,
+    favour: 8, use: 5, info: 6,
+    note: 'Wait on the queen. Favour in her household, and you hear what she hears.' },
+  petition: { label: 'Petition for a pension', where: 'court', target: 'patron', cost: 80, via: 'patron', delay: 1,
+    pension: { queen: 150, arm: 180, bur: 180, none: 130 }, failFavour: -3,
+    note: 'Ask a patron for a yearly grant, through their household. Answers come next half-year, if they come.' },
+  gift: { label: 'Send a gift', where: 'any', target: 'person', cost: 150, via: 'maid', delay: 0,
+    trust: 10, use: 4, favour: 6,
+    note: 'A gift through your chamberwoman. Gifts to the same person lose their edge.' },
+  gossip: { label: 'Gather gossip', where: 'court', target: 'source', cost: 30, via: 'source', delay: 0,
+    info: 16, rumours: 2,
+    note: 'Have someone listen for you. What they bring back is only as good as they are.' },
+  rumour: { label: 'Spread a rumour about your rival', where: 'court', cost: 40, via: 'maid', delay: 1,
+    rivalUse: -15, tracedRep: -10, tracedFavour: -8,
+    note: 'Weakens your rival\'s standing. If it is traced to you, it costs you more than her.' },
+  courtly: { label: 'Join a Court of Love evening', where: 'court', cost: 100, via: null, delay: 0,
+    favour: 3, info: 5, rep: 3, from: '1401a', until: '1407b',
+    note: 'Ballades, judgments on questions of love, and every party in one room. A place to be seen with both sides.' },
+  accounts: { label: 'Go through the accounts', where: 'estates', cost: 0, via: 'steward', delay: 0,
+    rentBonus: 0.15,
+    note: 'Sit with your steward over the rolls. Rents come in fuller, and you learn how honest he is.' },
+  repair: { label: 'Repair and defend the house', where: 'estates', cost: 200, via: null, delay: 0,
+    household: 15, guardTurns: 4,
+    note: 'Roofs, walls, a watch on the gate. Protects the house against the war for two years.' },
+  tenants: { label: 'Hear tenant disputes', where: 'estates', cost: 0, via: null, delay: 0,
+    rep: 1, household: 5, info: 3,
+    note: 'Sit in judgment in the hall. A lady who does justice is spoken of well, if slowly.' },
+  rest: { label: 'Rest and recover', where: 'estates', cost: 0, via: null, delay: 0,
+    health: 15,
+    note: 'Sleep, eat, ride out in the mornings.' },
+  children: { label: 'See to the children', where: 'estates', cost: 40, via: null, delay: 0,
+    upbringing: 12, care: 2,
+    note: 'Their health, their letters, their manners. A well-raised child marries better.' },
+  letter: { label: 'Write a letter', where: 'any', target: 'correspondent', cost: 10, via: 'messenger', delay: 1,
+    trust: 6, use: 2, info: 6,
+    note: 'Letters take time to arrive, and the answer longer. To your husband, a letter carries your counsel.' },
+  chapel: { label: 'Endow a chapel', where: 'any', cost: 500, via: 'confessor', delay: 2,
+    rep: 3, repLater: 7, confessorTrust: 10,
+    note: 'Masses for the dead of your house. Piety is the one reputation nobody can take from a woman.' },
+  lawsuit: { label: 'Press your case in the Parlement', where: 'any', cost: 150, via: 'lawyer', delay: 0,
+    stepsToJudgment: 3,
+    note: 'Lawsuits are slow and expensive, and they can be won.' },
+  servant: { label: 'Replace a servant', where: 'any', target: 'servant', cost: 60, via: null, delay: 0,
+    note: 'Dismiss your steward or your chamberwoman and take on someone new. You will not know the new one\'s worth for a while.' },
+  betroth: { label: 'Negotiate a child\'s marriage', where: 'any', target: 'child', cost: 50, via: 'mother', delay: 0,
+    note: 'A betrothal contract with another house. The wedding waits until the child is grown; the alliance starts now.' },
+  ransom: { label: 'Pay toward the ransom', where: 'any', target: 'amount', cost: 0, via: null, delay: 0,
+    amounts: [500, 1000, 2000],
+    note: 'Every instalment brings him nearer home. Every livre paid is one the house does not have.' },
+};
+
+/** Order the plan screen lists them in. */
+export const ACTION_ORDER = ['attend', 'petition', 'courtly', 'gossip', 'gift', 'rumour', 'accounts', 'tenants', 'repair', 'rest', 'children', 'letter', 'chapel', 'lawsuit', 'betroth', 'ransom', 'servant'];
