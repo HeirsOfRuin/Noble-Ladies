@@ -11,6 +11,7 @@ import { onBoard, controlAt, queenSideAt, between, keyOf, factionLabel, turnOfKe
 import { clamp, TRAITS } from './effects.js';
 import { WANTS } from '../data/arcs.data.js';
 import { debtsIn } from './favours.js';
+import { officeTie } from './offices.js';
 
 export const D = (s) => DIFFICULTY[s.difficulty];
 export const costOf = (s, n) => Math.round(n * D(s).costMult);
@@ -77,13 +78,15 @@ export function placePreview(s, place) {
   const pensions = pensionIncome(s);
   const spend = husbandSpend(s);
   const interest = interestDue(s);
-  const net = rents + pensions - cost - spend - interest;
+  const offices = place === 'court' ? s.offices.reduce((a, o) => a + o.income, 0) : 0;
+  const net = rents + pensions + offices - cost - spend - interest;
   const lines = place === 'court'
     ? ['News and favour come to you. You are in Paris if it turns violent.']
     : ['Full rents, rest, repairs. Favour fades and news comes late.'];
   if (s.hh < CONFIG.smallHouseholdBelow) lines.push(`Your household is run down (${s.hh}): one action fewer until it is above ${CONFIG.smallHouseholdBelow}. Time on the estates mends it.`);
   if (s.widowed && !s.husband) lines.push('As a widow you govern your own affairs: one action more.');
-  return { place, label: place === 'court' ? 'At court' : 'On the estates', rents, pensions, cost, spend, interest, net, slots: slotsFor(s, place), lines };
+  if (s.offices.length && place === 'estates') lines.push(`Your office${s.offices.length > 1 ? 's go' : ' goes'} unpaid while you are away; ${CONFIG.officeAbsenceLimit} half-years away and ${s.offices.length > 1 ? 'they are' : 'it is'} given to someone else.`);
+  return { place, label: place === 'court' ? 'At court' : 'On the estates', rents, pensions, offices, cost, spend, interest, net, slots: slotsFor(s, place), lines };
 }
 
 // ---- actions --------------------------------------------------------------
@@ -177,6 +180,13 @@ export function letterOpenChance(s, to) {
   return clamp(p, 0, 0.6);
 }
 
+/** Her husband's chance of an office from whoever holds the council. */
+export function officeChance(s) {
+  const c = controlAt(s.turn);
+  const fav = c === 'contested' ? Math.max(s.fav.arm, s.fav.bur) : s.fav[c];
+  return clamp(0.1 + fav / 180 + s.rep / 400 + (s.husband?.competence || 0) * 0.04 + (s.husband?.lean === c ? 0.1 : 0), 0.05, 0.85);
+}
+
 export const COUNSEL = { none: 'none given', stay: 'stay out of the armies', arm: 'hold to Orléans', bur: 'hold to Burgundy' };
 
 export function heedWord(s) {
@@ -196,6 +206,9 @@ export function actionPreview(s, id, place = s.place) {
   else if (id === 'children' && !s.children.some((c) => c.alive)) why = 'You have no children yet.';
   else if (id === 'lawsuit' && !s.cause && !brecourtOpen(s)) why = 'You have no case before the Parlement.';
   else if (id === 'betroth' && !marriageable(s).length) why = `No child is old enough for a contract (${CONFIG.childOfAge}).`;
+  else if (id === 'office' && (!s.husband || s.husband.status !== 'present')) why = 'Your husband must be at home to hold an office.';
+  else if (id === 'office' && s.offices.some((o) => o.id === 'husband')) why = 'Your husband already holds an office.';
+  else if (id === 'office' && s.queue.some((q) => q.kind === 'office')) why = 'You are already waiting for an answer.';
   else if (id === 'callin' && !debtsIn(s).length) why = 'Nobody owes you anything yet.';
   else if (id === 'ransom' && s.husband?.status !== 'captured') why = 'Nobody of yours is held for ransom.';
   else if (id === 'petition' && !patrons(s).length) why = 'No patron is at court.';
@@ -206,6 +219,7 @@ export function actionPreview(s, id, place = s.place) {
   const viaId = a.via === 'maid' || a.via === 'steward' || a.via === 'lawyer' || a.via === 'confessor' || a.via === 'mother' ? a.via : null;
   const via = viaId ? { id: viaId, name: CAST[viaId].short, word: relWord(s.npcs[viaId]) } : null;
   let chance = null;
+  if (id === 'office') chance = `${pct(officeChance(s))} chance · ${ACTIONS.office.income} livres a half-year at court`;
   if (id === 'lawsuit' && s.cause) chance = `${s.cause.progress} of ${a.stepsToJudgment} hearings; ${pct(lawsuitChance(s))} to win at judgment`;
   return { id, label: a.label, note: a.note, cost, ok: !why, why, targets, via, chance, delay: a.delay };
 }
@@ -214,10 +228,11 @@ export function actionPreview(s, id, place = s.place) {
 
 /** How tied she is to a side, as the swing will read it (0 to about 1.3). */
 export function tie(s, f) {
-  if (f === 'queen') return s.fav.queen / 100;
+  if (f === 'queen') return s.fav.queen / 100 + officeTie(s, 'queen');
   let t = s.fav[f] / 100;
   if (s.husband && ['present', 'away'].includes(s.husband.status) && s.husband.lean === f) t += 0.3;
   if (queenSideAt(s.turn) === f) t += s.fav.queen / 250;
+  t += officeTie(s, f);                                 // she holds their office
   if (s.colours === f) t += 0.25;                       // her household wears their badge
   t += s.flags.exposedTo?.[f] || 0;                     // letters of hers that were opened
   return t;

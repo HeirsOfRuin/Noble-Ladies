@@ -26,6 +26,7 @@ import { resolveAction, resolveDue } from './actions.js';
 import { familyTurn, birthRisk, childRisk, WAR } from './family.js';
 import { historyTurn, actTurn } from './history.js';
 import { arcsTurn } from './arcs.js';
+import { officesTurn } from './offices.js';
 import { debtsIn, debtsOut } from './favours.js';
 import { WANTS } from '../data/arcs.data.js';
 import { ambientNews, addNews, liveWarnings } from './news.js';
@@ -88,6 +89,7 @@ function income(s, rng, place, ctx, lines) {
   }
   if (s.guard > 0) s.guard -= 1;
   for (const p of s.pensions) if (pensionPays(s, p)) coin(s, p.amount, `pension from ${CAST[p.from].short}`);
+  lines.push(...officesTurn(s, place, coin));
   const pv = placePreview(s, place);
   coin(s, -pv.cost, place === 'court' ? 'the cost of court' : 'the household on the estates');
   if (pv.spend) coin(s, -pv.spend, 'your husband\'s spending');
@@ -312,6 +314,7 @@ export function houseView(s) {
     regard: h ? regardWord(h.regard ?? 40) : null,
     brecourt: brecourtLine(s),
     colours: s.colours, coloursOpen: coloursOpen(s), coloursOptions: Object.fromEntries(Object.entries(COLOURS).map(([k, f]) => [k, f(s)])),
+    offices: s.offices.map((o) => ({ ...o })),
     owedToYou: debtsIn(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w, hold: d.hold })),
     youOwe: debtsOut(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w })),
   };

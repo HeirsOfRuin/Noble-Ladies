@@ -49,8 +49,10 @@ export const ACTIONS = {
   lawsuit: { label: 'Press your case in the Parlement', where: 'any', target: 'case', cost: 150, via: 'lawyer', delay: 0,
     stepsToJudgment: 3,
     note: 'Lawsuits are slow and expensive, and they can be won.' },
-  distance: { label: 'Put distance between you and a party', where: 'any', target: 'party', cost: 0, via: null, delay: 0, favour: -22,
+  distance: { label: 'Put distance between you and a party', where: 'any', target: 'party', cost: 0, via: null, delay: 0, favour: -12,
     note: 'Burn their letters, take off their badge, stop hearing mass in their chapels. If Paris turns against them, it may save you. If it does not, you have thrown away years of favour.' },
+  office: { label: 'Seek an office for your husband', where: 'court', cost: 120, via: null, delay: 1, income: 220,
+    note: 'A place in the king\'s household, from whoever holds the council: wages every half-year you are in Paris to collect them. Offices go to the people who are there, and are taken back the same way.' },
   callin: { label: 'Call in a favour', where: 'any', target: 'debt', cost: 0, via: null, delay: 0,
     note: 'Ask in person for what someone owes you: money, a word for you, or what they know. Each debt is called once.' },
   intercept: { label: 'Have letters opened', where: 'court', target: 'person', cost: 40, via: 'maid', delay: 1,
@@ -65,4 +67,4 @@ export const ACTIONS = {
 };
 
 /** Order the plan screen lists them in. */
-export const ACTION_ORDER = ['attend', 'petition', 'courtly', 'gossip', 'gift', 'rumour', 'accounts', 'tenants', 'repair', 'rest', 'children', 'letter', 'chapel', 'lawsuit', 'intercept', 'distance', 'callin', 'betroth', 'ransom', 'servant'];
+export const ACTION_ORDER = ['attend', 'petition', 'courtly', 'gossip', 'gift', 'rumour', 'accounts', 'tenants', 'repair', 'rest', 'children', 'letter', 'chapel', 'lawsuit', 'intercept', 'distance', 'office', 'callin', 'betroth', 'ransom', 'servant'];

@@ -58,7 +58,12 @@ export const CONFIG = {
   hedgeAt: 45,                 // favour with both sides at or above this: the hedge can be exposed
   warningLead: 2,              // turns before a swing that true warnings can arrive
   swingSeverity: 1.6,          // scales every swing's severity (history.data.js); the kill gate's lever for what news is worth
-  awayFromSwing: 0.55,         // on the estates when Paris changes hands, fines and confiscations shrink to this
+  awayFromSwing: 0.55,
+
+  // Offices (FRAME-ROUND3, K2 fix): wages paid only in the half-years she is at
+  // court; this many half-years away and the place goes to someone who was there.
+  officeAbsenceLimit: 2,
+  officeTie: 0.2,              // holding a party's office counts toward her tie to that party         // on the estates when Paris changes hands, fines and confiscations shrink to this
 };
 
 export const DIFFICULTY = {

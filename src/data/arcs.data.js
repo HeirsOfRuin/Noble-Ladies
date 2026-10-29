@@ -337,7 +337,7 @@ export const BEATS = [
       { if: ['want', 'court'], text: `It is the place you want.` },
     ],
     choices: [
-      { label: 'Press your own claim, through Ysabel', kind: 'chance', p: { base: 0.05, fav: 'queen', trust: 'friend' }, win: [['flag', 'queensLady', true], ['fav', 'queen', 8], ['trust', 'rival', -15]], lose: [['flag', 'jacquelinePlace', true], ['trust', 'rival', -8]], note: 'The queen\'s favour and your friend\'s word against a Burgundian marriage.' },
+      { label: 'Press your own claim, through Ysabel', kind: 'chance', p: { base: 0.05, fav: 'queen', trust: 'friend' }, win: [['flag', 'queensLady', true], ['office', 'queen'], ['fav', 'queen', 8], ['trust', 'rival', -15]], lose: [['flag', 'jacquelinePlace', true], ['trust', 'rival', -8]], note: 'The queen\'s favour and your friend\'s word against a Burgundian marriage.' },
       { label: 'Let her have it', note: 'There will be other places. Jacqueline will be in the queen\'s ear.', ops: [['flag', 'jacquelinePlace', true], ['rep', 1]] },
       { label: 'Remind the queen\'s mistress whose man her husband is', need: ['trait', 'bold', '>=', 1], why: 'That takes some nerve (bold 1).', kind: 'chance', p: 0.55, win: [['trust', 'rival', -20], ['flag', 'placeBlocked', true]], lose: [['rep', -4], ['flag', 'jacquelinePlace', true], ['trust', 'rival', -20]], note: 'Neither of you gets it. She will know who.' },
     ],
@@ -490,7 +490,7 @@ export const BEATS = [
     id: 'queens_lady', arc: 'her', from: '1409a', until: '1416b', title: 'The queen\'s offer', if: [['not', ['flag', 'queensLady']], ['fav', 'queen', '>=', 60], ['rep', '>=', 50]],
     text: `The queen's mistress of the household asks to see you after vespers, in a window bay where nobody can stand close enough to hear. Would you accept a place among the queen's ladies? Wages of three hundred livres a year, a room in the Hôtel Barbette, and the queen's company whenever the queen wants it, which is often, and at night, when she cannot sleep.`,
     choices: [
-      { label: 'Accept', note: 'The heart of the court. When the queen falls, her ladies fall with her.', ops: [['flag', 'queensLady', true], ['fav', 'queen', 10], ['purse', 150, 'the queen\'s wages'], ['regard', -2]] },
+      { label: 'Accept', note: 'Wages of 150 livres every half-year you are at court to earn them. Two half-years away and the place goes to someone else. When the queen falls, her ladies fall with her.', ops: [['flag', 'queensLady', true], ['office', 'queen'], ['fav', 'queen', 10], ['regard', -2]] },
       { label: 'Decline, gracefully', note: 'Your household needs you more than the queen does.', ops: [['fav', 'queen', -4], ['rep', 1], ['regard', 3]] },
     ],
   },

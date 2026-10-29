@@ -9,10 +9,11 @@ import { CONFIG } from '../data/config.data.js';
 import { controlAt } from './clock.js';
 import { coin } from './ledger.js';
 import { clamp, gainRep, applyOps } from './effects.js';
-import { letterOpenChance, letterSide, costOf, giftGain, lawsuitChance, petitionChance, childAge, nameOf, brecourtChance, BRECOURT_JUDGMENT } from './derive.js';
+import { officeChance, letterOpenChance, letterSide, costOf, giftGain, lawsuitChance, petitionChance, childAge, nameOf, brecourtChance, BRECOURT_JUDGMENT } from './derive.js';
 import { makeNpc } from './state.js';
 import { addNews } from './news.js';
 import { addDebt, callInCard } from './favours.js';
+import { grantOffice } from './offices.js';
 import { matchOffers } from './family.js';
 
 const REPLACEMENTS = {
@@ -159,6 +160,11 @@ export function resolveAction(s, act, rng, lines, ctx) {
       lines.push(`You burned their letters in the kitchen fire and stopped going to their masses. ${f === 'queen' ? 'The queen\'s ladies' : 'Their people'} noticed within the week. Favour ${a.favour}.`);
       break;
     }
+    case 'office': {
+      s.queue.push({ due: s.turn + 1, kind: 'office', p: officeChance(s) });
+      lines.push('You put your husband\'s name before the council\'s people, with a gift to the right secretary. An answer next half-year.');
+      break;
+    }
     case 'callin': {
       const d = s.debts.find((x) => x.id === Number(t));
       s.cards.push(callInCard(s, d));
@@ -253,6 +259,10 @@ export function resolveDue(s, q, rng, lines) {
       if (n.faction === 'arm' || n.faction === 'bur') addNews(s, rng, { quality: 0.9, src: 'maid', horizon: 3 });
       lines.push(`You have read ${CAST[q.who].short}'s letters, and copied what mattered. You now hold something over ${CAST[q.who].short}.`);
     } else lines.push(`${nameOf(s, 'maid')}'s cousin brought nothing back but a story about a dog.`);
+  } else if (q.kind === 'office') {
+    if (!s.husband || s.husband.status !== 'present') { lines.push('The office went to someone else: your husband was not there to take it.'); return; }
+    if (rng.chance(q.p)) { grantOffice(s, 'husband'); lines.push(`Your husband has ${s.offices.at(-1).label}: ${s.offices.at(-1).income} livres a half-year while you are at court to collect it.`); }
+    else lines.push('The office went to someone with better friends on the council.');
   } else if (q.kind === 'loan') {
     coin(s, -q.amount, 'repaying the Lombards');
     lines.push(`The Lombard banker's man comes for ${q.amount} livres, on the day, with a notary.`);

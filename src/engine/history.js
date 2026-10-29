@@ -19,6 +19,8 @@ function applySwing(s, key, place) {
   const w = SWINGS[key];
   const o = swingOutcome(s, key, place);
   const lines = [];
+  const lostOffices = s.offices.filter((o) => w.losers.includes(o.faction));
+  if (lostOffices.length) { s.offices = s.offices.filter((o) => !w.losers.includes(o.faction)); lines.push(`${lostOffices.map((o) => o.label).join(' and ')}: taken back by the new council, and counted against you.`.replace(/^./, (c) => c.toUpperCase())); }
   const lost = s.pensions.filter((p) => w.losers.includes(p.faction));
   if (lost.length) {
     s.pensions = s.pensions.filter((p) => !w.losers.includes(p.faction));

@@ -142,7 +142,8 @@ function plan(s, v, policy, rng, deafened = false) {
   if (policy === 'random') place = rng.pick(['court', 'estates']);
   else if (policy === 'homebody') place = 'estates';
   else if (policy === 'seasonal') place = s.turn % 2 === 0 ? 'court' : 'estates';
-  else if (ADAPTIVE.has(policy)) place = claim || s.money < 700 || s.health < 40 || s.hh < 35 ? 'estates' : 'court';
+  // An office is kept by being there: with one, short purses do not send her home; a believed warning still does.
+  else if (ADAPTIVE.has(policy)) place = claim || s.health < 40 || s.hh < 35 || (s.money < 700 && !s.offices.length) ? 'estates' : 'court';
   else place = 'court';
   const P = byPlace[place];
   const ok = Object.fromEntries(P.actions.filter((a) => a.ok).map((a) => [a.id, a]));
@@ -159,6 +160,7 @@ function plan(s, v, policy, rng, deafened = false) {
     if (ok.callin && s.money < 500) add('callin', pickTarget(ok.callin));
     if (ok.lawsuit && s.money >= 600) add('lawsuit', pickTarget(ok.lawsuit, [(t) => t.id === 'cause', (t) => t.id === 'brecourt']));
     if (ok.betroth) add('betroth', pickTarget(ok.betroth));
+    if (place === 'court' && policy !== 'homebody') add('office');
     if (policy === 'courtier') { add('attend'); add('petition', pickTarget(ok.petition, [patron('queen')])); add('courtly'); add('gossip', pickTarget(ok.gossip)); add('gift', 'queen'); }
     else if (SIDE[policy] && !ADAPTIVE.has(policy)) {
       const f = SIDE[policy];

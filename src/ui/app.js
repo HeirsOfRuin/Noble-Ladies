@@ -139,7 +139,7 @@ function planView(v) {
       <button data-place="${p.place}" class="place ${draft.place === p.place ? 'on' : ''}">
         <strong>${esc(p.label)}</strong>
         <span class="${p.net < 0 ? 'neg' : 'pos'}">${signed(p.net)} l. before actions</span>
-        <small>Rents ${num(p.rents)}${p.pensions ? ` · pensions ${num(p.pensions)}` : ''} · costs ${num(p.cost)}${p.spend ? ` · his spending ${num(p.spend)}` : ''}${p.interest ? ` · interest ${num(p.interest)}` : ''}</small>
+        <small>Rents ${num(p.rents)}${p.pensions ? ` · pensions ${num(p.pensions)}` : ''}${p.offices ? ` · wages ${num(p.offices)}` : ''} · costs ${num(p.cost)}${p.spend ? ` · his spending ${num(p.spend)}` : ''}${p.interest ? ` · interest ${num(p.interest)}` : ''}</small>
         <small>${p.slots} actions. ${esc(p.lines.join(' '))}</small>
       </button>`).join('')}</div>
     <h2>What will you do? <small>${draft.actions.length} of ${P.slots}</small></h2>
@@ -222,6 +222,8 @@ function houseTab() {
     <h2>Children</h2>
     ${h.children.length ? `<ul class="kids">${h.children.map((c) => `<li>${esc(c.name)}, ${c.sex}${c.alive ? `, ${c.age || 'under one'}${c.age ? ' years' : ''}${c.betrothed ? ` · promised to ${esc(c.betrothed.name)}` : ''}${c.risk ? ` · sickness risk ${pct(c.risk)} this half-year` : ''}` : ' (died)'}</li>`).join('')}</ul>` : '<p class="empty">No children yet. They come while your husband is at home with you.</p>'}
     ${h.pregnant ? `<p class="hint">Risk in childbed: ${pct(h.birthRisk.estates)} on the estates, ${pct(h.birthRisk.court)} at court. Rest and good health lower it.</p>` : ''}
+    <h2>Offices</h2>
+    ${h.offices.length ? `<ul>${h.offices.map((o) => `<li>${esc(o.label[0].toUpperCase() + o.label.slice(1))}: ${num(o.income)} l. a half-year at court${o.absent ? ` · <b>unpaid, away ${o.absent} half-year${o.absent > 1 ? 's' : ''}</b>` : ''}</li>`).join('')}</ul><p class="hint">Paid only while you are at court. Two half-years away and the place goes to someone who was there. If the party that granted it falls, it is taken back and counted against you.</p>` : '<p class="empty">No office. Seek one for your husband at court, or win a place among the queen\'s ladies.</p>'}
     <h2>Income</h2>
     ${h.pensions.length ? `<ul>${h.pensions.map((p) => `<li>${esc(p.from)}: ${num(p.amount)} l. a half-year${p.paying ? '' : ' (not paying while the other party holds Paris)'}</li>`).join('')}</ul>` : '<p class="empty">No pensions. Petition a patron at court for one.</p>'}
     ${h.cause ? `<p class="warn">Before the Parlement: ${h.cause.holdings} holding${h.cause.holdings > 1 ? 's' : ''} (${esc(h.cause.kind)}), ${h.cause.progress} of 3 hearings.</p>` : ''}

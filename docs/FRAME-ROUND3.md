@@ -147,3 +147,36 @@ the queen, then measurement. A commit after each.
   choice for the author: make court presence at the critical moments worth more
   (offices, the queen's household, a child's placement that needs you in Paris),
   so that leaving on a warning costs something real and the warning decides it.
+
+---
+
+## K2 fix: offices kept by being there (2026-10-29)
+The author approved the proposed fix ("2. yes").
+
+**Built.** Offices pay wages only in half-years she is at court, and are given to
+someone else after two half-years away (`src/engine/offices.js`). Two kinds: a
+place among the queen's ladies (150 a half-year), and a new action, *Seek an office
+for your husband* (220 a half-year, from whoever holds the council). An office
+belongs to the party that granted it: taken back when that party falls, and it
+adds 0.2 to her tie to them. "Put distance between you and a party" now costs 12
+favour, not 22. Save version 4 with a migration (a v3 lady of the queen keeps her place).
+
+**Measured.** The mechanism works (300 to 400 runs per policy, instrumented by swing):
+
+| 1413 Cabochien swing | At court | Fine | Holdings confiscated | Harm |
+|---|---|---|---|---|
+| christine (reads warnings) | 28% | 369 | 0.39 | 7 |
+| deaf (ignores them) | 78% | 567 | 0.85 | 22 |
+
+Across all swings the listener takes about a third less in fines and half the
+confiscations. But leaving Paris on a warning costs position: listeners hold the
+queen's place less often (115 vs 144 games in 300), and children and ambition
+score 20.5 against 22.3, while lands and wealth score 32.1 against 31.4. Net score is about even
+(christine 68, deaf 71; loyal_bur 80 vs 81). **News is now a trade-off, not
+decoration:** it protects the house at the cost of position. The bot acts on any
+credible-looking warning; a player who reads sources well should do better. The
+author's playtest decides whether that feels right.
+
+Side effect, disclosed: court play is more viable. Courtier survival 35% to 53%,
+score 51 to 59; burgundy 68.5 to 72. Partisans still lead (loyal_bur 80, loyal_arm
+76), homebody 72. Playtime estimate unchanged (96-99 minutes for careful play).

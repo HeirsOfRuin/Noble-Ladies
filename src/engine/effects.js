@@ -27,6 +27,7 @@ import { CAST } from '../data/cast.data.js';
 import { FACTIONS } from '../data/config.data.js';
 import { SWINGS } from '../data/history.data.js';
 import { addDebt, clearDebt, nextSwing } from './favours.js';
+import { grantOffice } from './offices.js';
 
 export const clamp = (x, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, x));
 
@@ -85,6 +86,7 @@ export function applyOps(s, ops = []) {
     else if (k === 'warnNext') { const key = nextSwing(s); if (key) applyOps(s, [['warn', key, a]]); }
     else if (k === 'guard') s.guard = Math.max(s.guard, a);
     else if (k === 'loan') s.queue.push({ due: s.turn + b, kind: 'loan', amount: a });
+    else if (k === 'office') grantOffice(s, a);
     else if (k === 'count') s.flags[a] = (s.flags[a] || 0) + b;
     else if (k === 'spending') { if (s.husband) s.husband.spending = Math.max(1, Math.min(5, s.husband.spending + a)); }
     else if (k === 'ransomCut') { if (s.husband?.ransom) s.husband.ransom.total = Math.round(s.husband.ransom.total * (1 - a)); }
@@ -115,6 +117,7 @@ export function describeOp(op) {
   if (k === 'warnNext') return 'News, if there is any';
   if (k === 'guard') return `Your villages left alone for ${a > 2 ? 'two years' : 'a year'}`;
   if (k === 'loan') return `${a} livres to repay in ${b / 2} years`;
+  if (k === 'office') return 'An office, paid while you are at court';
   if (k === 'betrothEldest') return 'Your eldest betrothed';
   if (k === 'spending') return a < 0 ? 'He spends less' : 'He spends more';
   if (k === 'ransomCut') return `Ransom −${Math.round(a * 100)}%`;
