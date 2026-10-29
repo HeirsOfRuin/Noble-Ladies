@@ -112,3 +112,38 @@ own timed playthrough.
 ## Order of work
 Style guide and lint, then texture, favours, letters, children, Christine and
 the queen, then measurement. A commit after each.
+
+---
+
+## As built (2026-10-29)
+| System | What exists |
+|---|---|
+| Style | `docs/STYLE.md` and `tools/lint-style.mjs` (37 banned words, 26 files), first step of `npm run check`; proven by a planted line |
+| Favours owed | Debts in the save, both ways; 15 story moments create them; call in (money, a word, what they know); others call theirs in (`debt_called`); leverage from opened letters |
+| Texture | Protection money (captains of Creil, Clermont, Compiègne, Senlis, Pontoise); household colours from 1405 (knotted stick, plane; white sash, cross of Saint Andrew); wet nurse and churching; New Year's gifts; a Lombard loan against a ransom |
+| Letters | By your own man (next half-year; 35% opened if to the other party's people while they hold the roads) or by Brother Robert (slower, safe); opened letters count at the next swing; correspondents bring better news than court talk; Perrette's cousin opens others' letters; "Put distance between you and a party" |
+| Children | Temperament at birth; upbringing at seven (page with Orléans, Burgundy or Berry; the queen's household; Poissy; the Church; home); a scene of their own at 12-16 (eight kinds); a child in a fallen household is a pledge |
+| Christine | The Quarrel of the Rose (1402), the *Treasure* (1405), her lawsuits, Poissy (1418): 4 beats |
+| The queen | The king's night, Melun, the Dauphin's death, Tours, Troyes: 5 beats |
+| Chivalry | Montendre (1402), brotherhood in arms with Raoul de Fléchin (1409), the contract tested at the gate (1418): 3 beats |
+
+37 story beats in all (was 25). Save version 3, with migrations from v1 and v2.
+
+### Measured (200 runs per policy)
+- **Playtime:** a full careful run is estimated at 96-99 minutes (target 90-120).
+  Estimate: scenes and story cards ~45 s, other cards ~20 s, a half-year plan ~50 s.
+  To be checked against the author's own timed run.
+- **Every beat fires** across 11 policies x 30 seeds; no raw tokens; no dead-end
+  card; every flag set is read; style lint clean.
+- **Balance:** loyal_bur 78, loyal_arm 75, homebody 71, christine 67, seasonal
+  66, burgundy 68.5, courtier 51. The sensible partisans stay ahead of staying home.
+- **K2 (what news is worth): still open.** Information is worth about 0 to 2 points
+  (loyal_bur 74.5 vs 76 deaf; christine 66-67 vs deaf 67-71, inside the noise).
+  What was tried: letters as the main channel, court talk thinned, the new
+  "distance" action, a bot that reads only reliable or agreeing warnings, harsher
+  swings (severity 2.4, up to three holdings; reverted because scores fell and
+  staying home pulled ahead). The cause: careful players are already on their
+  estates at most swings, and being away halves the cost. The fix is a design
+  choice for the author: make court presence at the critical moments worth more
+  (offices, the queen's household, a child's placement that needs you in Paris),
+  so that leaving on a warning costs something real and the warning decides it.

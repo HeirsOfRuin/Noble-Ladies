@@ -5,6 +5,7 @@
 
 import { CONFIG } from '../data/config.data.js';
 import { CHILD_NAMES, MATCH_HOUSES } from '../data/cast.data.js';
+import { TEMPERS, childrenTurn } from './children.js';
 import { PLAGUE } from '../data/history.data.js';
 import { coin } from './ledger.js';
 import { clamp, gainRep } from './effects.js';
@@ -20,7 +21,7 @@ export function birthRisk(s, place = s.place) {
 export function childRisk(s, c, care = false) {
   if (!c.alive || childAge(s, c) >= 5) return 0;
   const plague = PLAGUE[keyOf(s.turn)] || 0;
-  return CONFIG.infantDeathPerTurn * (1 - c.care / 200) * (1 + plague) * (s.hh < 30 ? 1.5 : 1) * (care ? 0.5 : 1);
+  return CONFIG.infantDeathPerTurn * (1 - c.care / 200) * (1 + plague) * (s.hh < 30 ? 1.5 : 1) * (care ? 0.5 : 1) * (c.temper === 'sickly' ? 1.6 : 1) * (c.nurse ? 0.85 : 1);
 }
 
 export const WAR = new Set(['1410b', '1411a', '1411b', '1412a', '1414a', '1417b', '1418a', '1418b', '1419a', '1419b', '1421a']);
@@ -45,7 +46,7 @@ export function familyTurn(s, rng, place, ctx) {
       const sex = rng.chance(0.5) ? 'son' : 'daughter';
       const used = s.children.map((c) => c.name);
       const name = rng.pick(CHILD_NAMES[sex].filter((n) => !used.includes(n))) || CHILD_NAMES[sex][0];
-      s.children.push({ id: s.nextId++, name, sex, born: s.turn, alive: true, care: 30, betrothed: null });
+      s.children.push({ id: s.nextId++, name, sex, born: s.turn, alive: true, care: 30, betrothed: null, temper: rng.pick(Object.keys(TEMPERS)), placement: null });
       const id = s.children.at(-1).id;
       s.queue.push({ due: s.turn + 1, kind: 'churching' });
       s.cards.push({ id: 'birth', title: `A ${sex}`, text: `You are delivered of a ${sex}, after a day and a night, with the midwife from the town and your women holding your hands. ${name} is baptised within the week. Your health is spent for a while.\n\nThe question every lady's household asks next: a wet nurse, or your own milk.`,
@@ -82,6 +83,7 @@ export function familyTurn(s, rng, place, ctx) {
   } else if (h && h.status === 'captured' && rng.chance(0.02)) {
     widow(s, rng, `${h.short} has died in captivity in England.`);
   }
+  childrenTurn(s, rng);
   if (h && h.status === 'present' && h.temper >= 4 && rng.chance(0.08)) {
     gainRep(s, -3);
     lines.push(`${h.short} struck a man at dinner. People talk. Reputation -3.`);
@@ -149,7 +151,10 @@ export function widow(s, rng, why) {
 export const matchNeed = (m) => 45 + m.rank * 15;
 export function matchStanding(s, c, m) {
   const friends = Math.max(m.faction === 'none' ? 20 : s.fav[m.faction], s.fav.queen * 0.8);
-  return s.rep + friends / 1.5 + c.care / 4;
+  // Raised in a great household, a child is known; raised in that party's household, a child is theirs.
+  const raised = ['page', 'queen', 'poissy'].includes(c.placement) ? 12 : 0;
+  const party = c.placement === 'page' && c.house === m.faction ? 8 : 0;
+  return s.rep + friends / 1.5 + c.care / 4 + raised + party;
 }
 
 /** Offers for a child's hand. Better houses offer only to a house with a name and friends. */

@@ -37,6 +37,15 @@ export function epitaph(s) {
   else if (s.flags.ysabelTurnedAway || s.flags.ysabelAbandoned) out.push('Her friend Ysabel de Fontenoy, whom she did not help, did not speak of her afterwards.');
   if (s.flags.mercyJacqueline) out.push('She took in her enemy Jacqueline d\'Aubercourt and her children when they had nowhere to go, and was repaid.');
   else if (s.flags.revengeJacqueline) out.push('She shut her door on her enemy Jacqueline d\'Aubercourt, and Jacqueline did not forget it.');
+  for (const c of s.children.filter((x) => x.alive)) {
+    const p = { page: `${c.name} was raised a page in a great household.`, queen: `${c.name} was raised among the girls of the queen\'s household.`, poissy: `${c.name} was schooled by the sisters of Poissy.`, church: `${c.name} went to the Church.`, nun: `${c.name} took the veil at Poissy.` }[c.placement];
+    if (p) out.push(p);
+  }
+  if (s.flags.followedQueen) out.push('She went with Queen Isabeau into exile at Tours, when few would.');
+  else if (s.flags.leftQueen) out.push('When the queen was sent to Tours, she stayed at home.');
+  if (s.flags.queenAnswered) out.push('At Troyes she asked the queen why, and the queen told her; she never repeated it.');
+  if (s.flags.raoulSaved) out.push('She kept her husband\'s oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep.');
+  else if (s.flags.brokeContract) out.push('She refused her husband\'s brother-in-arms at the gate, and was spoken of for it.');
   const r = s.flags.remarried ? null : (s.husband?.regard ?? s.flags.lastRegard);
   if (r !== undefined && r !== null) out.push(r >= 65 ? 'Her lord trusted her judgment, and said so.' : r <= 30 ? 'She and her lord were courteous strangers.' : '');
   const lost = s.landsStart - s.lands;

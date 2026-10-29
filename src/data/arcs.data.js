@@ -20,6 +20,9 @@ export const ARCS = {
   husband: { title: 'Your husband' },
   ysabel: { title: 'Ysabel' },
   jacqueline: { title: 'Jacqueline' },
+  christine: { title: 'Christine' },
+  queen: { title: 'The queen' },
+  arms: { title: 'Your husband\'s honour' },
   her: { title: 'Your own life' },
 };
 
@@ -351,6 +354,134 @@ export const BEATS = [
       { label: 'Take them in', note: 'Three children and a woman who has hated you for thirteen years, under your roof.', ops: [['purse', -150, 'Jacqueline and her children'], ['trust', 'rival', 35], ['flag', 'mercyJacqueline', true], ['owe', 'rival', 3, 'taking her children in'], ['trait', 'warm', 2], ['swingMod', '1418a', 0.35, 'Jacqueline d\'Aubercourt had your name struck from the Burgundian lists.']] },
       { label: 'Give her money for the road to Burgundy', note: 'Decent, and at a distance.', ops: [['purse', -150, 'money for Jacqueline'], ['trust', 'rival', 15], ['flag', 'mercyJacqueline', true], ['owe', 'rival', 1, 'money for the road to Burgundy'], ['swingMod', '1418a', 0.6, 'Jacqueline d\'Aubercourt spoke for you to the Burgundian council.']] },
       { label: 'Close the door', note: 'She would have.', ops: [['trust', 'rival', -35], ['flag', 'revengeJacqueline', true], ['trait', 'warm', -2], ['swingMod', '1418a', 1.5, 'Jacqueline d\'Aubercourt gave the Burgundian council your name.']] },
+    ],
+  },
+
+  // ---- CHRISTINE DE PIZAN ---------------------------------------------------
+  {
+    id: 'rose_quarrel', arc: 'christine', from: '1401b', until: '1402a', title: 'The Romance of the Rose', if: [['alive', 'christine']],
+    text: [
+      { text: `Christine de Pizan is at court with a bundle of letters tied in red. For a year she has been arguing in writing with Jean de Montreuil, the provost of Lille, and the Col brothers, one of them a secretary to the King, about the Romance of the Rose: Jean de Meun's great poem, which every gentleman at the Court of Love can quote, and which says that every woman is for sale and every wife a trap.` },
+      { text: `"They write ballades swearing to defend ladies' honour," she says, "and then they defend that book. I want the queen to read both sides. I cannot walk into her chamber. You can."` },
+    ],
+    choices: [
+      { label: 'Carry the letters into the queen\'s chamber', need: ['fav', 'queen', '>=', 15], why: 'You are not yet known in the queen\'s chamber (queen\'s favour 15).', note: 'The queen likes Christine. The King\'s secretaries will know who carried it.', ops: [['trust', 'christine', 15], ['use', 'christine', 10], ['fav', 'queen', 3], ['flag', 'roseDossier', true], ['trait', 'bold', 1], ['owe', 'christine', 1, 'carrying her letters to the queen']] },
+      { label: 'Say at supper, where the Court of Love men can hear, that she is right', note: 'You will be laughed at, wittily, in verse.', ops: [['trust', 'christine', 10], ['rep', -2], ['flag', 'roseSpoke', true], ['trait', 'bold', 1]] },
+      { label: 'Keep out of a quarrel among clerks', note: 'It is only a book.', ops: [['trust', 'christine', -5], ['trait', 'bold', -1]] },
+    ],
+  },
+  {
+    id: 'treasure', arc: 'christine', from: '1405a', until: '1405b', title: 'A book for ladies', if: [['alive', 'christine'], ['trust', 'christine', '>=', 15]],
+    text: `Christine is writing a book of instruction for ladies, from the queen down to the wives of artisans, and she wants to get it right. She sits in your window with a wax tablet. "Not what the sermons say. How it is. The accounts, the husband, the steward, the queen's people, the debts. What a lady actually does when the men are away and the rents are short."`,
+    choices: [
+      { label: 'Tell her the truth, all of it', note: 'The steward, the plate, the clause in your contract, what you do on the nights the queen cannot sleep. She will change the names.', ops: [['trust', 'christine', 15], ['flag', 'inTreasure', true], ['info', 4], ['trait', 'warm', 1]] },
+      { label: 'Tell her what a book should say', note: 'Prudence, piety, obedience. She will thank you politely and write it down.', ops: [['trust', 'christine', 3], ['trait', 'devout', 1]] },
+      { label: 'Ask her to leave you out of it', note: 'Books are read by the wrong people.', ops: [['trust', 'christine', -3], ['trait', 'bold', -1]] },
+    ],
+  },
+  {
+    id: 'christine_debts', arc: 'christine', from: '1409a', until: '1411b', title: 'Christine\'s lawsuits', if: [['alive', 'christine'], ['trust', 'christine', '>=', 25]],
+    text: [
+      { text: `Christine has been at law for twenty years over her late husband's debts and the money his employers never paid, and she has lost more than she has won. She does not ask for help. She mentions, in passing, that the bailiff's men came on Tuesday and that her son needs a place.` },
+      { if: ['flag', 'caseBrecourt'], text: `She asks to see your procureur's brief on Brécourt. "I have lost more lawsuits than your Master Lorfèvre has argued," she says. "I know where they leak."` },
+    ],
+    choices: [
+      { label: 'Lend her two hundred livres, and ask for her eye on your brief', note: 'She will pay it back. She always does, eventually.', ops: [['purse', -200, 'a loan to Christine'], ['trust', 'christine', 12], ['owe', 'christine', 2, 'the two hundred livres when the bailiff came'], ['count', 'brecourtHearings', 1], ['flag', 'christineBrief', true]] },
+      { label: 'Ask the Duke of Berry to take her son into his household', need: ['trust', 'berry', '>=', 30], why: 'The Duke of Berry does not know you well enough (trust 30).', note: 'Berry collects books and owes Christine for several. A word costs you a favour.', ops: [['trust', 'christine', 15], ['owe', 'christine', 2, 'a place for her son'], ['oweTo', 'berry', 1, 'a place for Christine\'s son']] },
+      { label: 'Sympathise, and change the subject', note: 'She will notice. She notices everything; it is her trade.', ops: [['trust', 'christine', -6]] },
+    ],
+  },
+  {
+    id: 'christine_poissy', arc: 'christine', from: '1418b', until: '1419b', title: 'A letter from Poissy', if: [['alive', 'christine']],
+    text: [
+      { text: `Christine has left Paris. After the June killings she went to the royal priory at Poissy, where her daughter has been a nun for twenty years. She writes in a hand that has got smaller. "I have stopped writing for princes. They do not read, and when they do they do not learn. I am writing for women now, and for God, who at least finishes the page."` },
+      { if: ['flag', 'inTreasure'], text: `"You are in my book, you know," she adds. "Chapter twenty-two. I changed your hair."` },
+    ],
+    choices: [
+      { label: 'Write back, and keep writing', note: 'A letter a season to Poissy. She hears more behind a grille than the council does in session.', ops: [['trust', 'christine', 10], ['warnNext', 'christine'], ['info', 6]] },
+      { label: 'Send money for the priory, in her name', note: 'A hundred livres to the sisters, for masses and for her keep.', ops: [['purse', -100, 'alms to the priory at Poissy'], ['rep', 2], ['trait', 'devout', 1]] },
+    ],
+  },
+
+  // ---- THE QUEEN -------------------------------------------------------------
+  {
+    id: 'kings_night', arc: 'queen', from: '1402b', until: '1404b', title: 'The king\'s night', if: [['place', 'court'], ['fav', 'queen', '>=', 20]],
+    text: `The king is ill again. Tonight in the Hôtel Saint-Pol he did not know his wife: he asked who that woman was, and had her put out of his rooms by his own servants. The queen comes into her chamber, where you are on duty, in her nightgown and a fur, and sits on the end of the bed, and says nothing for a long time. Then she asks for wine.`,
+    choices: [
+      { label: 'Sit with her until morning, and never speak of it', note: 'She will know you can keep a secret. Few at court can.', ops: [['fav', 'queen', 10], ['use', 'queen', 8], ['flag', 'queenSecret', true], ['trait', 'warm', 1]] },
+      { label: 'Send for her physician and her confessor', note: 'Proper, and the whole household will know by matins.', ops: [['fav', 'queen', 4]] },
+      { label: 'Tell Ysabel in the morning what you saw', note: 'Ysabel will tell you what she knows in return. The queen may find out where it came from.', kind: 'chance', p: 0.6, win: [['info', 8], ['trust', 'friend', 6]], lose: [['info', 8], ['fav', 'queen', -12]], ops: [['trait', 'warm', -1]] },
+    ],
+  },
+  {
+    id: 'melun_queen', arc: 'queen', from: '1405a', until: '1405a', title: 'The road to Melun', if: [['fav', 'queen', '>=', 40], ['alive', 'queen']],
+    text: `The queen is leaving Paris for Melun with the Duke of Orléans, ahead of the Burgundian army, and she asks her ladies to follow. Litters are being loaded in the courtyard of the Hôtel Barbette before dawn. In Paris they are already calling it a flight, and worse.`,
+    choices: [
+      { label: 'Go with her', note: 'Two days in a litter. The Burgundians will remember who rode with Orléans.', ops: [['fav', 'queen', 10], ['fav', 'arm', 5], ['fav', 'bur', -10], ['health', -3], ['flag', 'rodeToMelun', true]] },
+      { label: 'Stay in Paris with your household', note: 'Your children are here. The queen will understand, or she will not.', ops: [['fav', 'queen', -5]] },
+    ],
+  },
+  {
+    id: 'dauphin_dead', arc: 'queen', from: '1415b', until: '1416a', title: 'The queen\'s son', if: [['fav', 'queen', '>=', 35], ['alive', 'queen']],
+    text: `In December the Dauphin Louis, the queen's eldest living son, eighteen years old, dies of a fever, two months after Agincourt. The queen has buried more of her children than most women bear. She asks for you, not her chaplain. She wants someone to read to her who will not try to comfort her.`,
+    choices: [
+      { label: 'Read to her, and say nothing', note: 'The Psalms, then a romance about Lancelot, because she asks for it.', ops: [['fav', 'queen', 8], ['trait', 'warm', 1], ['trait', 'devout', 1]] },
+      { label: 'Send a letter, and stay with your own', note: 'Your own house has its own dead this year.', ops: [['fav', 'queen', 2]] },
+    ],
+  },
+  {
+    id: 'tours', arc: 'queen', from: '1417a', until: '1417a', title: 'Tours', if: [['alive', 'queen'], ['any', [['fav', 'queen', '>=', 50], ['flag', 'queensLady']]]],
+    text: `The Count of Armagnac has broken up the queen's household and is sending her to Tours under guard, with three ladies of his choosing and a gaoler he calls a steward. She is allowed one lady of her own. Through her almoner, she asks for you.`,
+    choices: [
+      { label: 'Go to Tours with her', note: 'Months in a castle with the queen and a gaoler. The Armagnacs will count you among her people; whoever frees her will remember.', ops: [['fav', 'queen', 15], ['fav', 'arm', -15], ['health', -5], ['flag', 'followedQueen', true], ['trait', 'bold', 1], ['owe', 'queen', 2, 'going with her to Tours']] },
+      { label: 'Plead your children, and stay', note: 'True, and she will never quite forgive it.', ops: [['fav', 'queen', -10], ['flag', 'leftQueen', true]] },
+    ],
+  },
+  {
+    id: 'troyes_queen', arc: 'queen', from: '1420a', until: '1420a', title: 'Troyes', if: [['alive', 'queen'], ['any', [['fav', 'queen', '>=', 50], ['flag', 'followedQueen']]]],
+    text: [
+      { text: `In May, in the cathedral at Troyes, the queen seals the treaty that makes the English king heir to France and leaves her own son with nothing but the south and a name. Half France says she has sold him. That night she sends for you.` },
+      { if: ['flag', 'followedQueen'], text: `You were with her at Tours. She has not forgotten.` },
+    ],
+    choices: [
+      { label: 'Stay with her', note: 'She is the queen of a treaty. Those who stay with her will be counted English by the Dauphin\'s people.', ops: [['fav', 'queen', 6], ['fav', 'bur', 5], ['fav', 'arm', -10], ['rep', -2]] },
+      { label: 'Ask her, plainly, why', need: ['trait', 'bold', '>=', 2], why: 'Only a bold woman asks the queen that (bold 2).', note: 'She may answer. She may never send for you again.', kind: 'chance', p: 0.6, win: [['fav', 'queen', 8], ['flag', 'queenAnswered', true]], lose: [['fav', 'queen', -15]] },
+      { label: 'Ask leave to go home to your estates', note: 'Honest, and it ends something.', ops: [['fav', 'queen', -6], ['trait', 'devout', 1]] },
+    ],
+  },
+
+  // ---- HER HUSBAND'S HONOUR: chivalry as practice --------------------------------
+  {
+    id: 'montendre', arc: 'arms', from: '1402a', until: '1402a', title: 'Seven against seven', if: [['husband', 'present'], ['any', [['lean', 'arm'], ['temper', '>=', 3]]]],
+    text: `The Duke of Orléans is choosing seven knights to meet seven English knights in the lists at Montendre, in Saintonge, in May, for the honour of France and of the duke. {husband} wants to be one of them more than he has wanted anything since you married him. He needs new harness to be considered: Milanese, fitted, three hundred livres.`,
+    choices: [
+      { label: 'Pay for the harness, and let him ask', note: 'He may not be chosen. If he is, he may be killed. If he wins, the duke will know his name.', ops: [['purse', -300, 'Milanese harness for Montendre']], kind: 'chance', p: 0.35, win: [['flag', 'montendre', true], ['rep', 4], ['fav', 'arm', 8], ['regard', 8]], lose: [['regard', 4]] },
+      { label: 'Tell him the harness is a year of your dowry', note: 'True. He will not be one of the seven, and he will know why.', ops: [['regard', -5], ['trait', 'bold', 1]] },
+    ],
+  },
+  {
+    id: 'brother_arms', arc: 'arms', from: '1409a', until: '1410b', title: 'Brothers in arms', if: [['husband', 'alive'], ['husband', 'first']],
+    text: [
+      { text: `{husband} has sworn brotherhood in arms with Messire Raoul de Fléchin, a Picard knight he has known since they were pages. The contract is drawn by a notary: they will share every ransom and every spoil, buy each other out of captivity, and never take the field against each other.` },
+      { if: ['lean', 'bur'], text: `Raoul serves the Count of Armagnac, on the other side of the quarrel from your husband. Neither of them seems to think it matters.` },
+      { if: ['not', ['lean', 'bur']], text: `Raoul serves the Count of Armagnac. Brotherhood with an Armagnac is a fine thing while the Armagnacs prosper.` },
+      { text: `The notary wants your seal as a witness.` },
+    ],
+    choices: [
+      { label: 'Set your seal to it', note: 'Your own seal, with your own arms, on a contract between two men. A brother-in-arms is family, with everything that brings.', ops: [['flag', 'brotherInArms', true], ['regard', 5]] },
+      { label: 'Refuse to witness it', note: '"A contract with the other side is a rope," you say. He seals it anyway.', ops: [['flag', 'brotherInArms', true], ['regard', -4], ['trait', 'bold', 1]] },
+    ],
+  },
+  {
+    id: 'brother_tested', arc: 'arms', from: '1418a', until: '1418b', title: 'Raoul at the gate', if: [['flag', 'brotherInArms']],
+    text: [
+      { text: `Messire Raoul de Fléchin is at your gate in June, with one squire and no horse, with the blood of the Paris prisons on his boots. His party lost; he was nearly killed in the Châtelet. Under the contract your husband sealed, your house owes him shelter, money and a horse.` },
+      { if: ['husband', 'none'], text: `Your husband is dead. Raoul says, gently, that the contract was with the house, and the house is you.` },
+    ],
+    choices: [
+      { label: 'Honour the contract', note: 'A horse, two hundred livres and a week in your stable loft. If the new council hears, you are harbouring the enemy.', ops: [['purse', -200, 'Raoul de Fléchin, under the contract'], ['rep', 4], ['regard', 8], ['trait', 'warm', 1]], kind: 'chance', p: 0.75, win: [['flag', 'raoulSaved', true]], lose: [['flag', 'raoulSaved', true], ['fav', 'bur', -15]] },
+      { label: 'Give him money at the gate, and no more', note: 'Half the contract. He will tell the story both ways.', ops: [['purse', -100, 'money for Raoul at the gate'], ['regard', -2]] },
+      { label: 'Refuse him', note: 'The contract was your husband\'s folly. Raoul will say, wherever he goes, that your house broke its word.', ops: [['rep', -6], ['regard', -10], ['flag', 'brokeContract', true], ['trait', 'warm', -1]] },
     ],
   },
 

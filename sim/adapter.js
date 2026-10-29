@@ -42,6 +42,9 @@ export function metrics(s) {
     killedAt1415: s.flags.agincourt === 'killed',
     pensions: s.pensions.length,
     endYear: yearOf(Math.min(s.turn, LAST_TURN)),
+    // Playtime estimate (FRAME-ROUND3): scenes and story cards ~45s, other cards ~20s, a half-year plan ~50s.
+    minutes: Math.round((s.history.filter((h) => h.scene).length * 45 + (s.stats?.beats || 0) * 45 + ((s.stats?.cards || 0) - (s.stats?.beats || 0)) * 20 + s.history.filter((h) => h.place).length * 50) / 60),
+    cards: s.stats?.cards || 0,
   };
 }
 

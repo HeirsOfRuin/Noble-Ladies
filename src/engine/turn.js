@@ -167,6 +167,9 @@ function resolveCard(s, idx) {
   if (!c) throw new Error(`no such choice: ${idx}`);
   if (c.locked) throw new Error(`not allowed: ${c.why}`);
   s.cards.shift();
+  s.stats = s.stats || { cards: 0 };
+  s.stats.cards += 1;
+  if (card.beat || card.margin || card.history) s.stats.beats = (s.stats.beats || 0) + 1;
   const rng = streamFor(s.seed, s.turn * 100 + s.nextId, `card:${card.id}`);
   s.nextId += 1;
   const lines = [];
@@ -197,6 +200,17 @@ function resolveCard(s, idx) {
   } else if (k === 'nurse' || k === 'ownMilk') {
     const child = s.children.find((x) => x.id === c.child);
     if (child) { child.care = clamp(child.care + (k === 'nurse' ? 8 : 15), 0, 100); child.nurse = k === 'nurse'; }
+  } else if (k === 'place' || k === 'childBeat' || k === 'pledge') {
+    const child = s.children.find((x) => x.id === c.child);
+    if (child) {
+      if (k === 'place') { child.placement = c.placement; child.house = c.house || null; child.care = clamp(child.care + (['page', 'queen', 'poissy'].includes(c.placement) ? 10 : 5)); }
+      if (k === 'childBeat') {
+        child.care = clamp(child.care + (c.care || 0));
+        if (c.placement) child.placement = c.placement;
+        if (c.risk && rng.chance(c.risk)) { child.care = clamp(child.care - 20); lines.push(`${child.name} was hurt in a skirmish, and came home on a cart, alive.`); }
+      }
+      if (k === 'pledge' && c.home) { child.placement = 'home'; child.house = null; }
+    }
   } else if (k === 'want') {
     s.want = c.want;
     lines.push(`You want ${WANTS[c.want].goal.charAt(0).toLowerCase()}${WANTS[c.want].goal.slice(1)}`);

@@ -13,6 +13,7 @@ import { swingOutcome, patrons, plagueRisk } from './derive.js';
 import { agincourt } from './family.js';
 import { settleNews } from './news.js';
 import { marginCard } from './reflect.js';
+import { pledgeCard } from './children.js';
 
 function applySwing(s, key, place) {
   const w = SWINGS[key];
@@ -62,6 +63,7 @@ function applySwing(s, key, place) {
     if (s.cause?.kind === 'confiscation' && !s.confiscated.length) s.cause = null;
   }
   if (o.modNote) lines.unshift(o.modNote);
+  for (const c of s.children) if (c.alive && c.house && w.losers.includes(c.house)) s.cards.push(pledgeCard(s, c, w.winner));
   if (s.flags.exposedTo && Object.keys(s.flags.exposedTo).length) { if (w.losers.some((f) => s.flags.exposedTo[f])) lines.push('Copies of your letters were in the council\'s hands.'); s.flags.exposedTo = {}; }
   if (!lines.length) lines.push('It passes you by. You were not important enough to punish or to reward.');
   return lines;

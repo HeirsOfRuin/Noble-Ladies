@@ -211,7 +211,7 @@ export function appatisCard(s, rng, gross, w) {
     lines: [],
     choices: [
       { label: `Pay the ${price} livres`, note: 'Every lady in the Beauvaisis pays someone. It is cheaper than barns.', ops: [['purse', -price, `appatis to the captain at ${garrison}`], ['guard', 2]] },
-      { label: 'Refuse, and set a watch on the villages', note: 'He may not bother. He may make an example of you.', kind: 'chance', p: 1 - w.raid, win: [['trait', 'bold', 1]], lose: w.lose ? [...burn, ['lands', -1], ['trait', 'bold', 1]] : [...burn, ['trait', 'bold', 1]] },
+      { label: 'Refuse, and set a watch on the villages', note: 'He may not bother. He may make an example of you.', ops: [['trait', 'bold', 1]], kind: 'chance', p: 1 - w.raid, win: [], lose: w.lose ? [...burn, ['lands', -1]] : burn },
       patron
         ? { label: `Ask ${CAST[patron].short} for a safe-conduct`, note: 'A sealed letter the captain cannot ignore. It will be a debt.', ops: [['guard', 4], ['oweTo', patron, 1, `a safe-conduct for your villages from ${garrison}`]] }
         : { label: 'Ask for a safe-conduct', note: 'You need a patron the captain fears, and someone who trusts you enough to write it.', locked: true, why: 'No patron of the ruling party knows you well enough (trust 20).', ops: [] },

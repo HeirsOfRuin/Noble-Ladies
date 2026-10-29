@@ -208,7 +208,7 @@ export function resolveDue(s, q, rng, lines) {
       s.pensions.push({ from: q.npc, faction: n.faction, amount });
       n.use = clamp(n.use + 5);
       lines.push(`Your petition is granted: a pension of ${amount} livres a half-year from ${CAST[q.npc].short}. A pension is also a debt: one day they will ask for something.`);
-      addDebt(s, q.npc, 'out', 1, 'the pension they granted you');
+      addDebt(s, q.npc, 'out', 1, 'the pension granted to you');
     } else {
       fav(s, n.faction, ACTIONS.petition.failFavour);
       lines.push(`Your petition to ${CAST[q.npc].short} was refused.`);

@@ -9,12 +9,12 @@ builds a place at court, survives the war between Armagnacs and Burgundians,
 and comes through Agincourt and its aftermath. The aim is that her house is
 still standing in 1422, and that she is too.
 
-Status (2026-10-29): **first playable, with her own story**. All four acts,
-kill gate run, phone UI; 25 story beats (the Brécourt inheritance, her husband,
-Ysabel, Jacqueline), her character, her want and her own words
-(`docs/FRAME-DEPTH.md`). Next: the author's verdict on this round's voice.
-Read `docs/SPEC.md` (one page), `docs/KILLGATE.md` (what the measurements say),
-`docs/DESIGN.md` (how it is built), `docs/BRIEF.md` (the original brief).
+Status (2026-10-29): **round 3, a lived-in world**. All four acts, 37 story
+beats (Brécourt, her husband, Ysabel, Jacqueline, Christine de Pizan, the queen,
+her husband's honour), favours owed, letters that can be opened, protection
+money, household colours, children with their own upbringings and scenes. About
+95-100 minutes a run. Text checked against `docs/STYLE.md` by `npm run lint`.
+See `docs/FRAME-ROUND3.md`.
 
 ## Play as an app
 

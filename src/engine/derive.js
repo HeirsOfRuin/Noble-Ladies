@@ -119,7 +119,7 @@ export function childAge(s, c) { return Math.floor((s.turn - c.born) / 2); }
 
 export function marriageable(s) {
   // Houses that have been answered once do not write again for two years.
-  return s.children.filter((c) => c.alive && !c.betrothed && childAge(s, c) >= CONFIG.childOfAge && !(c.asked && s.turn - c.asked < 4));
+  return s.children.filter((c) => c.alive && !c.betrothed && !['church', 'nun'].includes(c.placement) && childAge(s, c) >= CONFIG.childOfAge && !(c.asked && s.turn - c.asked < 4));
 }
 
 function targetsFor(s, id) {

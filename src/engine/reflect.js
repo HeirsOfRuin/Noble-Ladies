@@ -59,6 +59,10 @@ function act2(s) {
   if (s.flags.placeBlocked) out.push('Neither Jacqueline nor I sleep in the Hôtel Barbette. She knows why.');
   if (s.flags.husbandReformed) out.push('{husband} has not pledged anything of mine since the goldsmith\'s letter.');
   if (s.flags.saidMurder) out.push('I told {husband} that murder is murder, whatever Aristotle says. He repeated it at a Burgundian table. We are not asked there now.');
+  if (s.flags.roseDossier) out.push('I carried Christine\'s letters against the Romance of the Rose into the queen\'s chamber. The King\'s secretary has not smiled at me since. Good.');
+  else if (s.flags.roseSpoke) out.push('I said at supper that Christine was right about the Romance of the Rose. They made a rondeau about it. It scanned.');
+  if (s.flags.queenSecret) out.push('I know what the king said to the queen that night. I have never told anyone, and she knows it.');
+  if (s.flags.montendre) out.push('{husband} fought at Montendre, seven against seven, and came home with a cut over his eye and the Duke of Orléans\' gold collar. He still talks about it.');
   if (s.flags.queensLady) out.push('I have a room in the Hôtel Barbette now, and the queen talks to me when she cannot sleep, which is most nights.');
   return out.filter(Boolean);
 }
@@ -76,6 +80,12 @@ function act3(s) {
   if (s.flags.revengeJacqueline) out.push('I closed my door on Jacqueline. She will remember it when the wheel turns, and it always turns.');
   if (s.flags.ysabelFreed) out.push('I got Ysabel out of the Châtelet. She has not thanked me, which is how I know she means to.');
   if (s.flags.ysabelAbandoned) out.push('I did nothing for Ysabel when the butchers took her. They let her go in the end. She has not written since.');
+  if (s.flags.christineBrief) out.push('Christine read Master Lorfèvre\'s brief and found the hole in it in an afternoon. He has been politer to me since.');
+  if (s.flags.rodeToMelun) out.push('I rode to Melun with the queen in 1405. Some Burgundians still call me the queen\'s runaway.');
+  for (const c of s.children.filter((x) => x.alive && x.placement)) {
+    const p = { page: `${c.name} is a page in a great household and writes to me twice a year, when he needs something.`, queen: `${c.name} is among the queen\'s girls, and knows more of the court at twelve than I did at twenty.`, poissy: `${c.name} is at Poissy with the sisters, learning Latin and accounts, and sounds happier than I was at her age.`, church: `${c.name} is for the Church, and reads more than is good for him.`, nun: `${c.name} has taken the veil at Poissy. She prays for us all. Someone should.` }[c.placement];
+    if (p) out.push(p);
+  }
   if (s.flags.gerardShamed) out.push('Gérard has not forgiven me the ring. Good.');
   if (s.flags.motherAtBrecourt) out.push('My mother lies beside my father at Brécourt, because Jacqueline asked it of Gérard. I did not expect to owe her that.');
   if (s.flags.gerardRefusedBurial) out.push('Gérard would not let my mother lie beside my father. I have added it to the account.');

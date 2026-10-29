@@ -103,6 +103,9 @@ function cardChoice(s, policy, rng) {
     // unless paying it would sink the house.
     if (c.kind === 'match') val += 10 + c.house.rank * 12 + (s.money + c.ops[0][1] > -1500 ? 0 : -60);
     if (c.kind === 'christine') val += 1;
+    if (c.kind === 'place') val += c.locked ? -99 : { page: SIDE[policy] ? (c.house === SIDE[policy] ? 8 : 2) : c.house === 'berry' ? 7 : 4, queen: 6, poissy: 5, home: 3, church: 1 }[c.placement];
+    if (c.kind === 'childBeat') val += (c.care || 0) * 0.3;
+    if (c.kind === 'pledge') val += 3;
     if (c.kind === 'want') val += c.want === WANT_OF[policy] ? 10 : 0;
     if (c.ops?.some((o) => o[0] === 'flag' && o[1] === 'convent')) val += careful ? -2 : -6;
     if (val > bestV) { bestV = val; best = i; }
