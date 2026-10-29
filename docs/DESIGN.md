@@ -137,5 +137,6 @@ Newest first.
 
 | Date | Decision |
 |---|---|
+| 2026-10-29 | **Depth: her, her people, her story** (`FRAME-DEPTH.md`). The author, after the first playtest: "It feels good, looks good but needs more depth. I need to feel more investment in the character, who she interacts with, and to have more behind the narrative overall plot." Built: her name, character and want; 25 story beats in five threads (the Brécourt inheritance spine, her husband, Ysabel, Jacqueline, the queen's offer); margin pages in her voice; an epitaph that names her story. New engine: `cond.js`, `arcs.js`, `reflect.js`; save v2 with migration. Measured: every beat fires; loyal_bur 63 -> 75, loyal_arm 54 -> 71, homebody 71.5 -> 71 (400 runs each). Christine's, the queen's and the children's arcs wait for the author's verdict on this round's voice. |
 | 2026-10-28 | **Phase 1 built.** All four acts at the brief's bare-bones scope: 7 Act 1 scenes, 44 half-years, 21 turning points, 6 faction swings, 13 cast, 17 actions, 9 systemic events, Agincourt fate roll, widowhood with dower, children's betrothals, legacy score and epitaph. Kill gate: 400 runs x 11 policies (`KILLGATE.md`). Nine faults found and fixed before the UI; four open findings for the author. Tests 15/15, smoke clean at 390px (4 runs). |
 | 2026-10-28 | **Her age**: 17 in Act 1, married at 18 (the author). See `SPEC.md`. |

@@ -53,6 +53,7 @@ function title() {
       ${banner ? `<p class="warn">${esc(banner)}</p>` : ''}
       <div class="stack">
         ${saved ? `<button class="primary" data-act="continue">Continue <small>${esc(view(saved).date)}</small></button>` : ''}
+        <label class="namefield">Her name <input id="lady-name" maxlength="24" value="Marguerite" autocomplete="off" spellcheck="false"></label>
         <button ${saved ? '' : 'class="primary"'} data-act="new">New game</button>
         <button data-act="load-code">Load a save code</button>
         ${install ? '<button data-act="install">Install on this device</button>' : ''}
@@ -86,11 +87,16 @@ function render() {
 
 function choiceButtons(choices) {
   return `<div class="stack">${choices.map((c, i) => `
-    <button data-choice="${i}" class="choice">
+    <button data-choice="${i}" class="choice" ${c.locked ? 'disabled' : ''}>
       <strong>${esc(c.label)}</strong>
       ${c.note ? `<small>${esc(c.note)}</small>` : ''}
-      ${c.stake ? `<span class="stake">${esc(c.stake)}</span>` : ''}
+      ${c.locked ? `<span class="stake">${esc(c.why)}</span>` : c.stake ? `<span class="stake">${esc(c.stake)}</span>` : ''}
     </button>`).join('')}</div>`;
+}
+
+/** Prose with paragraph breaks; the drop capital goes on the first paragraph only. */
+function paras(text, cls = 'prose') {
+  return String(text).split(/\n\n+/).map((p, i) => `<p class="${i ? 'para' : cls}">${esc(p)}</p>`).join('');
 }
 
 function playTab(v) {
@@ -99,15 +105,20 @@ function playTab(v) {
     const sc = v.scene;
     return `<p class="kicker">${esc(sc.when)} · Lesson: ${esc(sc.lesson)}</p>
       <blockquote class="governess">${esc(sc.governess)}<cite>Dame Guillemette, your governess</cite></blockquote>
-      <p class="prose">${esc(sc.text)}</p>
+      ${paras(sc.text)}
       ${sc.reports.length ? `<div class="box"><p class="label">What you have been told</p><ul>${sc.reports.map((r) => `<li>${esc(r)}</li>`).join('')}</ul><p class="hint">Reports are only as good as the people who bring them.</p></div>` : ''}
       ${choiceButtons(sc.choices)}`;
   }
   if (v.phase === 'card') {
     const c = v.card;
-    return `<p class="kicker">${esc(c.when || '')}${v.cardsLeft > 1 ? ` · ${v.cardsLeft - 1} more after this` : ''}</p>
+    if (c.margin) return `<p class="kicker">${esc(c.when || '')}</p>
+      <h2>${esc(c.title)}</h2>
+      <blockquote class="margin">${esc(c.text)}<cite>${esc(state.lady.name)}, in her own hand</cite></blockquote>
+      ${c.lines.length ? `<p class="hint">${esc(c.lines.join(' '))}</p>` : ''}
+      ${choiceButtons(c.choices)}`;
+    return `<p class="kicker">${esc(c.when || '')}${c.arc ? ` · ${esc(c.arc)}` : ''}${v.cardsLeft > 1 ? ` · ${v.cardsLeft - 1} more after this` : ''}</p>
       <h2 class="${c.history ? 'history' : ''}">${esc(c.title)}</h2>
-      ${c.text ? `<p class="prose">${esc(c.text)}</p>` : ''}
+      ${c.text ? paras(c.text) : ''}
       ${c.lines.length ? `<ul class="lines">${c.lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
       ${choiceButtons(c.choices)}`;
   }
@@ -166,6 +177,7 @@ function endingView() {
     <table class="score">${e.parts.map((p) => `<tr><td>${esc(p.label)}</td><td class="num">${p.n} / ${p.of}</td></tr>`).join('')}
       <tr class="total"><td>Legacy</td><td class="num">${e.total} / 100</td></tr></table>
     <blockquote class="chronicle">${esc(e.epitaph)}</blockquote>
+    ${e.lastWords ? `<blockquote class="margin">${esc(e.lastWords)}<cite>${esc(state.lady.name)}</cite></blockquote>` : ''}
     <button class="primary" data-act="new">Begin again</button>`;
 }
 
@@ -179,7 +191,11 @@ function houseTab() {
   const H = h.husband;
   const traits = H ? Object.entries(H.traits).map(([k, n]) => `${k} ${'●'.repeat(n)}${'○'.repeat(5 - n)}`).join(' · ') : '';
   const counsel = H && v.phase === 'plan' ? `<p class="label">Your counsel to him</p><div class="chips">${Object.entries(h.counselOptions).map(([k, label]) => `<button data-counsel="${k}" class="${h.counsel === k ? 'on' : ''}">${esc(label)}</button>`).join('')}</div><p class="hint">Counsel travels by letter: write to him (an action) and he may take it. He listens ${esc(H.heed)}.</p>` : '';
+  const W = h.want;
   return `<h2>${esc(h.lady.title)}</h2>
+    ${h.said.length ? `<p class="said">What is said of her: <em>${esc(h.said.join(', '))}</em>.</p>` : '<p class="hint">Nobody has made up their mind about her yet. Her choices will.</p>'}
+    ${W ? `<div class="box ${W.achieved ? 'done' : ''}"><p class="label">What you want: ${esc(W.label)}</p><p>${esc(W.goal)}</p><p class="small">${esc(W.progress)}${W.achieved ? ' <b>Achieved.</b>' : ''}</p></div>` : ''}
+    <div class="box"><p class="label">Brécourt</p><p class="small">${esc(h.brecourt)}</p></div>
     <p>Age ${h.age}. ${h.lands} holding${h.lands === 1 ? '' : 's'}${h.landsStart ? ` of the ${h.landsStart} the house began with` : ''}.${h.pregnant ? ' You are with child.' : ''}</p>
     <table class="stats">
       <tr><td>Good name</td><td>${bar(v.rep)}</td><td class="num">${v.rep}</td></tr>
@@ -195,7 +211,7 @@ function houseTab() {
       ${h.hedging ? '<p class="warn">You stand well with both parties. Either can find that out.</p>' : ''}
       <p class="hint">Ties to the losing side bring fines and confiscation; ties to the winners bring rewards. Being on your estates when it happens halves the cost.</p></div>
     <h2>Your husband</h2>
-    ${H ? `<p><strong>${esc(H.name)}</strong>. ${esc({ present: 'At home with you.', away: 'Away with the army.', captured: 'A prisoner in England.', dead: 'Dead.' }[H.status])} His party: ${esc(H.lean)}.</p><p class="small">${traits}</p>
+    ${H ? `<p><strong>${esc(H.name)}</strong>. ${esc({ present: 'At home with you.', away: 'Away with the army.', captured: 'A prisoner in England.', dead: 'Dead.' }[H.status])} His party: ${esc(H.lean)}. ${esc(h.regard || '')}</p><p class="small">${traits}</p>
       ${H.ransom ? `<p class="warn">Ransom: ${num(H.ransom.paid)} of ${num(H.ransom.total)} l. paid.</p>` : ''}${counsel}`
       : h.widowed ? '<p>You are a widow, and govern your own affairs: one more action each half-year.</p>' : '<p class="empty">Not yet married.</p>'}
     <h2>Children</h2>
@@ -302,7 +318,7 @@ app.addEventListener('click', (e) => {
       modal = report(record);
     } else {
       const act = d.act;
-      if (act === 'new') { state = newGame({ seed: (Math.random() * 2 ** 31) >>> 0 }); tab = 'play'; modal = null; draft = null; save(); }
+      if (act === 'new') { const name = document.getElementById('lady-name')?.value; state = newGame({ seed: (Math.random() * 2 ** 31) >>> 0, name }); tab = 'play'; modal = null; draft = null; save(); }
       else if (act === 'continue') { state = load(); draft = null; }
       else if (act === 'close') { modal = null; picking = null; }
       else if (act === 'dismiss') { banner = null; }

@@ -7,8 +7,9 @@ import { CONFIG, DIFFICULTY, FACTIONS } from '../data/config.data.js';
 import { ACTIONS } from '../data/actions.data.js';
 import { CAST } from '../data/cast.data.js';
 import { SWINGS, PLAGUE } from '../data/history.data.js';
-import { onBoard, controlAt, queenSideAt, between, keyOf, factionLabel } from './clock.js';
-import { clamp } from './effects.js';
+import { onBoard, controlAt, queenSideAt, between, keyOf, factionLabel, turnOfKey } from './clock.js';
+import { clamp, TRAITS } from './effects.js';
+import { WANTS } from '../data/arcs.data.js';
 
 export const D = (s) => DIFFICULTY[s.difficulty];
 export const costOf = (s, n) => Math.round(n * D(s).costMult);
@@ -131,6 +132,12 @@ function targetsFor(s, id) {
   if (a.target === 'person') return Object.keys(s.npcs).filter((p) => present(s, p) && !['steward', 'maid', 'confessor', 'lawyer'].includes(p)).map((p) => ({ id: p, label: CAST[p].name, detail: `${giftGain(s, p) < 1 ? 'recent gifts dull this one · ' : ''}trust ${s.npcs[p].trust}`, ok: true }));
   if (a.target === 'source') return ['maid', 'friend'].filter((p) => present(s, p)).map((p) => ({ id: p, label: CAST[p].name, detail: relWord(s.npcs[p]), ok: true }));
   if (a.target === 'correspondent') return correspondents(s).map((p) => ({ id: p, label: p === 'husband' ? `Your husband (counsel: ${COUNSEL[s.counsel]})` : CAST[p].name, detail: p === 'husband' ? `he listens: ${heedWord(s)}` : `trust ${s.npcs[p].trust}`, ok: true }));
+  if (a.target === 'case') {
+    const out = [];
+    if (s.cause) out.push({ id: 'cause', label: s.cause.kind === 'dower' ? 'Your dower' : 'Your confiscated lands', detail: `${s.cause.progress} of ${a.stepsToJudgment} hearings; ${pct(lawsuitChance(s))} to win at judgment`, ok: true });
+    if (brecourtOpen(s)) out.push({ id: 'brecourt', label: 'Brécourt', detail: `${s.flags.brecourtHearings || 0} hearings pressed; judgment at ${BRECOURT_JUDGMENT}; ${pct(brecourtChance(s))} if judged now`, ok: true });
+    return out;
+  }
   if (a.target === 'servant') return ['steward', 'maid'].map((p) => ({ id: p, label: `Replace ${nameOf(s, p)}, ${p === 'maid' ? 'your chamberwoman' : 'your steward'}`, detail: relWord(s.npcs[p]), ok: true }));
   if (a.target === 'child') return marriageable(s).map((c) => ({ id: String(c.id), label: `${c.name}, ${childAge(s, c)}`, detail: c.sex === 'daughter' ? 'needs a dowry' : 'brings a dowry in', ok: true }));
   if (a.target === 'amount') {
@@ -139,6 +146,8 @@ function targetsFor(s, id) {
   }
   return [];
 }
+
+export const BRECOURT_JUDGMENT = 6; // hearings before the Parlement judges Brécourt without a crisis to hurry it
 
 export const COUNSEL = { none: 'none given', stay: 'stay out of the armies', arm: 'hold to Orléans', bur: 'hold to Burgundy' };
 
@@ -157,7 +166,7 @@ export function actionPreview(s, id, place = s.place) {
   else if ((a.from || a.until) && !between(s.turn, a.from, a.until)) why = 'Not in these years.';
   else if (id === 'rumour' && !present(s, 'rival')) why = 'You have no rival at court now.';
   else if (id === 'children' && !s.children.some((c) => c.alive)) why = 'You have no children yet.';
-  else if (id === 'lawsuit' && !s.cause) why = 'You have no case before the Parlement.';
+  else if (id === 'lawsuit' && !s.cause && !brecourtOpen(s)) why = 'You have no case before the Parlement.';
   else if (id === 'betroth' && !marriageable(s).length) why = `No child is old enough for a contract (${CONFIG.childOfAge}).`;
   else if (id === 'ransom' && s.husband?.status !== 'captured') why = 'Nobody of yours is held for ransom.';
   else if (id === 'petition' && !patrons(s).length) why = 'No patron is at court.';
@@ -194,6 +203,8 @@ export function swingOutcome(s, key, place = s.place) {
   const win = tie(s, w.winner);
   let p = clamp(lose - win * 0.6, 0, 1.2) * w.severity * CONFIG.swingSeverity;
   if (protector(s)) p *= 0.6;
+  const mod = s.flags.swingMod?.[key];
+  if (mod) p *= mod.mult;
   if (place === 'estates') p *= CONFIG.awayFromSwing; // out of sight when the purges come
   const fine = p > 0.1 ? costOf(s, Math.round(p * 1000)) : 0;
   const confiscate = p > 0.8 ? 2 : p > 0.4 ? 1 : 0;
@@ -202,7 +213,7 @@ export function swingOutcome(s, key, place = s.place) {
   const spoils = win >= 0.8 ? 1 : 0;     // the winners hand out what they took from the losers
   const lethal = w.danger >= 1;           // only the 1418 massacre kills; earlier risings imprison
   const prison = harm && !lethal ? costOf(s, harm * 10) : 0;
-  return { p, fine, confiscate, harm, lethal, prison, reward, spoils, win, lose };
+  return { p, fine, confiscate, harm, lethal, prison, reward, spoils, win, lose, modNote: mod?.note || null };
 }
 
 /** The House tab's "if Paris changed hands now" lines, one per side. */
@@ -242,21 +253,78 @@ export function hedging(s) {
 
 export function score(s) {
   const lady = s.outcome === 'dead' ? 0 : s.widowed && !s.husband ? 10 : s.flags.convent ? 6 : 7;
-  const house = s.landsStart ? Math.round(25 * clamp(s.lands / s.landsStart, 0, 1)) : 0;
+  const house = s.landsStart ? Math.round(20 * clamp(s.lands / s.landsStart, 0, 1)) : 0;
   let kids = 0;
-  for (const c of s.children) if (c.alive) kids += 2 + (c.betrothed ? c.betrothed.rank * 5 : 0) + Math.round(c.care / 100);
-  kids = Math.min(30, kids);
+  for (const c of s.children) if (c.alive) kids += 2 + (c.betrothed ? c.betrothed.rank * 4 : 0) + Math.round(c.care / 100);
+  kids = Math.min(25, kids);
+  const want = s.want && wantStatus(s).achieved ? 10 : 0;
   const rep = Math.round(s.rep / 5);
   const wealth = clamp(Math.round((s.money + 2000) / 400), 0, 15);
   const parts = [
-    { key: 'house', label: 'The house\'s lands', n: house, of: 25 },
-    { key: 'children', label: 'Children living and placed', n: kids, of: 30 },
+    { key: 'house', label: 'The house\'s lands', n: house, of: 20 },
+    { key: 'children', label: 'Children living and placed', n: kids, of: 25 },
     { key: 'rep', label: 'Her good name', n: rep, of: 20 },
     { key: 'wealth', label: 'Wealth after debts', n: wealth, of: 15 },
     { key: 'lady', label: 'Her own fate', n: lady, of: 10 },
+    { key: 'want', label: s.want ? `What she wanted: ${WANTS[s.want].label}` : 'What she wanted', n: want, of: 10 },
   ];
   const total = parts.reduce((a, p) => a + p.n, 0);
   return { parts, total, grade: total >= 75 ? 'A house that rose' : total >= 55 ? 'A house that held' : total >= 35 ? 'A house diminished' : 'A house undone' };
+}
+
+// ---- her own story --------------------------------------------------------
+
+export const brecourtOpen = (s) => !!s.flags.caseBrecourt && !['judged', 'refused', 'shared', 'given', 'seized', 'lost'].includes(s.flags.brecourt);
+
+/** Her chance if the Parlement judged Brécourt now: hearings pressed, witnesses, the 1400 clause. */
+export function brecourtChance(s) {
+  const c = controlAt(s.turn);
+  const fav = c === 'contested' ? (s.fav.arm + s.fav.bur) / 2 : s.fav[c];
+  // A case before the Parlement was moved by patrons as much as by hearings: a
+  // well-argued case from a lady nobody at court knows still mostly loses.
+  let p = 0.04 * Math.min(s.flags.brecourtHearings || 0, 6);
+  if (s.flags.witnessThibaut) p += 0.15;
+  if (s.flags.witnessRobert) p += 0.08;
+  if (s.flags.thibautLost) p -= 0.05;
+  if (!s.flags.renounced) p += 0.2;
+  if (s.flags.motherCase) p += 0.03;
+  p += s.npcs.lawyer.rel * 0.08 + fav / 160 + s.fav.queen / 400;
+  return clamp(p, 0.05, 0.9);
+}
+
+/** Her ambition, as the House tab shows it and the score counts it. */
+export function wantStatus(s) {
+  if (!s.want) return null;
+  const w = WANTS[s.want];
+  let achieved = false, progress = '';
+  if (s.want === 'brecourt') {
+    achieved = ['judged', 'shared'].includes(s.flags.brecourt);
+    progress = { judged: 'Brécourt is yours by judgment.', shared: 'Brécourt will go to your grandchildren, by contract.', seized: 'Brécourt is yours while the Armagnacs hold Paris.', lost: 'Gérard has Brécourt back.', refused: 'The Parlement found against you.', given: 'You let it go.' }[s.flags.brecourt]
+      || (s.flags.caseBrecourt ? `Your case: ${s.flags.brecourtHearings || 0} hearings pressed; ${pct(brecourtChance(s))} if judged now.` : s.turn >= turnOfKey('1403b') ? 'Gérard holds Brécourt. No case is open.' : 'Your father still holds Brécourt.');
+  } else if (s.want === 'court') {
+    achieved = !!s.flags.queensLady;
+    progress = achieved ? 'You are one of the queen\'s ladies.' : `Not yet. The queen\'s favour ${s.fav.queen} (she looks for about 60) and a good name (about 50).`;
+  } else if (s.want === 'children') {
+    const placed = s.children.filter((c) => c.alive && c.betrothed && c.betrothed.rank >= 2).length;
+    achieved = placed >= 2;
+    progress = `${placed} of 2 children promised to good houses.`;
+  } else if (s.want === 'soul') {
+    const n = s.flags.chapels || 0;
+    achieved = n >= 2 && s.rep >= 60;
+    progress = `${n} of 2 chapels endowed; your good name ${s.rep} (it must be 60 at the end).`;
+  }
+  return { id: s.want, label: w.label, goal: w.goal, progress, achieved };
+}
+
+/** What is said of her: her tendencies, in words. */
+export function traitWords(s) {
+  const out = [];
+  for (const [axis, [hi, lo]] of Object.entries(TRAITS)) {
+    const v = s.traits?.[axis] ?? 0;
+    if (v >= 4) out.push(`very ${hi}`); else if (v >= 2) out.push(hi);
+    else if (v <= -4) out.push(`very ${lo}`); else if (v <= -2) out.push(lo);
+  }
+  return out;
 }
 
 export { keyOf, FACTIONS };

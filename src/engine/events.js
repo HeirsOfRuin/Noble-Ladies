@@ -39,14 +39,13 @@ const E = {
     }),
   },
   ally_asks: {
-    weight: (s) => (['friend', 'mother', 'christine'].some((id) => present(s, id) && s.npcs[id].trust >= 45) ? 0.35 : 0),
+    // Ysabel's requests live in her own story (arcs.data.js), not here.
+    weight: (s) => (['mother', 'christine'].some((id) => present(s, id) && s.npcs[id].trust >= 45) ? 0.35 : 0),
     card: (s, rng) => {
-      const who = rng.pick(['friend', 'mother', 'christine'].filter((id) => present(s, id) && s.npcs[id].trust >= 45));
-      if (who === 'friend') return { title: 'Ysabel asks a favour', text: 'Ysabel de Fontenoy has lost at dice at the queen\'s tables, more than she can pay. She asks you for 200 livres, quietly.',
-        choices: [{ label: 'Lend it', ops: [['purse', -200, 'a loan to Ysabel'], ['trust', 'friend', 12], ['use', 'friend', 10]] }, { label: 'Refuse, kindly', ops: [['trust', 'friend', -10]] }] };
+      const who = rng.pick(['mother', 'christine'].filter((id) => present(s, id) && s.npcs[id].trust >= 45));
       if (who === 'christine') return { title: 'Christine asks a favour', text: 'Christine de Pizan has finished a new book, a treatise for the instruction of ladies. She asks you to put a copy into the queen\'s hands.',
         choices: [{ label: 'Do it', ops: [['fav', 'queen', -2], ['trust', 'christine', 15], ['info', 5]] }, { label: 'Make your excuses', ops: [['trust', 'christine', -6]] }] };
-      return { title: 'Your mother writes', text: 'Your mother asks for 300 livres toward your younger sister\'s dowry. Your father, she says, need not know.',
+      return { title: 'Your mother writes', text: 'Your mother asks for 300 livres toward your younger sister\'s dowry. She has asked nobody else, she says, which you believe.',
         choices: [{ label: 'Send it', ops: [['purse', -300, 'your sister\'s dowry'], ['trust', 'mother', 10], ['rep', 2]] }, { label: 'Refuse', ops: [['trust', 'mother', -12]] }] };
     },
   },
@@ -155,8 +154,9 @@ export function queuedCard(s, id, rng) {
 }
 
 /** Pick at most one systemic event for this half-year. */
-export function eventsTurn(s, rng, place) {
-  if (!rng.chance(0.75)) return;
+export function eventsTurn(s, rng, place, beats = 0) {
+  // When her own story has a beat this half-year, the systemic events give way.
+  if (!rng.chance(beats ? 0.3 : 0.75)) return;
   s.flags.evLast = s.flags.evLast || {};
   const pool = Object.entries(E).map(([id, e]) => ({ id, weight: (s.turn - (s.flags.evLast[id] ?? -9)) >= 3 ? e.weight(s, place) : 0 }));
   const pick = rng.weighted(pool);

@@ -46,7 +46,7 @@ export const ACTIONS = {
   chapel: { label: 'Endow a chapel', where: 'any', cost: 500, via: 'confessor', delay: 2,
     rep: 3, repLater: 7, confessorTrust: 10,
     note: 'Masses for the dead of your house. Piety is the one reputation nobody can take from a woman.' },
-  lawsuit: { label: 'Press your case in the Parlement', where: 'any', cost: 150, via: 'lawyer', delay: 0,
+  lawsuit: { label: 'Press your case in the Parlement', where: 'any', target: 'case', cost: 150, via: 'lawyer', delay: 0,
     stepsToJudgment: 3,
     note: 'Lawsuits are slow and expensive, and they can be won.' },
   servant: { label: 'Replace a servant', where: 'any', target: 'servant', cost: 60, via: null, delay: 0,

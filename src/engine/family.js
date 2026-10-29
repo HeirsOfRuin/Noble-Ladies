@@ -120,6 +120,7 @@ export function agincourt(s, rng) {
 export function widow(s, rng, why) {
   const h = s.husband;
   h.status = 'dead';
+  s.flags.lastRegard = h.regard;
   s.husband = null;
   s.widowed = true;
   s.pregnant = null;

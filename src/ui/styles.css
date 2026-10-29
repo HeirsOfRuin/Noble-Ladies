@@ -121,3 +121,13 @@ textarea { width: 100%; font: 12px/1.3 ui-monospace, monospace; background: var(
 
 @media (max-width: 360px) { .places { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Her own story (FRAME-DEPTH) */
+.para { overflow-wrap: anywhere; }
+.margin { font-style: italic; border-left-color: var(--blue); background: #f7f1e1; }
+.margin cite { color: var(--blue); }
+.said em { color: var(--rubric); font-style: normal; font-variant: small-caps; letter-spacing: .03em; }
+.box.done { border-color: var(--good); }
+.namefield { display: flex; flex-direction: column; gap: .3rem; font-variant: small-caps; color: var(--rubric); }
+.namefield input { font: inherit; font-size: 1.1rem; padding: .5em .7em; border: 1px solid var(--line); border-radius: 6px; background: #fff9ec; color: var(--ink); min-height: var(--tap); }
+.choice:disabled { opacity: .55; }

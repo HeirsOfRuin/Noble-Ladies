@@ -9,8 +9,10 @@ builds a place at court, survives the war between Armagnacs and Burgundians,
 and comes through Agincourt and its aftermath. The aim is that her house is
 still standing in 1422, and that she is too.
 
-Status (2026-10-28): **first playable build**. All four acts at bare-bones
-scope, kill gate run, phone UI. Next: the author's calibration playtest.
+Status (2026-10-29): **first playable, with her own story**. All four acts,
+kill gate run, phone UI; 25 story beats (the Brécourt inheritance, her husband,
+Ysabel, Jacqueline), her character, her want and her own words
+(`docs/FRAME-DEPTH.md`). Next: the author's verdict on this round's voice.
 Read `docs/SPEC.md` (one page), `docs/KILLGATE.md` (what the measurements say),
 `docs/DESIGN.md` (how it is built), `docs/BRIEF.md` (the original brief).
 

@@ -19,12 +19,14 @@ import { streamFor } from './rng.js';
 import { coin, turnAccount } from './ledger.js';
 import { newGame, makeNpc } from './state.js';
 import { applyOps, describeOps, clamp } from './effects.js';
-import { FIRST_TURN, LAST_TURN, isAct1, dateLabel, actOf, actTitle, ladyAge, keyOf, controlAt, factionLabel } from './clock.js';
-import { warRisk, placePreview, actionPreview, rentsGross, slotsFor, costOf, pct, exposureNow, hedging, nameOf, COUNSEL, heedWord, relWord, pensionPays, childAge, score } from './derive.js';
+import { turnOfKey, FIRST_TURN, LAST_TURN, isAct1, dateLabel, actOf, actTitle, ladyAge, keyOf, controlAt, factionLabel } from './clock.js';
+import { traitWords, wantStatus, brecourtOpen, brecourtChance, BRECOURT_JUDGMENT, warRisk, placePreview, actionPreview, rentsGross, slotsFor, costOf, pct, exposureNow, hedging, nameOf, COUNSEL, heedWord, relWord, pensionPays, childAge, score } from './derive.js';
 import { sceneView, resolveScene } from './act1.js';
 import { resolveAction, resolveDue } from './actions.js';
 import { familyTurn, birthRisk, childRisk, WAR } from './family.js';
-import { historyTurn } from './history.js';
+import { historyTurn, actTurn } from './history.js';
+import { arcsTurn } from './arcs.js';
+import { WANTS } from '../data/arcs.data.js';
 import { ambientNews, addNews, liveWarnings } from './news.js';
 import { eventsTurn, queuedCard } from './events.js';
 import { finish } from './ending.js';
@@ -127,8 +129,10 @@ function resolveHalfYear(s, input) {
   drift(s, place);
   lines.push(...familyTurn(s, r('family'), place, ctx));
   if (!s.over) historyTurn(s, r('history'), place);
+  const beats = s.over ? 0 : arcsTurn(s);
   ambientNews(s, r('news'), place);
-  if (!s.over) eventsTurn(s, r('events'), place);
+  if (!s.over) eventsTurn(s, r('events'), place, beats);
+  if (!s.over) actTurn(s);
 
   if (!s.over && s.health <= 0) { s.over = true; s.outcome = 'dead'; s.flags.death = 'illness'; }
   if (!s.over && s.money < CONFIG.ruinDebt) { s.over = true; s.outcome = 'ruined'; }
@@ -162,6 +166,7 @@ function resolveCard(s, idx) {
   const card = s.cards[0];
   const c = card?.choices[idx];
   if (!c) throw new Error(`no such choice: ${idx}`);
+  if (c.locked) throw new Error(`not allowed: ${c.why}`);
   s.cards.shift();
   const rng = streamFor(s.seed, s.turn * 100 + s.nextId, `card:${card.id}`);
   s.nextId += 1;
@@ -190,6 +195,9 @@ function resolveCard(s, idx) {
     s.lands = Math.max(1, s.lands - c.holdings); // held by his brother until judgment
   } else if (k === 'settle') {
     s.lands = Math.max(1, s.lands - c.holdings);
+  } else if (k === 'want') {
+    s.want = c.want;
+    lines.push(`You want ${WANTS[c.want].goal.charAt(0).toLowerCase()}${WANTS[c.want].goal.slice(1)}`);
   } else if (k === 'match') {
     const child = s.children.find((x) => x.id === c.child);
     if (child) child.betrothed = { name: c.house.name, rank: c.house.rank, faction: c.house.faction };
@@ -241,6 +249,7 @@ function cardStake(s, c) {
   else if (k === 'settle') extra = `Lose ${c.holdings} holding${c.holdings > 1 ? 's' : ''}`;
   else if (k === 'match') extra = 'Betrothed';
   else if (k === 'christine') extra = 'What she knows';
+  else if (k === 'want') extra = '';
   return [base, extra].filter(Boolean).join(' · ');
 }
 
@@ -256,7 +265,8 @@ export function view(s) {
   if (s.phase === 'scene') v.scene = sceneView(s);
   if (s.phase === 'card') {
     const c = s.cards[0];
-    v.card = { id: c.id, title: c.title, when: c.when || dateLabel(s.turn - 1), text: c.text, lines: c.lines || [], history: !!c.history, choices: c.choices.map((x) => ({ label: x.label, stake: cardStake(s, x) })) };
+    v.card = { id: c.id, title: c.title, when: c.when || dateLabel(s.turn - 1), text: c.text, lines: c.lines || [], history: !!c.history, arc: c.arc || null, margin: !!c.margin,
+      choices: c.choices.map((x) => ({ label: x.label, note: x.note || '', stake: x.locked ? '' : cardStake(s, x), locked: !!x.locked, why: x.why || '' })) };
     v.cardsLeft = s.cards.length;
   }
   if (s.phase === 'plan') {
@@ -278,7 +288,20 @@ export function houseView(s) {
     pensions: s.pensions.map((p) => ({ from: CAST[p.from].name, amount: p.amount, paying: pensionPays(s, p) })),
     exposure: exposureNow(s), hedging: hedging(s), cause: s.cause, confiscated: s.confiscated,
     score: s.landsStart ? score(s) : null,
+    said: traitWords(s), want: wantStatus(s),
+    regard: h ? regardWord(h.regard ?? 40) : null,
+    brecourt: brecourtLine(s),
   };
+}
+
+const regardWord = (r) => (r >= 65 ? 'He trusts your judgment.' : r >= 45 ? 'He respects you.' : r >= 30 ? 'He is civil to you.' : 'You are strangers under one roof.');
+
+function brecourtLine(s) {
+  if (s.turn < turnOfKey('1403a')) return 'Your father holds Brécourt.';
+  const b = s.flags.brecourt;
+  if (b) return { judged: 'Brécourt is yours, by judgment of the Parlement.', seized: 'Brécourt is yours, by grant of the Armagnac council. It will last as long as they do.', lost: 'Gérard holds Brécourt again.', refused: 'The Parlement found for Gérard. He holds Brécourt.', shared: 'Brécourt will pass to your grandchildren, by contract with Gérard\'s house.', given: 'You have let Brécourt go.' }[b];
+  if (brecourtOpen(s)) return `Gérard holds Brécourt. Your case: ${s.flags.brecourtHearings || 0} of ${BRECOURT_JUDGMENT} hearings pressed; ${pct(brecourtChance(s))} if judged now. Press it with the lawsuit action.`;
+  return 'Gérard holds Brécourt. No case is open against him.';
 }
 
 export function peopleView(s) {

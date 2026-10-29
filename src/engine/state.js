@@ -12,7 +12,7 @@ import { CAST, SUITORS, LADY } from '../data/cast.data.js';
 import { streamFor } from './rng.js';
 
 export const SAVE_KEY = 'the-lady-of-saint-pol.save.v1'; // never rename
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 export const CODE_PREFIX = 'LSP1.';
 
 const draw = (rng, v, dp = 0) => {
@@ -38,7 +38,13 @@ function makeSuitor(t, rng) {
   return { ...t, competence: nudge(t.competence), loyalty: nudge(t.loyalty), temper: nudge(t.temper), spending: nudge(t.spending) };
 }
 
-export function newGame({ seed = 1, difficulty = 'normal' } = {}) {
+/** Her name as the player gave it: letters, spaces, apostrophes and hyphens, at most 24 characters. */
+export function cleanName(name) {
+  const n = String(name || '').replace(/[^\p{L}' -]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 24);
+  return n || LADY.name;
+}
+
+export function newGame({ seed = 1, difficulty = 'normal', name } = {}) {
   if (!DIFFICULTY[difficulty]) throw new Error(`unknown difficulty: ${difficulty}`);
   const rng = streamFor(seed >>> 0, 0, 'setup');
   const npcs = {};
@@ -55,7 +61,10 @@ export function newGame({ seed = 1, difficulty = 'normal' } = {}) {
     v: SAVE_VERSION,
     seed: seed >>> 0,
     difficulty,
-    lady: { ...LADY },
+    lady: { ...LADY, name: cleanName(name), title: `${cleanName(name)} de ${LADY.house}` },
+    traits: { devout: 0, bold: 0, warm: 0 },
+    want: null,
+    arcs: {},
     turn: 1,
     phase: 'scene',
     money: 0,
@@ -93,7 +102,15 @@ export function newGame({ seed = 1, difficulty = 'normal' } = {}) {
 
 /** MIGRATIONS[v](save) returns the save at version v + 1. Add one per version bump. */
 export const MIGRATIONS = {
-  // 1: (s) => ({ ...s, v: 2, newField: defaultValue }),
+  // v2 (2026-10-29): her character, her ambition, story beats, her husband's
+  // regard. A v1 game carries on: beats already past are passed by, and its
+  // contract is read as the usual one (the inheritance renounced).
+  1: (s) => {
+    const flags = { renounced: true, ...s.flags };
+    if (s.husband && !flags.husbandShort) flags.husbandShort = s.husband.short;
+    const husband = s.husband ? { regard: 40, ...s.husband } : s.husband;
+    return { ...s, v: 2, traits: { devout: 0, bold: 0, warm: 0 }, want: null, arcs: {}, flags, husband };
+  },
 };
 
 export function migrate(save) {

@@ -12,6 +12,7 @@ import { keyOf, actOf, factionLabel, dateLabel } from './clock.js';
 import { swingOutcome, patrons, plagueRisk } from './derive.js';
 import { agincourt } from './family.js';
 import { settleNews } from './news.js';
+import { marginCard } from './reflect.js';
 
 function applySwing(s, key, place) {
   const w = SWINGS[key];
@@ -60,6 +61,7 @@ function applySwing(s, key, place) {
     s.confiscated = s.confiscated.filter((c) => !w.losers.includes(c.by));
     if (s.cause?.kind === 'confiscation' && !s.confiscated.length) s.cause = null;
   }
+  if (o.modNote) lines.unshift(o.modNote);
   if (!lines.length) lines.push('It passes you by. You were not important enough to punish or to reward.');
   return lines;
 }
@@ -93,6 +95,12 @@ export function historyTurn(s, rng, place) {
   if (h) s.cards.unshift({ id: `history:${key}`, title: h.title, when: dateLabel(s.turn), history: true, text: h.text, lines, choices: [{ label: 'Continue', ops: [] }] });
   else if (lines.length) s.cards.unshift({ id: `news:${key}`, title: 'News of the half-year', when: dateLabel(s.turn), text: '', lines, choices: [{ label: 'Continue', ops: [] }] });
 
+}
+
+/** The end of an act: her page in the margins, then the next act's card. Dealt after her story beats. */
+export function actTurn(s) {
   const nextAct = actOf(s.turn + 1);
-  if (nextAct > actOf(s.turn) && ACT_CARDS[nextAct]) s.cards.push({ id: `act${nextAct}`, title: `Act ${['', 'One', 'Two', 'Three', 'Four'][nextAct]}`, text: ACT_CARDS[nextAct], choices: [{ label: 'Continue', ops: [] }] });
+  if (!(nextAct > actOf(s.turn) && ACT_CARDS[nextAct])) return;
+  if (nextAct >= 3) s.cards.push(marginCard(s, nextAct - 1));
+  s.cards.push({ id: `act${nextAct}`, title: `Act ${['', 'One', 'Two', 'Three', 'Four'][nextAct]}`, text: ACT_CARDS[nextAct], choices: [{ label: 'Continue', ops: [] }] });
 }

@@ -34,6 +34,8 @@ export const POLICIES = ['courtier', 'homebody', 'orleans', 'burgundy', 'hedger'
 // the pair measures what information is worth to that player (sim/run.js --policy=loyal_bur+deaf).
 
 const SIDE = { orleans: 'arm', burgundy: 'bur', loyal_arm: 'arm', loyal_bur: 'bur' };
+// What each policy wants from her life (the wedding card).
+const WANT_OF = { courtier: 'court', homebody: 'brecourt', orleans: 'brecourt', burgundy: 'brecourt', hedger: 'court', christine: 'children', deaf: 'children', loyal_arm: 'brecourt', loyal_bur: 'brecourt', seasonal: 'soul' };
 const ADAPTIVE = new Set(['christine', 'deaf', 'loyal_arm', 'loyal_bur', 'seasonal']);
 
 // ---- Act 1 ----------------------------------------------------------------
@@ -45,11 +47,12 @@ function sceneChoice(s, v, policy, rng) {
   const su = s.act1.suitors;
   const leanPick = (f) => { const i = su.findIndex((x) => x.lean === f); return i >= 0 ? i : 2; };
   const table = {
-    courtier: { offers: 1, court: 0, servants: 2, choice: 2, persuade: 0, quarrel: 0, contract: 2 },
+    // contract: 0 dower assigned (renounces), 1 refuses to renounce Brécourt, 2 larger dowry, 3 as it stands
+    courtier: { offers: 1, court: 0, servants: 2, choice: 2, persuade: 0, quarrel: 0, contract: 3 },
     homebody: { offers: 0, court: 0, servants: 1, choice: 2, persuade: 0, quarrel: 2, contract: 1 },
-    orleans: { offers: 1, court: 1, servants: 2, choice: leanPick('arm'), persuade: 0, quarrel: 1, contract: 1 },
-    burgundy: { offers: 1, court: 2, servants: 2, choice: leanPick('bur'), persuade: 0, quarrel: 1, contract: 1 },
-    hedger: { offers: 1, court: 0, servants: 2, choice: 2, persuade: 0, quarrel: 2, contract: 2 },
+    orleans: { offers: 1, court: 1, servants: 2, choice: leanPick('arm'), persuade: 0, quarrel: 1, contract: 2 },
+    burgundy: { offers: 1, court: 2, servants: 2, choice: leanPick('bur'), persuade: 0, quarrel: 1, contract: 2 },
+    hedger: { offers: 1, court: 0, servants: 2, choice: 2, persuade: 0, quarrel: 2, contract: 3 },
     christine: { offers: 0, court: 0, servants: 1, choice: 2, persuade: 0, quarrel: 2, contract: 0 },
   };
   const t = table[policy === 'deaf' || policy === 'seasonal' ? 'christine' : policy === 'loyal_arm' ? 'orleans' : policy === 'loyal_bur' ? 'burgundy' : policy];
@@ -70,6 +73,12 @@ function opValue(op, policy) {
   if (k === 'trust') return b * 0.15;
   if (k === 'use') return b * 0.1;
   if (k === 'later') return -0.5;
+  if (k === 'regard') return a * 0.1;
+  if (k === 'heed') return a * 0.05;
+  if (k === 'lands') return a * 6;
+  if (k === 'warn') return 2;
+  if (k === 'swingMod') return (1 - b) * 4;
+  if (k === 'ransomCut') return a * 10;
   return 0;
 }
 
@@ -77,10 +86,11 @@ const opsValue = (ops, policy) => (ops || []).reduce((t, o) => t + opValue(o, po
 
 function cardChoice(s, policy, rng) {
   const card = s.cards[0];
-  if (policy === 'random') return rng.int(card.choices.length);
+  const open = card.choices.map((c, i) => [c, i]).filter(([c]) => !c.locked);
+  if (policy === 'random') return rng.pick(open)[1];
   const careful = policy === 'christine' || policy === 'deaf' || policy === 'seasonal';
   let best = 0, bestV = -Infinity;
-  card.choices.forEach((c, i) => {
+  open.forEach(([c, i]) => {
     let val = opsValue(c.ops, policy);
     if (c.kind === 'chance') val += c.p * opsValue(c.win, policy) + (1 - c.p) * (opsValue(c.lose, policy) - (c.loseKind === 'settle' ? c.holdings * 6 : 0));
     if (c.kind === 'replace') val += s.npcs[c.who].seen >= 2 && s.npcs[c.who].rel < 0.65 ? 3 : -1;
@@ -93,6 +103,7 @@ function cardChoice(s, policy, rng) {
     // unless paying it would sink the house.
     if (c.kind === 'match') val += 10 + c.house.rank * 12 + (s.money + c.ops[0][1] > -1500 ? 0 : -60);
     if (c.kind === 'christine') val += 1;
+    if (c.kind === 'want') val += c.want === WANT_OF[policy] ? 10 : 0;
     if (c.ops?.some((o) => o[0] === 'flag' && o[1] === 'convent')) val += careful ? -2 : -6;
     if (val > bestV) { bestV = val; best = i; }
   });
@@ -138,7 +149,7 @@ function plan(s, v, policy, rng, deafened = false) {
   } else {
     // Obligations first, for every policy.
     if (ok.ransom) add('ransom', pickTarget(ok.ransom, [(t) => t.ok && Number(t.id) <= s.money - 300, () => true]));
-    if (ok.lawsuit) add('lawsuit');
+    if (ok.lawsuit && s.money >= 600) add('lawsuit', pickTarget(ok.lawsuit, [(t) => t.id === 'cause', (t) => t.id === 'brecourt']));
     if (ok.betroth) add('betroth', pickTarget(ok.betroth));
     if (policy === 'courtier') { add('attend'); add('petition', pickTarget(ok.petition, [patron('queen')])); add('courtly'); add('gossip', pickTarget(ok.gossip)); add('gift', 'queen'); }
     else if (SIDE[policy] && !ADAPTIVE.has(policy)) {
@@ -166,7 +177,7 @@ function plan(s, v, policy, rng, deafened = false) {
         add('letter', 'christine');
         add('courtly');
       }
-      if (s.money > 2500) add('chapel');
+      if (s.money > (WANT_OF[policy] === 'soul' ? 1200 : 2500)) add('chapel');
     }
   }
   // Thrift, for every policy but random: no optional spending below 800 livres.

@@ -11,6 +11,7 @@ import { applyOps, describeOps, gainRep } from './effects.js';
 import { coin } from './ledger.js';
 import { relWord, pct } from './derive.js';
 import { ladyAge, FIRST_TURN, factionLabel } from './clock.js';
+import { wantCard } from './arcs.js';
 
 const TRAITS = {
   temper: { high: '{X} has a temper. His servants are afraid of him.', low: '{X} is even-tempered, they say, and slow to anger.' },
@@ -50,7 +51,7 @@ function contractText(s) {
   const h = suitors[pick];
   const got = prefer === null ? 'You left it to him.' : prefer === pick ? 'The match is the one you wanted.' : 'He heard what was said for you, and decided otherwise.';
   const dowry = h.dowryAsk + s.act1.dowryBonus;
-  return `Your father has settled on ${h.name}. ${got} ${h.note} The dowry agreed is ${dowry} livres. The wedding is set for the spring, after your eighteenth birthday. The lawyers have one more question for you.`;
+  return `Your father has settled on ${h.name}. ${got} ${h.note} The dowry agreed is ${dowry} livres. The wedding is set for the spring, after your eighteenth birthday.\n\nThe lawyers have drawn the contract in the usual form. In return for the dowry you are to swear that you will claim nothing more of your father's lands, now or after his death. Daughters do; few think about it. There is also the matter of your dower, should you be widowed.`;
 }
 
 function viaWord(s, via) {
@@ -146,7 +147,10 @@ function wedding(s, lines) {
     competence: h.competence, loyalty: h.loyalty, temper: h.temper, spending: h.spending,
     heed: 15 + h.loyalty * 9 + (s.act1.prefer === s.act1.pick ? 10 : 0),
     status: 'present', away: 0, ransom: null, age: h.age,
+    regard: 40 + (s.act1.prefer === s.act1.pick ? 10 : 0),
   };
+  s.flags.husbandShort = h.short;
+  if (s.flags.renounced === undefined) s.flags.renounced = true;
   s.lands = h.lands; s.landsStart = h.lands;
   coin(s, CONFIG.startPurse, 'the household purse', FIRST_TURN - 1);
   coin(s, dowry, 'your dowry', FIRST_TURN - 1);
@@ -154,9 +158,10 @@ function wedding(s, lines) {
   const lean = h.lean === 'none' ? 'belongs to no party' : `is known as a friend of ${factionLabel(h.lean, FIRST_TURN)}`;
   s.cards.push({
     id: 'wedding', title: 'The wedding', when: 'April 1401',
-    text: `In April 1401, at eighteen, you marry ${h.name} in the church of your father's parish. Your father pays ${dowry} livres. Your husband holds ${h.lands} holdings and ${lean}. You leave your mother's house with Perrette, two chests and a book of hours.`,
+    text: `In April 1401, at eighteen, you marry ${h.name} in the chapel at Brécourt, where your father and his father were married. Your father pays ${dowry} livres. Your husband holds ${h.lands} holdings and ${lean}. You leave your mother's house with Perrette, two chests, and the book of hours your mother gave you, with wide margins, "for your own thoughts, which nobody else will want."`,
     lines: [ACT_CARDS[2]], choices: [{ label: 'Begin', ops: [] }],
   });
+  s.cards.push(wantCard(s));
   lines.push(`Married to ${h.name}. Age at the wedding: ${ladyAge(FIRST_TURN)}.`);
 }
 

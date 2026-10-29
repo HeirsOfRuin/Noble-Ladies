@@ -8,7 +8,7 @@ import { CAST } from '../data/cast.data.js';
 import { CONFIG } from '../data/config.data.js';
 import { coin } from './ledger.js';
 import { clamp, gainRep } from './effects.js';
-import { costOf, giftGain, lawsuitChance, petitionChance, childAge, nameOf } from './derive.js';
+import { costOf, giftGain, lawsuitChance, petitionChance, childAge, nameOf, brecourtChance, BRECOURT_JUDGMENT } from './derive.js';
 import { makeNpc } from './state.js';
 import { addNews } from './news.js';
 import { matchOffers } from './family.js';
@@ -93,6 +93,7 @@ export function resolveAction(s, act, rng, lines, ctx) {
     case 'letter': s.queue.push({ due: s.turn + 1, kind: 'letter', to: t }); lines.push(`A letter to ${t === 'husband' ? s.husband.short : CAST[t].name} is on the road.`); break;
     case 'chapel': {
       bump(s, 'rep', a.rep);
+      s.flags.chapels = (s.flags.chapels || 0) + 1;
       s.queue.push({ due: s.turn + a.delay, kind: 'chapel' });
       lines.push('The chapel is endowed. Masses will be said for your dead, and the county will notice.');
       break;
@@ -100,6 +101,15 @@ export function resolveAction(s, act, rng, lines, ctx) {
     case 'lawsuit': {
       const law = s.npcs.lawyer;
       law.seen += 1;
+      if (t === 'brecourt') {
+        s.flags.brecourtHearings = (s.flags.brecourtHearings || 0) + (law.rel >= 0.8 ? 2 : 1);
+        if (s.flags.brecourtHearings >= BRECOURT_JUDGMENT) {
+          const won = rng.chance(brecourtChance(s));
+          if (won) { s.flags.brecourt = 'judged'; s.lands += 3; gainRep(s, 3); lines.push('Judgment in the Parlement: Brécourt is yours. Gérard has a month to leave your father\'s house.'); }
+          else { s.flags.brecourt = 'refused'; lines.push('Judgment in the Parlement: the court upholds Gérard. Master Lorfèvre says there is no appeal worth making, and does not meet your eye.'); }
+        } else lines.push(`Master Lorfèvre argued Brécourt before the Parlement. ${s.flags.brecourtHearings} of ${BRECOURT_JUDGMENT} hearings.`);
+        break;
+      }
       s.cause.progress += law.rel >= 0.8 ? 2 : 1;
       if (s.cause.progress >= a.stepsToJudgment) {
         const won = rng.chance(lawsuitChance(s));
