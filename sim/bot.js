@@ -120,8 +120,12 @@ function pickTarget(p, prefer) {
 }
 
 function warned(s) {
-  // A warning she believes: the side it says will win is one she is weaker with.
-  for (const w of liveWarnings(s)) {
+  // A warning she believes: from someone who has proved reliable (or a friend),
+  // or two that agree; and the side it says will win is one she is weaker with.
+  // Hearsay alone moves nobody sensible.
+  const live = liveWarnings(s);
+  const agree = (w) => live.filter((x) => x.claim.winner === w.claim.winner).length >= 2;
+  for (const w of live.filter((x) => ['reliable', 'a friend', 'fair'].includes(x.srcWord) || agree(x))) {
     const lose = Math.max(...w.claim.losers.map((f) => tie(s, f)));
     if (lose > tie(s, w.claim.winner)) return w.claim;
   }
@@ -149,6 +153,7 @@ function plan(s, v, policy, rng, deafened = false) {
   } else {
     // Obligations first, for every policy.
     if (ok.ransom) add('ransom', pickTarget(ok.ransom, [(t) => t.ok && Number(t.id) <= s.money - 300, () => true]));
+    if (ok.callin && s.money < 500) add('callin', pickTarget(ok.callin));
     if (ok.lawsuit && s.money >= 600) add('lawsuit', pickTarget(ok.lawsuit, [(t) => t.id === 'cause', (t) => t.id === 'brecourt']));
     if (ok.betroth) add('betroth', pickTarget(ok.betroth));
     if (policy === 'courtier') { add('attend'); add('petition', pickTarget(ok.petition, [patron('queen')])); add('courtly'); add('gossip', pickTarget(ok.gossip)); add('gift', 'queen'); }
@@ -167,14 +172,15 @@ function plan(s, v, policy, rng, deafened = false) {
     } else { // christine, deaf, loyal_*
       const side = SIDE[policy];
       if (place === 'estates') {
+        // A warning she believes comes first: cut ties with the side about to fall.
+        if (claim) { for (const f of claim.losers) if (tie(s, f) >= 0.35 && ok.distance?.targets.some((x) => x.id === f && x.ok)) add('distance', f); add('gift', pickTarget(ok.gift, [patron(claim.winner)])); }
         add('accounts'); if (s.health < 60) add('rest'); if (s.hh < 50) add('repair'); add('children'); add('tenants');
-        if (claim) add('gift', pickTarget(ok.gift, [patron(claim.winner)]));
       } else {
         add('attend');
         add('petition', pickTarget(ok.petition, side ? [patron(side)] : [patron('queen'), patron('none')]));
         if (side) add('gift', pickTarget(ok.gift, [patron(side)]));
         if (s.info < 40) add('gossip', pickTarget(ok.gossip));
-        add('letter', 'christine');
+        add('letter', 'christine|own');
         add('courtly');
       }
       if (s.money > (WANT_OF[policy] === 'soul' ? 1200 : 2500)) add('chapel');
@@ -205,7 +211,7 @@ export function decide(s, policyName = 'christine') {
     const p = plan(s, v, policy, rng, deafened);
     // Until he has agreed to stay out of the armies, every plan carries a letter saying so.
     if (careful && s.husband && !s.husband.stay && s.turn >= 22 && p.actions.length) {
-      const alt = { ...p, actions: [...p.actions.slice(0, -1), { id: 'letter', target: 'husband' }] };
+      const alt = { ...p, actions: [...p.actions.slice(0, -1), { id: 'letter', target: 'husband|robert' }] };
       if (!planProblem(s, alt)) return alt;
     }
     return p;

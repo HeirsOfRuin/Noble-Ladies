@@ -10,6 +10,7 @@ import { SWINGS, PLAGUE } from '../data/history.data.js';
 import { onBoard, controlAt, queenSideAt, between, keyOf, factionLabel, turnOfKey } from './clock.js';
 import { clamp, TRAITS } from './effects.js';
 import { WANTS } from '../data/arcs.data.js';
+import { debtsIn } from './favours.js';
 
 export const D = (s) => DIFFICULTY[s.difficulty];
 export const costOf = (s, n) => Math.round(n * D(s).costMult);
@@ -131,7 +132,17 @@ function targetsFor(s, id) {
   });
   if (a.target === 'person') return Object.keys(s.npcs).filter((p) => present(s, p) && !['steward', 'maid', 'confessor', 'lawyer'].includes(p)).map((p) => ({ id: p, label: CAST[p].name, detail: `${giftGain(s, p) < 1 ? 'recent gifts dull this one · ' : ''}trust ${s.npcs[p].trust}`, ok: true }));
   if (a.target === 'source') return ['maid', 'friend'].filter((p) => present(s, p)).map((p) => ({ id: p, label: CAST[p].name, detail: relWord(s.npcs[p]), ok: true }));
-  if (a.target === 'correspondent') return correspondents(s).map((p) => ({ id: p, label: p === 'husband' ? `Your husband (counsel: ${COUNSEL[s.counsel]})` : CAST[p].name, detail: p === 'husband' ? `he listens: ${heedWord(s)}` : `trust ${s.npcs[p].trust}`, ok: true }));
+  if (a.target === 'correspondent') return correspondents(s).flatMap((p) => {
+    const who = p === 'husband' ? `Your husband (counsel: ${COUNSEL[s.counsel]})` : CAST[p].name;
+    const base = p === 'husband' ? `he listens ${heedWord(s)}` : `trust ${s.npcs[p].trust}`;
+    const open = letterOpenChance(s, p);
+    return [
+      { id: `${p}|own`, label: `${who}, by your own man`, detail: `${base} · arrives next half-year${open >= 0.1 ? ` · ${pct(open)} it is opened on the road` : ''}`, ok: true },
+      { id: `${p}|robert`, label: `${who}, by Brother Robert`, detail: `${base} · a half-year slower · a friar's bag is not searched`, ok: true },
+    ];
+  });
+  if (a.target === 'party') return ['arm', 'bur', 'queen'].map((f) => ({ id: f, label: f === 'queen' ? 'The queen\'s household' : factionLabel(f, s.turn), detail: `favour ${s.fav[f]}${s.colours === f ? ' · you wear their badge' : ''}${s.flags.exposedTo?.[f] ? ' · they have copies of your letters' : ''}`, ok: s.fav[f] > 0 || s.colours === f, why: 'You have no ties to them to cut.' }));
+  if (a.target === 'debt') return debtsIn(s).map((d) => ({ id: String(d.id), label: `${nameOf(s, d.who)}${d.hold ? ' (what you read)' : ''}`, detail: `${d.why} · ${['', 'a small debt', 'a real debt', 'a great debt'][d.w]}${d.hold ? ' · costs their trust' : ''}`, ok: true }));
   if (a.target === 'case') {
     const out = [];
     if (s.cause) out.push({ id: 'cause', label: s.cause.kind === 'dower' ? 'Your dower' : 'Your confiscated lands', detail: `${s.cause.progress} of ${a.stepsToJudgment} hearings; ${pct(lawsuitChance(s))} to win at judgment`, ok: true });
@@ -148,6 +159,23 @@ function targetsFor(s, id) {
 }
 
 export const BRECOURT_JUDGMENT = 6; // hearings before the Parlement judges Brécourt without a crisis to hurry it
+
+/** The side a correspondent is counted with, for whoever opens the letter. */
+export function letterSide(s, to) {
+  if (to === 'husband') return s.husband?.lean || 'none';
+  const f = s.npcs[to]?.faction || 'none';
+  return f === 'queen' ? queenSideAt(s.turn) : f;
+}
+
+/** The chance a letter by her own man is opened on the road: by whoever holds the roads. */
+export function letterOpenChance(s, to) {
+  const f = letterSide(s, to), c = controlAt(s.turn);
+  let p = 0.05;
+  if ((f === 'arm' || f === 'bur') && c !== 'contested' && c !== f) p = 0.35;
+  else if ((f === 'arm' || f === 'bur') && c === 'contested') p = 0.15;
+  if (hedging(s)) p += 0.1;
+  return clamp(p, 0, 0.6);
+}
 
 export const COUNSEL = { none: 'none given', stay: 'stay out of the armies', arm: 'hold to Orléans', bur: 'hold to Burgundy' };
 
@@ -168,6 +196,7 @@ export function actionPreview(s, id, place = s.place) {
   else if (id === 'children' && !s.children.some((c) => c.alive)) why = 'You have no children yet.';
   else if (id === 'lawsuit' && !s.cause && !brecourtOpen(s)) why = 'You have no case before the Parlement.';
   else if (id === 'betroth' && !marriageable(s).length) why = `No child is old enough for a contract (${CONFIG.childOfAge}).`;
+  else if (id === 'callin' && !debtsIn(s).length) why = 'Nobody owes you anything yet.';
   else if (id === 'ransom' && s.husband?.status !== 'captured') why = 'Nobody of yours is held for ransom.';
   else if (id === 'petition' && !patrons(s).length) why = 'No patron is at court.';
   const cost = costOf(s, a.cost);
@@ -189,8 +218,18 @@ export function tie(s, f) {
   let t = s.fav[f] / 100;
   if (s.husband && ['present', 'away'].includes(s.husband.status) && s.husband.lean === f) t += 0.3;
   if (queenSideAt(s.turn) === f) t += s.fav.queen / 250;
+  if (s.colours === f) t += 0.25;                       // her household wears their badge
+  t += s.flags.exposedTo?.[f] || 0;                     // letters of hers that were opened
   return t;
 }
+
+/** Badges: from 1405 the princes' followers wore their emblems; from 1411 Paris wore them to survive. */
+export const coloursOpen = (s) => s.turn >= turnOfKey('1405a');
+export const COLOURS = {
+  none: () => 'No badge: your people wear your own livery',
+  arm: (s) => (keyOf(s.turn) >= '1410a' ? 'The white sash of the Armagnacs' : 'The knotted stick of Orléans'),
+  bur: (s) => (keyOf(s.turn) >= '1411a' ? 'The cross of Saint Andrew, for Burgundy' : 'The carpenter\'s plane of Burgundy'),
+};
 
 export function protector(s) {
   return present(s, 'berry') && s.npcs.berry.trust >= 40;
@@ -242,7 +281,7 @@ export function warProtected(s) {
 /** The chance soldiers damage her lands this half-year, and of losing a holding outright. */
 export function warRisk(s) {
   const p = warProtected(s);
-  return { raid: s.guard > 0 ? 0 : p ? 0.12 : 0.4, lose: s.guard > 0 ? 0 : p ? 0 : 0.12, protected: p };
+  return { demand: s.guard > 0 ? 0 : p ? 0.15 : 0.45, raid: p ? 0.35 : 0.65, lose: p ? 0 : 0.2, protected: p };
 }
 
 export function hedging(s) {

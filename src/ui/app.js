@@ -27,7 +27,7 @@ const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').
 const num = (n) => Number(n).toLocaleString('en-GB');
 const signed = (n) => (n > 0 ? `+${num(n)}` : num(n));
 const pct = (p) => `${Math.round(p * 100)}%`;
-const MULTI = new Set(['gift', 'letter']); // the engine allows these twice, for different people
+const MULTI = new Set(['gift', 'letter', 'distance']); // the engine allows these twice, for different people
 
 function save() { if (state) lsSet(SAVE_KEY, serialize(state)); }
 function load() {
@@ -196,6 +196,11 @@ function houseTab() {
     ${h.said.length ? `<p class="said">What is said of her: <em>${esc(h.said.join(', '))}</em>.</p>` : '<p class="hint">Nobody has made up their mind about her yet. Her choices will.</p>'}
     ${W ? `<div class="box ${W.achieved ? 'done' : ''}"><p class="label">What you want: ${esc(W.label)}</p><p>${esc(W.goal)}</p><p class="small">${esc(W.progress)}${W.achieved ? ' <b>Achieved.</b>' : ''}</p></div>` : ''}
     <div class="box"><p class="label">Brécourt</p><p class="small">${esc(h.brecourt)}</p></div>
+    <div class="box"><p class="label">Favours owed</p>
+      ${h.owedToYou.length ? `<p class="small">Owed to you: ${h.owedToYou.map((d) => `${esc(d.who)} (${esc(d.why)}${d.hold ? '; leverage, not a debt' : ''})`).join('; ')}.</p>` : '<p class="small">Nobody owes you anything yet. Help people, and they will.</p>'}
+      ${h.youOwe.length ? `<p class="small">You owe: ${h.youOwe.map((d) => `${esc(d.who)} (${esc(d.why)})`).join('; ')}. They will ask, at a time of their choosing.</p>` : ''}
+      <p class="hint">Call in what you are owed with the action of that name: money, a word for you, or what they know.</p></div>
+    ${h.coloursOpen && v.phase === 'plan' ? `<div class="box"><p class="label">What your household wears</p><div class="chips">${Object.entries(h.coloursOptions).map(([k, label]) => `<button data-colours="${k}" class="${h.colours === k ? 'on' : ''}">${esc(label)}</button>`).join('')}</div><p class="hint">A badge worn at court wins that side's favour every half-year, costs you the other's, and marks you when Paris turns.</p></div>` : ''}
     <p>Age ${h.age}. ${h.lands} holding${h.lands === 1 ? '' : 's'}${h.landsStart ? ` of the ${h.landsStart} the house began with` : ''}.${h.pregnant ? ' You are with child.' : ''}</p>
     <table class="stats">
       <tr><td>Good name</td><td>${bar(v.rep)}</td><td class="num">${v.rep}</td></tr>
@@ -289,7 +294,7 @@ function step(input) {
 }
 
 app.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-act],[data-tab],[data-action],[data-choice],[data-place],[data-pick],[data-unpick],[data-target],[data-counsel]');
+  const t = e.target.closest('[data-act],[data-tab],[data-action],[data-choice],[data-place],[data-pick],[data-unpick],[data-target],[data-counsel],[data-colours]');
   if (!t || busy) return;
   busy = true;
   try {
@@ -312,6 +317,7 @@ app.addEventListener('click', (e) => {
     }
     else if (d.unpick !== undefined) { draft.actions.splice(Number(d.unpick), 1); }
     else if (d.counsel) { step({ type: 'counsel', value: d.counsel }); }
+    else if (d.colours) { step({ type: 'colours', value: d.colours }); }
     else if (d.action === 'commit') {
       const record = step({ type: 'plan', place: draft.place, actions: draft.actions.map(({ id, target }) => ({ id, target })) });
       draft = null; tab = 'play';

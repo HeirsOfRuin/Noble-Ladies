@@ -12,7 +12,7 @@ import { CAST, SUITORS, LADY } from '../data/cast.data.js';
 import { streamFor } from './rng.js';
 
 export const SAVE_KEY = 'the-lady-of-saint-pol.save.v1'; // never rename
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 export const CODE_PREFIX = 'LSP1.';
 
 const draw = (rng, v, dp = 0) => {
@@ -65,6 +65,9 @@ export function newGame({ seed = 1, difficulty = 'normal', name } = {}) {
     traits: { devout: 0, bold: 0, warm: 0 },
     want: null,
     arcs: {},
+    debts: [],          // favours owed, both ways (src/engine/favours.js)
+    colours: 'none',    // whose badge her household wears
+    stats: { cards: 0 },
     turn: 1,
     phase: 'scene',
     money: 0,
@@ -105,6 +108,8 @@ export const MIGRATIONS = {
   // v2 (2026-10-29): her character, her ambition, story beats, her husband's
   // regard. A v1 game carries on: beats already past are passed by, and its
   // contract is read as the usual one (the inheritance renounced).
+  // v3 (2026-10-29): favours owed, household colours, play counters.
+  2: (s) => ({ ...s, v: 3, debts: [], colours: 'none', stats: { cards: 0 } }),
   1: (s) => {
     const flags = { renounced: true, ...s.flags };
     if (s.husband && !flags.husbandShort) flags.husbandShort = s.husband.short;

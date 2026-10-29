@@ -6,11 +6,13 @@
 import { ACTIONS } from '../data/actions.data.js';
 import { CAST } from '../data/cast.data.js';
 import { CONFIG } from '../data/config.data.js';
+import { controlAt } from './clock.js';
 import { coin } from './ledger.js';
-import { clamp, gainRep } from './effects.js';
-import { costOf, giftGain, lawsuitChance, petitionChance, childAge, nameOf, brecourtChance, BRECOURT_JUDGMENT } from './derive.js';
+import { clamp, gainRep, applyOps } from './effects.js';
+import { letterOpenChance, letterSide, costOf, giftGain, lawsuitChance, petitionChance, childAge, nameOf, brecourtChance, BRECOURT_JUDGMENT } from './derive.js';
 import { makeNpc } from './state.js';
 import { addNews } from './news.js';
+import { addDebt, callInCard } from './favours.js';
 import { matchOffers } from './family.js';
 
 const REPLACEMENTS = {
@@ -90,7 +92,33 @@ export function resolveAction(s, act, rng, lines, ctx) {
       lines.push('You saw to the children: their health, their letters, their manners.');
       break;
     }
-    case 'letter': s.queue.push({ due: s.turn + 1, kind: 'letter', to: t }); lines.push(`A letter to ${t === 'husband' ? s.husband.short : CAST[t].name} is on the road.`); break;
+    case 'letter': {
+      const [to, how] = String(t).split('|');
+      const name = to === 'husband' ? s.husband.short : CAST[to].name;
+      if (how === 'robert') {
+        s.npcs.confessor.seen += 1;
+        s.queue.push({ due: s.turn + 2, kind: 'letter', to });
+        lines.push(`Brother Robert takes your letter to ${name} in his satchel, with his breviary. It will be slow.`);
+      } else {
+        s.queue.push({ due: s.turn + 1, kind: 'letter', to });
+        lines.push(`Your man rides with a letter to ${name}.`);
+        if (rng.chance(letterOpenChance(s, to))) {
+          const f = letterSide(s, to), c = controlAt(s.turn);
+          s.flags.exposedTo = { ...(s.flags.exposedTo || {}) };
+          if (f === 'arm' || f === 'bur') s.flags.exposedTo[f] = Math.min(0.4, (s.flags.exposedTo[f] || 0) + 0.15);
+          if (c === 'arm' || c === 'bur') s.fav[c] = clamp(s.fav[c] - 5);
+          s.flags.lettersOpened = (s.flags.lettersOpened || 0) + 1;
+          lines.push(`Your letter to ${name} was opened at a gate and sealed again, badly. Someone has a copy. It will count against you when Paris next changes hands.`);
+        }
+      }
+      break;
+    }
+    case 'intercept': {
+      s.npcs.maid.seen += 1;
+      s.queue.push({ due: s.turn + 1, kind: 'intercept', who: t, p: 0.3 + s.npcs.maid.rel * 0.6, caught: (1 - s.npcs.maid.loyalty) * 0.4 });
+      lines.push(`${nameOf(s, 'maid')} has a cousin who carries letters for ${CAST[t].short}'s household.`);
+      break;
+    }
     case 'chapel': {
       bump(s, 'rep', a.rep);
       s.flags.chapels = (s.flags.chapels || 0) + 1;
@@ -120,6 +148,21 @@ export function resolveAction(s, act, rng, lines, ctx) {
         } else lines.push('Judgment in the Parlement: you lose. There is no appeal worth making.');
         s.cause = null;
       } else lines.push(`Your procureur argued the case. ${s.cause.progress} of ${a.stepsToJudgment} hearings.`);
+      break;
+    }
+    case 'distance': {
+      const f = t;
+      s.fav[f] = clamp(s.fav[f] + a.favour);
+      if (s.colours === f) s.colours = 'none';
+      if (s.flags.exposedTo?.[f]) { s.flags.exposedTo = { ...s.flags.exposedTo, [f]: 0 }; }
+      gainRep(s, -1);
+      lines.push(`You burned their letters in the kitchen fire and stopped going to their masses. ${f === 'queen' ? 'The queen\'s ladies' : 'Their people'} noticed within the week. Favour ${a.favour}.`);
+      break;
+    }
+    case 'callin': {
+      const d = s.debts.find((x) => x.id === Number(t));
+      s.cards.push(callInCard(s, d));
+      lines.push(`You go in person to ${CAST[d.who].short}.`);
       break;
     }
     case 'servant': {
@@ -164,7 +207,8 @@ export function resolveDue(s, q, rng, lines) {
       const amount = ACTIONS.petition.pension[n.faction];
       s.pensions.push({ from: q.npc, faction: n.faction, amount });
       n.use = clamp(n.use + 5);
-      lines.push(`Your petition is granted: a pension of ${amount} livres a half-year from ${CAST[q.npc].short}.`);
+      lines.push(`Your petition is granted: a pension of ${amount} livres a half-year from ${CAST[q.npc].short}. A pension is also a debt: one day they will ask for something.`);
+      addDebt(s, q.npc, 'out', 1, 'the pension they granted you');
     } else {
       fav(s, n.faction, ACTIONS.petition.failFavour);
       lines.push(`Your petition to ${CAST[q.npc].short} was refused.`);
@@ -192,11 +236,30 @@ export function resolveDue(s, q, rng, lines) {
     const n = s.npcs[q.to];
     if (!n.alive) return;
     n.trust = clamp(n.trust + ACTIONS.letter.trust); n.use = clamp(n.use + ACTIONS.letter.use);
-    if (['christine', 'friend', 'mother'].includes(q.to)) {
-      bump(s, 'info', ACTIONS.letter.info);
-      addNews(s, rng, { quality: q.to === 'christine' ? 0.85 : q.to === 'friend' ? 0.4 + 0.5 * n.rel : 0.5, src: q.to, horizon: 3 });
-    }
+    // Correspondents are the best road for news: better than talk at court.
+    bump(s, 'info', ACTIONS.letter.info);
+    addNews(s, rng, { quality: q.to === 'christine' ? 0.9 : q.to === 'friend' ? 0.45 + 0.5 * n.rel : CAST[q.to].role === 'patron' ? 0.65 : 0.55, src: q.to, horizon: 3 });
     lines.push(`${CAST[q.to].name} has answered your letter.`);
+  } else if (q.kind === 'intercept') {
+    const n = s.npcs[q.who];
+    if (!n?.alive) return;
+    if (rng.chance(q.caught)) {
+      gainRep(s, -8); n.trust = clamp(n.trust - 30); if (n.faction !== 'none') fav(s, n.faction, -8);
+      lines.push(`The cousin was caught with ${CAST[q.who].short}'s letters open on a kitchen table, and said whose woman sent him. Reputation -8.`);
+      return;
+    }
+    if (rng.chance(q.p)) {
+      applyOps(s, [['hold', q.who, `what you read in ${CAST[q.who].short}'s letters`], ['info', 8]]);
+      if (n.faction === 'arm' || n.faction === 'bur') addNews(s, rng, { quality: 0.9, src: 'maid', horizon: 3 });
+      lines.push(`You have read ${CAST[q.who].short}'s letters, and copied what mattered. You now hold something over ${CAST[q.who].short}.`);
+    } else lines.push(`${nameOf(s, 'maid')}'s cousin brought nothing back but a story about a dog.`);
+  } else if (q.kind === 'loan') {
+    coin(s, -q.amount, 'repaying the Lombards');
+    lines.push(`The Lombard banker's man comes for ${q.amount} livres, on the day, with a notary.`);
+  } else if (q.kind === 'churching') {
+    coin(s, -20, 'candles and a veil for your churching');
+    gainRep(s, 1);
+    lines.push('Forty days after the birth you were churched at the parish church, in a new veil, and the women of the household walked behind you with candles.');
   } else if (q.kind === 'chapel') {
     bump(s, 'rep', ACTIONS.chapel.repLater); s.npcs.confessor.trust = clamp(s.npcs.confessor.trust + ACTIONS.chapel.confessorTrust);
     lines.push(`The first masses are said in your chapel. Reputation +${ACTIONS.chapel.repLater}.`);

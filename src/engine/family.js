@@ -46,7 +46,13 @@ export function familyTurn(s, rng, place, ctx) {
       const used = s.children.map((c) => c.name);
       const name = rng.pick(CHILD_NAMES[sex].filter((n) => !used.includes(n))) || CHILD_NAMES[sex][0];
       s.children.push({ id: s.nextId++, name, sex, born: s.turn, alive: true, care: 30, betrothed: null });
-      s.cards.push({ id: 'birth', title: `A ${sex}`, text: `You are delivered of a ${sex}. ${name} is baptised within the week. Your health is spent for a while.`, choices: [{ label: 'Continue', ops: [] }] });
+      const id = s.children.at(-1).id;
+      s.queue.push({ due: s.turn + 1, kind: 'churching' });
+      s.cards.push({ id: 'birth', title: `A ${sex}`, text: `You are delivered of a ${sex}, after a day and a night, with the midwife from the town and your women holding your hands. ${name} is baptised within the week. Your health is spent for a while.\n\nThe question every lady's household asks next: a wet nurse, or your own milk.`,
+        choices: [
+          { label: 'Hire a wet nurse from the village', note: 'A strong woman with her own baby, forty livres a year and her keep. You recover sooner. The child will love her first.', ops: [['purse', -40, 'a wet nurse'], ['health', 6]], kind: 'nurse', child: id },
+          { label: 'Nurse the child yourself', note: 'Unusual in a lady, and the women will say so. The child stays close; you stay tired.', ops: [['health', -4], ['trait', 'warm', 1], ['rep', -1]], kind: 'ownMilk', child: id },
+        ] });
     }
   }
 

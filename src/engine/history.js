@@ -62,6 +62,7 @@ function applySwing(s, key, place) {
     if (s.cause?.kind === 'confiscation' && !s.confiscated.length) s.cause = null;
   }
   if (o.modNote) lines.unshift(o.modNote);
+  if (s.flags.exposedTo && Object.keys(s.flags.exposedTo).length) { if (w.losers.some((f) => s.flags.exposedTo[f])) lines.push('Copies of your letters were in the council\'s hands.'); s.flags.exposedTo = {}; }
   if (!lines.length) lines.push('It passes you by. You were not important enough to punish or to reward.');
   return lines;
 }

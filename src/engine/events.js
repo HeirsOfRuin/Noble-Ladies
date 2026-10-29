@@ -8,8 +8,9 @@
 import { CAST } from '../data/cast.data.js';
 import { SUITORS } from '../data/cast.data.js';
 import { PLAGUE } from '../data/history.data.js';
-import { keyOf, factionLabel } from './clock.js';
+import { keyOf, factionLabel, controlAt } from './clock.js';
 import { hedging, present, nameOf, protector, costOf } from './derive.js';
+import { debtsOut } from './favours.js';
 import { WAR } from './family.js';
 import { lateCard } from './act1.js';
 
@@ -113,6 +114,41 @@ const E = {
       ],
     }),
   },
+  debt_called: {
+    // Someone she owes asks for it back, usually at a bad moment (favours.js).
+    weight: (s) => (debtsOut(s).some((d) => s.turn - d.turn >= 2) ? 0.45 : 0),
+    card: (s, rng) => {
+      const d = rng.pick(debtsOut(s).filter((x) => s.turn - x.turn >= 2));
+      const n = s.npcs[d.who], c = CAST[d.who];
+      const other = n.faction === 'arm' ? 'bur' : n.faction === 'bur' ? 'arm' : null;
+      const word = other
+        ? { label: `Speak for their man, openly`, note: `Everyone in ${factionLabel(other, s.turn)} will hear you did.`, ops: [['fav', other, -6 * d.w], ['fav', n.faction, 3], ['trust', d.who, 10], ['clearDebt', d.id]] }
+        : { label: 'Lend your name to their request at court', note: 'The queen\'s people will notice whose errands you run.', ops: [['fav', 'queen', -4 * d.w], ['trust', d.who, 10], ['clearDebt', d.id]] };
+      return {
+        title: `${c.short[0].toUpperCase()}${c.short.slice(1)} calls in a debt`,
+        text: `${nameOf(s, d.who)} has not forgotten ${d.why}. A letter comes, polite and specific: a word for one of their people before the council, or, failing that, ${120 * d.w} livres, which is what such a word is worth.`,
+        choices: [
+          word,
+          { label: `Pay ${120 * d.w} livres instead`, note: 'Money settles it, and buys nothing more.', ops: [['purse', -120 * d.w, `what you owed ${c.short}`], ['clearDebt', d.id]] },
+          { label: 'Refuse', note: 'A lady who does not pay what she owes is talked about.', ops: [['trust', d.who, -25], ['rep', -4], ['clearDebt', d.id]] },
+        ],
+      };
+    },
+  },
+  etrennes: {
+    // New Year's gifts at court (étrennes): what you give, and to whom, is read by everyone.
+    weight: (s, place) => (place === 'court' && keyOf(s.turn).endsWith('b') ? 0.55 : 0),
+    card: (s) => {
+      const to = Object.keys(GIFTS).filter((p) => present(s, p));
+      return {
+        title: 'New Year\'s gifts', text: 'On the first day of January the court gives gifts, and everyone notes who gave what to whom. The queen\'s ladies compare. The princes keep lists. Your husband says a lady of your rank is expected to give something, and something that will be talked about.',
+        choices: [
+          ...to.slice(0, 3).map((p) => ({ label: `To ${CAST[p].name}: ${GIFTS[p].what.split(',')[0]}`, note: `${costOf(s, GIFTS[p].cost)} livres. A gift received is a debt, however small.`, ops: [['purse', -costOf(s, GIFTS[p].cost), `New Year's gift for ${CAST[p].short}`], ['trust', p, 8], ['use', p, 5], ...(GIFTS[p].fav ? [['fav', GIFTS[p].fav, 5]] : [['rep', 2]]), ['owe', p, 1, 'your New Year\'s gift']] })),
+          { label: 'To your husband only: a hawk', note: '60 livres. The court will notice you gave nothing to anyone who matters.', ops: [['purse', -costOf(s, 60), 'a hawk for your husband'], ['regard', 6], ['fav', 'queen', -3]] },
+        ],
+      };
+    },
+  },
   christine_letter: {
     weight: (s) => (present(s, 'christine') && s.npcs.christine.trust >= 35 ? 0.15 : 0),
     card: () => ({
@@ -154,6 +190,43 @@ export function queuedCard(s, id, rng) {
 }
 
 /** Pick at most one systemic event for this half-year. */
+const GARRISONS = ['Creil', 'Clermont', 'Compiègne', 'Senlis', 'Pontoise', 'Beaumont-sur-Oise'];
+const CAPTAINS = ['a Gascon called Arnaud de Lartigue', 'a Breton who calls himself the Bastard of Plouër', 'a Picard squire called Colart Hennequin', 'a Lombard crossbowman named Boniface'];
+
+/**
+ * Protection money (appatis). In the war years the captain of the nearest
+ * garrison, of whichever party, sells the villages around him their safety.
+ * Pay, refuse and risk the raid, or buy a safe-conduct through a patron.
+ */
+export function appatisCard(s, rng, gross, w) {
+  const garrison = rng.pick(GARRISONS), captain = rng.pick(CAPTAINS);
+  const price = costOf(s, 40 + s.lands * 6);
+  const loss = Math.round(gross * 0.45);
+  const ruling = controlAt(s.turn);
+  const patron = ['margaret', 'bernard', 'charles_o', 'berry', 'queen'].find((p) => present(s, p) && (s.npcs[p].faction === ruling || s.npcs[p].faction === 'none' || p === 'queen') && s.npcs[p].trust >= 20);
+  const burn = [['purse', -loss, 'barns burned by soldiers'], ['hh', -10]];
+  return {
+    id: 'appatis', title: 'A captain sends word',
+    text: `${captain[0].toUpperCase()}${captain.slice(1)}, who holds the castle at ${garrison} for whoever paid him last, sends a man to your steward with a list of your villages and a price: ${price} livres, and he will see that no harm comes to them until the vintage. The man waits in the kitchen and eats like a soldier.`,
+    lines: [],
+    choices: [
+      { label: `Pay the ${price} livres`, note: 'Every lady in the Beauvaisis pays someone. It is cheaper than barns.', ops: [['purse', -price, `appatis to the captain at ${garrison}`], ['guard', 2]] },
+      { label: 'Refuse, and set a watch on the villages', note: 'He may not bother. He may make an example of you.', kind: 'chance', p: 1 - w.raid, win: [['trait', 'bold', 1]], lose: w.lose ? [...burn, ['lands', -1], ['trait', 'bold', 1]] : [...burn, ['trait', 'bold', 1]] },
+      patron
+        ? { label: `Ask ${CAST[patron].short} for a safe-conduct`, note: 'A sealed letter the captain cannot ignore. It will be a debt.', ops: [['guard', 4], ['oweTo', patron, 1, `a safe-conduct for your villages from ${garrison}`]] }
+        : { label: 'Ask for a safe-conduct', note: 'You need a patron the captain fears, and someone who trusts you enough to write it.', locked: true, why: 'No patron of the ruling party knows you well enough (trust 20).', ops: [] },
+    ],
+  };
+}
+
+const GIFTS = {
+  queen: { what: 'a little book of hours from a workshop in the rue Neuve-Notre-Dame, with your arms on the clasp', cost: 220, fav: 'queen' },
+  berry: { what: 'a cameo set in gold, which the Duke will add to his collection without comment', cost: 260, fav: null },
+  margaret: { what: 'a pair of white greyhounds with collars of your colours', cost: 160, fav: 'bur' },
+  charles_o: { what: 'a book of ballades, newly copied', cost: 140, fav: 'arm' },
+  valentina: { what: 'a reliquary pendant from a Paris goldsmith', cost: 200, fav: 'arm' },
+};
+
 export function eventsTurn(s, rng, place, beats = 0) {
   // When her own story has a beat this half-year, the systemic events give way.
   if (!rng.chance(beats ? 0.3 : 0.75)) return;

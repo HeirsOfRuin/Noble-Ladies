@@ -10,8 +10,11 @@
     "smoke": "node tools/smoke.mjs",
     "check-bundle": "node tools/check-bundle.mjs",
     "icons": "node tools/make-icons.mjs",
-    "check": "node --test \"test/*.test.js\" && node sim/run.js --runs=50 --by=policy && node tools/bundle.js && node tools/check-bundle.mjs && node tools/smoke.mjs",
-    "serve": "python3 -m http.server 8000"
+    "check": "node tools/lint-style.mjs && node --test \"test/*.test.js\" && node sim/run.js --runs=50 --by=policy && node tools/bundle.js && node tools/check-bundle.mjs && node tools/smoke.mjs",
+    "serve": "python3 -m http.server 8000",
+    "lint": "node tools/lint-style.mjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

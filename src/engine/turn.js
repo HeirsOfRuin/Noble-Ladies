@@ -20,21 +20,22 @@ import { coin, turnAccount } from './ledger.js';
 import { newGame, makeNpc } from './state.js';
 import { applyOps, describeOps, clamp } from './effects.js';
 import { turnOfKey, FIRST_TURN, LAST_TURN, isAct1, dateLabel, actOf, actTitle, ladyAge, keyOf, controlAt, factionLabel } from './clock.js';
-import { traitWords, wantStatus, brecourtOpen, brecourtChance, BRECOURT_JUDGMENT, warRisk, placePreview, actionPreview, rentsGross, slotsFor, costOf, pct, exposureNow, hedging, nameOf, COUNSEL, heedWord, relWord, pensionPays, childAge, score } from './derive.js';
+import { coloursOpen, COLOURS, traitWords, wantStatus, brecourtOpen, brecourtChance, BRECOURT_JUDGMENT, warRisk, placePreview, actionPreview, rentsGross, slotsFor, costOf, pct, exposureNow, hedging, nameOf, COUNSEL, heedWord, relWord, pensionPays, childAge, score } from './derive.js';
 import { sceneView, resolveScene } from './act1.js';
 import { resolveAction, resolveDue } from './actions.js';
 import { familyTurn, birthRisk, childRisk, WAR } from './family.js';
 import { historyTurn, actTurn } from './history.js';
 import { arcsTurn } from './arcs.js';
+import { debtsIn, debtsOut } from './favours.js';
 import { WANTS } from '../data/arcs.data.js';
 import { ambientNews, addNews, liveWarnings } from './news.js';
-import { eventsTurn, queuedCard } from './events.js';
+import { eventsTurn, queuedCard, appatisCard } from './events.js';
 import { finish } from './ending.js';
 import { CAST } from '../data/cast.data.js';
 
 export { newGame };
 
-const MULTI = new Set(['gift', 'letter']); // may be taken twice in a half-year, for different people
+const MULTI = new Set(['gift', 'letter', 'distance']); // may be taken twice in a half-year, for different people
 
 /** What a plan will cost up front (actions and ransom payments). */
 export function planCost(s, place, actions = []) {
@@ -82,12 +83,8 @@ function income(s, rng, place, ctx, lines) {
   if (WAR.has(keyOf(s.turn))) {
     const w = warRisk(s);
     if (s.guard > 0) lines.push('Soldiers passed near your lands. The watch you set kept them off.');
-    else if (rng.chance(w.raid)) {
-      coin(s, -Math.round(gross * 0.4), 'barns burned by soldiers');
-      s.hh = clamp(s.hh - 10);
-      lines.push(`Soldiers burned barns on your lands${w.protected ? ', letters of protection or no' : ''}. Household -10.`);
-      if (s.lands > 2 && rng.chance(w.lose / w.raid)) { s.lands -= 1; lines.push('One village was burned out entirely and its people have gone. A holding is lost.'); }
-    } else if (w.protected) lines.push('Soldiers passed near your lands. Your letters of protection were honoured.');
+    else if (rng.chance(w.demand)) s.cards.push(appatisCard(s, rng, gross, w));
+    else if (w.protected) lines.push('Soldiers passed near your lands. Your letters of protection were honoured.');
   }
   if (s.guard > 0) s.guard -= 1;
   for (const p of s.pensions) if (pensionPays(s, p)) coin(s, p.amount, `pension from ${CAST[p.from].short}`);
@@ -99,6 +96,8 @@ function income(s, rng, place, ctx, lines) {
 
 function drift(s, place) {
   for (const f of ['queen', 'arm', 'bur']) s.fav[f] = clamp(s.fav[f] - CONFIG.favourDecay[place]);
+  // Her household's badge, worn at court: that side notices, and so does the other.
+  if (place === 'court' && s.colours !== 'none') { s.fav[s.colours] = clamp(s.fav[s.colours] + 3); const o = s.colours === 'arm' ? 'bur' : 'arm'; s.fav[o] = clamp(s.fav[o] - 2); }
   const cap = CONFIG.infoCap[place];
   const d = CONFIG.infoDrift[place];
   s.info = d > 0 ? Math.max(s.info, Math.min(cap, s.info + d)) : clamp(s.info + d);
@@ -195,6 +194,9 @@ function resolveCard(s, idx) {
     s.lands = Math.max(1, s.lands - c.holdings); // held by his brother until judgment
   } else if (k === 'settle') {
     s.lands = Math.max(1, s.lands - c.holdings);
+  } else if (k === 'nurse' || k === 'ownMilk') {
+    const child = s.children.find((x) => x.id === c.child);
+    if (child) { child.care = clamp(child.care + (k === 'nurse' ? 8 : 15), 0, 100); child.nurse = k === 'nurse'; }
   } else if (k === 'want') {
     s.want = c.want;
     lines.push(`You want ${WANTS[c.want].goal.charAt(0).toLowerCase()}${WANTS[c.want].goal.slice(1)}`);
@@ -221,6 +223,10 @@ export function advance(prev, input) {
   } else if (s.phase === 'card') {
     if (input?.type !== 'card') throw new Error('a card is waiting for a choice');
     record = resolveCard(s, input.choice);
+  } else if (s.phase === 'plan' && input?.type === 'colours') {
+    if (!coloursOpen(s) || !['none', 'arm', 'bur'].includes(input.value)) throw new Error('not allowed: household colours are not worn yet');
+    s.colours = input.value;
+    return { state: s, record: { turn: s.turn, colours: input.value, lines: [] } };
   } else if (s.phase === 'plan' && input?.type === 'counsel') {
     if (!COUNSEL[input.value]) throw new Error(`unknown counsel: ${input.value}`);
     if (!s.husband) throw new Error('not allowed: you have no husband to counsel');
@@ -291,6 +297,9 @@ export function houseView(s) {
     said: traitWords(s), want: wantStatus(s),
     regard: h ? regardWord(h.regard ?? 40) : null,
     brecourt: brecourtLine(s),
+    colours: s.colours, coloursOpen: coloursOpen(s), coloursOptions: Object.fromEntries(Object.entries(COLOURS).map(([k, f]) => [k, f(s)])),
+    owedToYou: debtsIn(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w, hold: d.hold })),
+    youOwe: debtsOut(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w })),
   };
 }
 

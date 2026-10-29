@@ -50,7 +50,8 @@ export function addNews(s, rng, { quality, src = 'talk', horizon = CONFIG.warnin
 
 /** The half-year's ambient news: what reaches her without asking. */
 export function ambientNews(s, rng, place) {
-  const q = place === 'court' ? 0.1 + s.info / 110 : s.info / 250;
+  // Talk at court is thinner than letters from people who know (FRAME-ROUND3: K2).
+  const q = place === 'court' ? 0.05 + s.info / 200 : s.info / 400;
   addNews(s, rng, { quality: Math.min(0.9, q), src: 'talk' });
 }
 

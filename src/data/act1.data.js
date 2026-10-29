@@ -67,8 +67,8 @@ export const ACT1 = [
     governess: 'What you do today, you will meet again in five years, wearing different clothes. Choose as if you will have to live beside it.',
     text: 'At the queen\'s court for the feast of Saint Denis, Ysabel de Fontenoy and Jacqueline d\'Aubercourt quarrel over who should walk first behind the queen\'s sister-in-law. Words are said. Both name you as a witness. You saw it all.',
     choices: [
-      { label: 'Speak for Ysabel', ops: [['trait', 'warm', 1], ['trust', 'friend', 15], ['trust', 'rival', -10], ['flag', 'quarrel', 'ysabel'], ['later', '1402b', 'rival_grudge']], note: 'A friend made firmer, an enemy made. Jacqueline does not forget.' },
-      { label: 'Speak for Jacqueline', ops: [['trait', 'warm', -1], ['trust', 'rival', 15], ['trust', 'friend', -12], ['flag', 'quarrel', 'jacqueline'], ['later', '1403a', 'rival_debt']], note: 'Jacqueline owes you, and she will remember it when it suits her.' },
+      { label: 'Speak for Ysabel', ops: [['owe', 'friend', 1, 'speaking for her at the feast of Saint Denis'], ['trait', 'warm', 1], ['trust', 'friend', 15], ['trust', 'rival', -10], ['flag', 'quarrel', 'ysabel'], ['later', '1402b', 'rival_grudge']], note: 'A friend made firmer, an enemy made. Jacqueline does not forget.' },
+      { label: 'Speak for Jacqueline', ops: [['owe', 'rival', 1, 'speaking for her at the feast of Saint Denis'], ['trait', 'warm', -1], ['trust', 'rival', 15], ['trust', 'friend', -12], ['flag', 'quarrel', 'jacqueline'], ['later', '1403a', 'rival_debt']], note: 'Jacqueline owes you, and she will remember it when it suits her.' },
       { label: 'Say you saw nothing', ops: [['trait', 'bold', -1], ['rep', 2], ['trust', 'friend', -5], ['trust', 'rival', -3], ['flag', 'quarrel', 'none'], ['later', '1402a', 'quarrel_none']], note: 'Discretion, and neither of them will forget it either.' },
     ],
   },

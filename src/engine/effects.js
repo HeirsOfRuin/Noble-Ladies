@@ -15,6 +15,8 @@
 //   ['warn', halfKey, npc]                  a true warning of that swing, from that person
 //   ['gone', npc, how]                      someone leaves the story (dies, goes to Burgundy)
 //   ['betrothEldest', house, rank, faction] her eldest unpromised child is betrothed there
+//   ['owe', npc, weight, why]  ['oweTo', npc, weight, why]   a debt to her, or hers to them (favours.js)
+//   ['clearDebt', id]  ['hold', npc, why]  ['warnNext', npc]  a call-in's effects
 //   ['count', key, n]                       add to a counter in flags (chapels, hearings)
 //   ['spending', n]                         her husband's spending trait, 1-5
 //   ['ransomCut', share]                    a share taken off her husband's ransom
@@ -24,6 +26,7 @@ import { turnOfKey } from './clock.js';
 import { CAST } from '../data/cast.data.js';
 import { FACTIONS } from '../data/config.data.js';
 import { SWINGS } from '../data/history.data.js';
+import { addDebt, clearDebt, nextSwing } from './favours.js';
 
 export const clamp = (x, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, x));
 
@@ -75,6 +78,13 @@ export function applyOps(s, ops = []) {
       const c = s.children.filter((x) => x.alive && !x.betrothed).sort((x, y) => x.born - y.born)[0];
       if (c) c.betrothed = { name: a, rank: b, faction: c2(op) };
     }
+    else if (k === 'owe') addDebt(s, a, 'in', b, c);
+    else if (k === 'oweTo') addDebt(s, a, 'out', b, c);
+    else if (k === 'clearDebt') clearDebt(s, a);
+    else if (k === 'hold') addDebt(s, a, 'in', 2, c || 'what you read in their letters', true);
+    else if (k === 'warnNext') { const key = nextSwing(s); if (key) applyOps(s, [['warn', key, a]]); }
+    else if (k === 'guard') s.guard = Math.max(s.guard, a);
+    else if (k === 'loan') s.queue.push({ due: s.turn + b, kind: 'loan', amount: a });
     else if (k === 'count') s.flags[a] = (s.flags[a] || 0) + b;
     else if (k === 'spending') { if (s.husband) s.husband.spending = Math.max(1, Math.min(5, s.husband.spending + a)); }
     else if (k === 'ransomCut') { if (s.husband?.ransom) s.husband.ransom.total = Math.round(s.husband.ransom.total * (1 - a)); }
@@ -99,6 +109,12 @@ export function describeOp(op) {
   if (k === 'heed') return a > 0 ? 'He will listen more' : 'He will listen less';
   if (k === 'lands') return `${signed(a)} holding${Math.abs(a) > 1 ? 's' : ''}`;
   if (k === 'swingMod' || k === 'warn') return 'Remembered later';
+  if (k === 'owe') return `${CAST[a].short} will owe you`;
+  if (k === 'oweTo') return `You will owe ${CAST[a].short}`;
+  if (k === 'hold') return `Leverage over ${CAST[a].short}`;
+  if (k === 'warnNext') return 'News, if there is any';
+  if (k === 'guard') return `Your villages left alone for ${a > 2 ? 'two years' : 'a year'}`;
+  if (k === 'loan') return `${a} livres to repay in ${b / 2} years`;
   if (k === 'betrothEldest') return 'Your eldest betrothed';
   if (k === 'spending') return a < 0 ? 'He spends less' : 'He spends more';
   if (k === 'ransomCut') return `Ransom −${Math.round(a * 100)}%`;
