@@ -145,7 +145,8 @@ function planView(v) {
     <h2>What will you do? <small>${draft.actions.length} of ${P.slots}</small></h2>
     ${chosen ? `<ol class="chosen">${chosen}</ol>` : '<p class="hint">Choose up to ' + P.slots + ' actions below. Most go through someone: their reliability is shown once you have used them.</p>'}
     <div class="stack actions">${P.actions.filter((a) => a.ok || !/^Only/.test(a.why || '')).map((a) => {
-      const taken = !a.targets?.length || !MULTI.has(a.id) ? draft.actions.some((x) => x.id === a.id) : false;
+      // Single actions: once in the plan. Per-person actions (gift, letter, distance): once every open target is taken.
+      const taken = !a.targets?.length || !MULTI.has(a.id) ? draft.actions.some((x) => x.id === a.id) : !a.targets.some((t) => t.ok && !draft.actions.some((x) => x.id === a.id && String(x.target) === String(t.id)));
       const short = a.ok && !taken && a.cost > left;
       const open = a.ok && !taken && !short && draft.actions.length < P.slots;
       return `
@@ -165,7 +166,11 @@ function targetSheet(id) {
   const P = view(state).plan.places.find((p) => p.place === draft.place);
   const a = P.actions.find((x) => x.id === id);
   return `<h2>${esc(a.label)}</h2><p class="hint">${esc(a.note)}</p>
-    <div class="stack">${a.targets.map((t) => `<button data-target="${esc(t.id)}" ${t.ok ? '' : 'disabled'}><strong>${esc(t.label)}</strong><small>${esc(t.ok ? t.detail : t.why)}</small></button>`).join('')}</div>
+    <div class="stack">${a.targets.map((t) => {
+      const taken = draft.actions.some((x) => x.id === id && String(x.target) === String(t.id));
+      const ok = t.ok && !taken;
+      return `<button data-target="${esc(t.id)}" ${ok ? '' : 'disabled'}><strong>${esc(t.label)}</strong><small>${esc(taken ? 'Already in your plan.' : t.ok ? t.detail : t.why)}</small></button>`;
+    }).join('')}</div>
     <button data-act="close">Cancel</button>`;
 }
 
@@ -333,9 +338,11 @@ app.addEventListener('click', (e) => {
       else if (act === 'quit') { state = null; modal = null; draft = null; }
       else if (act === 'install') { install?.(); }
       else if (act === 'export') { modal = `<h2>Save code</h2><textarea readonly rows="5">${esc(toCode(state))}</textarea><button class="primary" data-act="close">Done</button>`; }
-      else if (act === 'load-code') {
-        const code = prompt('Paste a save code');
-        if (code) { try { state = fromCode(code); save(); tab = 'play'; modal = null; draft = null; } catch (err) { banner = err.message; } }
+      // An in-page box, not prompt(): some hosts (claude.ai artifacts, some embeds) refuse dialogs silently.
+      else if (act === 'load-code') { modal = `<h2>Load a save code</h2><p class="hint">Paste a code copied from Menu, Copy a save code.</p><textarea id="code-in" rows="5" spellcheck="false"></textarea><div class="stack"><button class="primary" data-act="load-code-go">Load this game</button><button data-act="close">Cancel</button></div>`; }
+      else if (act === 'load-code-go') {
+        const code = document.getElementById('code-in')?.value || '';
+        try { state = fromCode(code); save(); tab = 'play'; modal = null; draft = null; banner = null; } catch (err) { modal = null; banner = err.message; }
       }
     }
     render();

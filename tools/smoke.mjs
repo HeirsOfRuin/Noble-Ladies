@@ -32,6 +32,7 @@ export async function advanceOnce(page) {
         for (let i = 0; i < n && !done; i++) {
           await picks.nth(i).click();
           if (await page.locator('.scrim [data-target]:not([disabled])').count()) await page.locator('.scrim [data-target]:not([disabled])').first().click();
+          else if (await page.locator('.scrim [data-act="close"]').count()) await page.locator('.scrim [data-act="close"]').first().click();
           done = true;
         }
       }
