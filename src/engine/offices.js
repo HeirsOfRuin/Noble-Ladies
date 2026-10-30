@@ -16,7 +16,7 @@ export const OFFICE_TABLE = {
   husband: (s) => {
     const c = controlAt(s.turn);
     const f = c === 'contested' ? (s.fav.arm >= s.fav.bur ? 'arm' : 'bur') : c;
-    return { id: 'husband', label: `your husband's place in the king's household, from ${factionLabel(f, s.turn)}`, faction: f, income: ACTIONS.office.income };
+    return { id: 'husband', label: `your husband's place in the king's household`, from: factionLabel(f, s.turn), faction: f, income: ACTIONS.office.income };
   },
 };
 

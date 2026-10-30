@@ -4,11 +4,12 @@
 // once, when the card is dealt, so they cannot be probed by asking again
 // (Touchline's rule for a value drawn once).
 
-import { BEATS, ARCS, WANTS } from '../data/arcs.data.js';
+import { BEATS, ARCS, WANTS, MEMOS, TOUCHES } from '../data/arcs.data.js';
 import { CAST } from '../data/cast.data.js';
 import { test, all } from './cond.js';
 import { applyOps } from './effects.js';
-import { turnOfKey, dateLabel, yearOf } from './clock.js';
+import { turnOfKey, dateLabel, yearOf, FIRST_TURN, keyOf, actOf } from './clock.js';
+import { SWINGS } from '../data/history.data.js';
 import { brecourtChance } from './derive.js';
 
 const clampP = (p) => Math.max(0.05, Math.min(0.95, p));
@@ -51,8 +52,9 @@ export function renderText(s, text) {
   return text.filter((part) => test(s, part.if)).map((part) => fill(s, part.text)).join('\n\n');
 }
 
-function buildChoice(s, c) {
+function buildChoice(s, c, memo) {
   const out = { label: fill(s, c.label), note: c.note ? fill(s, c.note) : '', ops: c.ops || [] };
+  if (memo || c.memo) out.memo = fill(s, memo || c.memo);
   if (c.kind) out.kind = c.kind;
   if (c.p !== undefined) out.p = chanceOf(s, c.p);
   if (c.win) out.win = c.win;
@@ -63,15 +65,43 @@ function buildChoice(s, c) {
   return out;
 }
 
-export function beatCard(s, b) {
-  const choices = b.choices.filter((c) => test(s, c.show)).map((c) => buildChoice(s, c));
+/** The last thing that happened in a storyline, if it was long enough ago to need recalling. */
+export function recallLine(s, arc) {
+  const last = [...(s.story || [])].reverse().find((e) => e.arc === arc);
+  if (!last || s.turn - last.turn < RECALL_AFTER) return null;
+  return `The last time, in the ${dateLabel(last.turn).replace(' ', ' of ').toLowerCase()}: ${last.memo}.`;
+}
+const RECALL_AFTER = 4; // half-years: two years away and a storyline reminds the player where it stood
+
+export function beatCard(s, b, touch = false) {
+  const choices = b.choices.map((c, i) => [c, i]).filter(([c]) => test(s, c.show)).map(([c, i]) => buildChoice(s, c, MEMOS[`${b.id}:${i}`]));
   // Every beat must leave a way through: if every choice is closed, the first opens.
   if (!choices.some((c) => !c.locked)) { delete choices[0].locked; delete choices[0].why; }
   return {
-    id: `beat:${b.id}`, beat: b.id, arc: ARCS[b.arc].title, title: b.title, when: dateLabel(s.turn),
-    text: renderText(s, b.text), lines: [], choices,
+    id: `beat:${b.id}`, beat: b.id, arcId: b.arc, touch, turn: s.turn, arc: ARCS[b.arc].title, title: b.title, when: dateLabel(s.turn),
+    recall: recallLine(s, b.arc), text: renderText(s, b.text), lines: [], choices,
   };
 }
+
+/** Half-years since a storyline was last seen (since the start of Act 2 if never). */
+export function arcGap(s, arc) {
+  const last = [...(s.story || [])].reverse().find((e) => e.arc === arc);
+  return s.turn - (last ? last.turn : FIRST_TURN);
+}
+
+/** Keeping in touch: in a half-year with no story beat, one short scene from the quietest storyline. */
+function touchTurn(s, lastChanceOnly = false) {
+  // Not beside a turning point that moves Paris, nor at the end of an act: those get the page to themselves.
+  if (SWINGS[keyOf(s.turn)] || actOf(s.turn + 1) > actOf(s.turn)) return 0;
+  const cands = TOUCHES.filter((t) => !s.arcs[t.id] && s.turn >= turnOfKey(t.from) && s.turn <= turnOfKey(t.until) && (!lastChanceOnly || s.turn === turnOfKey(t.until)) && all(s, t.if) && arcGap(s, t.arc) >= TOUCH_GAP);
+  if (!cands.length) return 0;
+  cands.sort((x, y) => arcGap(s, y.arc) - arcGap(s, x.arc) || turnOfKey(x.until) - turnOfKey(y.until));
+  const t = cands[0];
+  s.arcs[t.id] = 'done';
+  s.cards.push(beatCard(s, t, true));
+  return 1;
+}
+const TOUCH_GAP = 3;
 
 /** Beats eligible now: in their window, conditions holding, the first such in each arc. */
 export function eligibleBeats(s) {
@@ -98,7 +128,7 @@ export function arcsTurn(s) {
     if (b.onSkip) applyOps(s, b.onSkip);
   }
   const elig = eligibleBeats(s);
-  if (!elig.length) return 0;
+  if (!elig.length) return touchTurn(s);
   const rank = (e) => (e.last ? 0 : 2) + (ARCS[e.b.arc].spine ? 0 : 1);
   elig.sort((x, y) => rank(x) - rank(y));
   const fire = elig.filter((e, i) => i === 0 || (e.last && i < 2));
@@ -106,6 +136,8 @@ export function arcsTurn(s) {
     s.arcs[b.id] = 'done';
     s.cards.push(beatCard(s, b));
   }
+  // A keeping-in-touch scene on the last half-year of its window may sit beside a single beat.
+  if (fire.length === 1) touchTurn(s, true);
   return fire.length;
 }
 

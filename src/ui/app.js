@@ -118,6 +118,7 @@ function playTab(v) {
       ${choiceButtons(c.choices)}`;
     return `<p class="kicker">${esc(c.when || '')}${c.arc ? ` · ${esc(c.arc)}` : ''}${v.cardsLeft > 1 ? ` · ${v.cardsLeft - 1} more after this` : ''}</p>
       <h2 class="${c.history ? 'history' : ''}">${esc(c.title)}</h2>
+      ${c.recall ? `<p class="recall">${esc(c.recall)}</p>` : ''}
       ${c.text ? paras(c.text) : ''}
       ${c.lines.length ? `<ul class="lines">${c.lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
       ${choiceButtons(c.choices)}`;
@@ -222,6 +223,7 @@ function houseTab() {
       <p class="hint">Ties to the losing side bring fines and confiscation; ties to the winners bring rewards. Being on your estates when it happens halves the cost.</p></div>
     <h2>Your husband</h2>
     ${H ? `<p><strong>${esc(H.name)}</strong>. ${esc({ present: 'At home with you.', away: 'Away with the army.', captured: 'A prisoner in England.', dead: 'Dead.' }[H.status])} His party: ${esc(H.lean)}. ${esc(h.regard || '')}</p><p class="small">${traits}</p>
+      ${h.betweenHusband.length ? `<details class="between"><summary>Between you (${h.betweenHusband.length})</summary><ul>${h.betweenHusband.map((e) => `<li><small>${esc(e.date)}</small> ${esc(e.memo[0].toUpperCase() + e.memo.slice(1))}.</li>`).join('')}</ul></details>` : ''}
       ${H.ransom ? `<p class="warn">Ransom: ${num(H.ransom.paid)} of ${num(H.ransom.total)} l. paid.</p>` : ''}${counsel}`
       : h.widowed ? '<p>You are a widow, and govern your own affairs: one more action each half-year.</p>' : '<p class="empty">Not yet married.</p>'}
     <h2>Children</h2>
@@ -246,6 +248,7 @@ function peopleTab() {
   const ps = peopleView(state);
   const row = (p) => `<li class="person ${p.alive ? '' : 'gone'}">
       <strong>${esc(p.name)}</strong> <small>${esc(p.role)} · ${esc(p.faction)}${p.real ? ' · historical' : ''}</small>
+      ${p.between.length ? `<details class="between"><summary>Between you (${p.between.length})</summary><ul>${p.between.map((e) => `<li><small>${esc(e.date)}</small> ${esc(e.memo[0].toUpperCase() + e.memo.slice(1))}.</li>`).join('')}</ul></details>` : ''}
       ${p.alive ? `<div class="pair"><span>Trusts you ${bar(p.trust)}</span><span>Needs you ${bar(p.use)}</span></div><small>As a go-between: ${esc(p.word)}.${p.onBoard ? '' : ' Not yet at court.'}</small>` : `<small>${esc(p.goneHow || 'gone')}.</small>`}
       <p class="small">${esc(p.note)}</p></li>`;
   return `<h2>People</h2><p class="hint">Trust: does this person believe you. Need: do you matter to them. Reliability shows once you have used someone twice.</p><ul class="people">${ps.map(row).join('')}</ul>`;
@@ -274,12 +277,26 @@ function menuTab() {
   <p class="hint">Saves live in this browser on this device. A save code moves a game anywhere.</p>`;
 }
 
+// The half-year read as a page, not a list of system messages: the narrative in
+// prose, the numbers that rode along with it gathered in a footer, the money
+// folded away under "Accounts".
+const STAT_TAIL = /\s*((?:Her household favour|Household|Health|Reputation|Information|Favour|[A-Z][a-z]+ favour)\s*[+−-]\d+)\.?\s*$/;
 function report(r) {
   const acct = Object.entries(r.account || {});
+  const net = acct.reduce((a, [, n]) => a + n, 0);
+  const stats = [], prose = [];
+  for (const line of r.lines) {
+    const m = line.match(STAT_TAIL);
+    if (m) { stats.push(m[1]); const rest = line.replace(STAT_TAIL, '').trim(); if (rest) prose.push(/[.!?"]$/.test(rest) ? rest : `${rest}.`); }
+    else prose.push(line);
+  }
+  const season = r.date.split(' ')[0].toLowerCase();
+  const opening = `You spent the ${season} ${r.place === 'court' ? 'at court, in Paris' : 'on your estates'}.`;
   return `<h2>${esc(r.date)}</h2>
-    ${r.lines.length ? `<ul class="lines">${r.lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
-    ${acct.length ? `<table class="ledger">${acct.map(([k, n]) => `<tr><td>${esc(k)}</td><td class="num">${signed(n)}</td></tr>`).join('')}</table>` : ''}
-    <p>Purse: ${num(r.money)} livres.</p>
+    <p class="prose">${esc([opening, ...prose].join(' '))}</p>
+    ${stats.length ? `<p class="small">${esc(stats.join(' · '))}</p>` : ''}
+    <details class="accounts"><summary>Accounts: ${signed(net)} livres this half-year · purse ${num(r.money)}</summary>
+      ${acct.length ? `<table class="ledger">${acct.map(([k, n]) => `<tr><td>${esc(k)}</td><td class="num">${signed(n)}</td></tr>`).join('')}</table>` : ''}</details>
     <button class="primary" data-act="close">Continue</button>`;
 }
 

@@ -8,7 +8,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import { BEATS, ARCS, WANTS } from '../src/data/arcs.data.js';
+import { BEATS as STORY_BEATS, TOUCHES, ARCS, WANTS, MEMOS } from '../src/data/arcs.data.js';
+const BEATS = [...STORY_BEATS, ...TOUCHES];
 import { ACT1, ACT1_LATE } from '../src/data/act1.data.js';
 import { KNOWN, flagsRead } from '../src/engine/cond.js';
 import { flagsSet } from '../src/engine/effects.js';
@@ -35,6 +36,11 @@ test('every beat is well formed and on the calendar', () => {
     for (const c of conds(b)) walk(c, (x) => { if (['trust', 'use', 'alive'].includes(x[0])) assert.ok(CAST[x[1]], `${b.id}: unknown person ${x[1]}`); });
     for (const c of conds(b)) walk(c, (x) => { if (x[0] === 'want') assert.ok(WANTS[x[1]], `${b.id}: unknown want ${x[1]}`); });
   }
+});
+
+test('every story choice has a memo for when the storyline returns', () => {
+  for (const b of BEATS) b.choices.forEach((c, i) => assert.ok(c.memo || MEMOS[`${b.id}:${i}`], `${b.id}:${i} has no memo`));
+  for (const k of Object.keys(MEMOS)) { const [id, i] = k.split(':'); assert.ok(STORY_BEATS.find((b) => b.id === id)?.choices[Number(i)], `memo ${k} names no choice`); }
 });
 
 test('every flag a beat reads is set somewhere, and every flag a beat sets is read somewhere', () => {

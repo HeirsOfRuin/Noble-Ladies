@@ -134,6 +134,7 @@ function resolveHalfYear(s, input) {
   ambientNews(s, r('news'), place);
   if (!s.over) eventsTurn(s, r('events'), place, beats);
   if (!s.over) actTurn(s);
+  orderCards(s);
 
   if (!s.over && s.health <= 0) { s.over = true; s.outcome = 'dead'; s.flags.death = 'illness'; }
   if (!s.over && s.money < CONFIG.ruinDebt) { s.over = true; s.outcome = 'ruined'; }
@@ -142,6 +143,16 @@ function resolveHalfYear(s, input) {
   s.history.push(record);
   s.turn += 1;
   return record;
+}
+
+/**
+ * The order a half-year's cards are read in: the world first (history), then her
+ * people (story beats), then her household (births, children, letters, events),
+ * then her own page and the next act. Stable within each group.
+ */
+const CARD_GROUP = (c) => (c.history || c.id.startsWith('news:') ? 0 : c.beat && !c.touch ? 1 : c.touch ? 2 : c.margin ? 8 : /^act\d/.test(c.id) ? 9 : ['wedding', 'want'].includes(c.id) ? 0 : 4);
+function orderCards(s) {
+  s.cards = s.cards.map((c, i) => [c, i]).sort((a, b) => CARD_GROUP(a[0]) - CARD_GROUP(b[0]) || a[1] - b[1]).map(([c]) => c);
 }
 
 function settlePhase(s) {
@@ -169,6 +180,7 @@ function resolveCard(s, idx) {
   if (!c) throw new Error(`no such choice: ${idx}`);
   if (c.locked) throw new Error(`not allowed: ${c.why}`);
   s.cards.shift();
+  if (card.beat && c.memo) (s.story ||= []).push({ turn: card.turn ?? s.turn - 1, arc: card.arcId, beat: card.beat, memo: c.memo });
   s.stats = s.stats || { cards: 0 };
   s.stats.cards += 1;
   if (card.beat || card.margin || card.history) s.stats.beats = (s.stats.beats || 0) + 1;
@@ -287,7 +299,7 @@ export function view(s) {
   if (s.phase === 'scene') v.scene = sceneView(s);
   if (s.phase === 'card') {
     const c = s.cards[0];
-    v.card = { id: c.id, title: c.title, when: c.when || dateLabel(s.turn - 1), text: c.text, lines: c.lines || [], history: !!c.history, arc: c.arc || null, margin: !!c.margin,
+    v.card = { id: c.id, title: c.title, when: c.when || dateLabel(s.turn - 1), text: c.text, lines: c.lines || [], history: !!c.history, arc: c.arc || null, margin: !!c.margin, recall: c.recall || null,
       choices: c.choices.map((x) => ({ label: x.label, note: x.note || '', stake: x.locked ? '' : cardStake(s, x), locked: !!x.locked, why: x.why || '' })) };
     v.cardsLeft = s.cards.length;
   }
@@ -315,6 +327,7 @@ export function houseView(s) {
     brecourt: brecourtLine(s),
     colours: s.colours, coloursOpen: coloursOpen(s), coloursOptions: Object.fromEntries(Object.entries(COLOURS).map(([k, f]) => [k, f(s)])),
     offices: s.offices.map((o) => ({ ...o })),
+    betweenHusband: storyOf(s, ['husband', 'arms']), brecourtStory: storyOf(s, ['brecourt']),
     owedToYou: debtsIn(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w, hold: d.hold })),
     youOwe: debtsOut(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w })),
   };
@@ -330,10 +343,19 @@ function brecourtLine(s) {
   return 'Gérard holds Brécourt. No case is open against him.';
 }
 
+/** Which storyline is about which person, for "between you" histories. */
+const ARC_PERSON = { ysabel: 'friend', jacqueline: 'rival', christine: 'christine', queen: 'queen' };
+
+/** What she has done with a storyline's people, oldest first, as dated lines. */
+export function storyOf(s, arcs) {
+  return (s.story || []).filter((e) => arcs.includes(e.arc)).map((e) => ({ date: dateLabel(e.turn), memo: e.memo }));
+}
+
 export function peopleView(s) {
   return Object.keys(s.npcs).map((id) => {
     const n = s.npcs[id], c = CAST[id];
-    return { id, name: nameOf(s, id), role: c.role, note: c.note, real: !!c.real, faction: n.faction === 'none' ? 'no party' : factionLabel(n.faction, s.turn, true), trust: n.trust, use: n.use, word: relWord(n), alive: n.alive, gone: n.gone, goneHow: c.goneHow, onBoard: n.alive && (!c.from || keyOf(s.turn) >= c.from) };
+    const arcs = Object.entries(ARC_PERSON).filter(([, p]) => p === id).map(([a]) => a);
+    return { id, name: nameOf(s, id), role: c.role, note: c.note, real: !!c.real, faction: n.faction === 'none' ? 'no party' : factionLabel(n.faction, s.turn, true), trust: n.trust, use: n.use, word: relWord(n), alive: n.alive, gone: n.gone, goneHow: c.goneHow, onBoard: n.alive && (!c.from || keyOf(s.turn) >= c.from), between: storyOf(s, arcs) };
   });
 }
 

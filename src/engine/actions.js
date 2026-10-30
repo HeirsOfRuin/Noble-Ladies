@@ -261,7 +261,7 @@ export function resolveDue(s, q, rng, lines) {
     } else lines.push(`${nameOf(s, 'maid')}'s cousin brought nothing back but a story about a dog.`);
   } else if (q.kind === 'office') {
     if (!s.husband || s.husband.status !== 'present') { lines.push('The office went to someone else: your husband was not there to take it.'); return; }
-    if (rng.chance(q.p)) { grantOffice(s, 'husband'); lines.push(`Your husband has ${s.offices.at(-1).label}: ${s.offices.at(-1).income} livres a half-year while you are at court to collect it.`); }
+    if (rng.chance(q.p)) { grantOffice(s, 'husband'); lines.push(`The council gives your husband a place in the king's household, from ${s.offices.at(-1).from}: ${s.offices.at(-1).income} livres a half-year while you are at court to collect it.`); }
     else lines.push('The office went to someone with better friends on the council.');
   } else if (q.kind === 'loan') {
     coin(s, -q.amount, 'repaying the Lombards');

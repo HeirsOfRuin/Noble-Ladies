@@ -7,7 +7,7 @@
 
 import { CAST } from '../data/cast.data.js';
 import { SUITORS } from '../data/cast.data.js';
-import { PLAGUE } from '../data/history.data.js';
+import { PLAGUE, SWINGS } from '../data/history.data.js';
 import { keyOf, factionLabel, controlAt } from './clock.js';
 import { hedging, present, nameOf, protector, costOf } from './derive.js';
 import { debtsOut } from './favours.js';
@@ -229,7 +229,9 @@ const GIFTS = {
 
 export function eventsTurn(s, rng, place, beats = 0) {
   // When her own story has a beat this half-year, the systemic events give way.
-  if (!rng.chance(beats ? 0.3 : 0.75)) return;
+  // A turning point that moves Paris gets the half-year to itself: no errands beside it.
+  if (SWINGS[keyOf(s.turn)] || keyOf(s.turn) === '1415b') return;
+  if (beats >= 2 || !rng.chance(beats ? 0.3 : 0.75)) return;
   s.flags.evLast = s.flags.evLast || {};
   const pool = Object.entries(E).map(([id, e]) => ({ id, weight: (s.turn - (s.flags.evLast[id] ?? -9)) >= 3 ? e.weight(s, place) : 0 }));
   const pick = rng.weighted(pool);
