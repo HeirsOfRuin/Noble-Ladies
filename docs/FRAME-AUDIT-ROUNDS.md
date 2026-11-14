@@ -65,3 +65,12 @@ because the bot that reads news leaves Paris on every credible warning and loses
 court standing doing it. That is the trade-off the K2 fix chose: news protects
 the house at the price of position. A player who reads sources better than the
 bot should come out ahead; the author's playtest decides.
+
+## Round 3: the manuscript look (2026-11-14)
+| Audit item | What changed | Where |
+|---|---|---|
+| A. Ornament | The title page opens on a miniature: the Hôtel Saint-Pol on the Seine in a gold quatrefoil, a lady in red at a window. Acts open with a gilt rule and a gilded initial; turning points carry a gilt rule. All SVG strings, no image files (after Knight of Adalia's Illumination) | `src/ui/art.js` |
+| C. A running chronicle | A sixth tab, **Years**: her life a year at a time, newest first, built only from the save (turning points, where she spent each half-year, each story choice under its storyline's name, births, deaths) | `src/engine/chronicle.js` |
+| E. Heraldry | Arms for every invented house, generated from the house's name, so the same house always bears the same arms (no save change), with the rule of tincture kept. Her own shield is her husband's arms impaling her father's, as a married woman's were. Shown on the House tab, beside her husband, and beside each child's betrothed house. Real princes are not drawn. Checked on a contact sheet: one roundel sat on a bend and vanished, fixed | `src/engine/heraldry.js` |
+| H. Sound | Made in code (after The Lists): two strokes of a parish bell when a half-year ends, a small chime on a choice, a low knell for a death or a turning point. On by default, a switch in Menu, remembered | `src/ui/sound.js` |
+| Found on the way | The same debt listed twice now says "twice"; the bundler does not follow `export ... from` (the Years tab threw until the import was made plain; the phone smoke now visits Years) | `turn.js`, `tools/smoke.mjs` |

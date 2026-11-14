@@ -9,12 +9,13 @@ builds a place at court, survives the war between Armagnacs and Burgundians,
 and comes through Agincourt and its aftermath. The aim is that her house is
 still standing in 1422, and that she is too.
 
-Status (2026-10-29): **round 3, a lived-in world**. All four acts, 37 story
-beats (Brécourt, her husband, Ysabel, Jacqueline, Christine de Pizan, the queen,
-her husband's honour), favours owed, letters that can be opened, protection
-money, household colours, children with their own upbringings and scenes. About
-95-100 minutes a run. Text checked against `docs/STYLE.md` by `npm run lint`.
-See `docs/FRAME-ROUND3.md`.
+Status (2026-11-14): **after the audit rounds** (`docs/AUDIT-2026-11.md`,
+`docs/FRAME-AUDIT-ROUNDS.md`). All four acts, 37 story beats and 13 short
+keeping-in-touch scenes, favours owed, letters that can be opened, offices kept
+by being in Paris, children with their own upbringings. What came of each choice
+is shown; standing at court is part of the legacy; a Years tab keeps the
+chronicle; generated heraldry; a manuscript look drawn in SVG; quiet sound made in
+code. About 95-100 minutes a run.
 
 ## Play as an app
 

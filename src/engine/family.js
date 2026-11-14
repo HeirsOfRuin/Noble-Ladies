@@ -79,7 +79,7 @@ export function familyTurn(s, rng, place, ctx) {
   for (const c of s.children) {
     if (!c.alive) continue;
     if (rng.chance(childRisk(s, c, ctx.care))) {
-      c.alive = false;
+      c.alive = false; c.died = s.turn;
       s.cards.push({ id: 'child_death', title: `${c.name} is dead`, text: `${c.name} died of a fever ${childAge(s, c) > 1 ? `at ${words(childAge(s, c))} years old` : childAge(s, c) === 1 ? 'at a year old' : 'before a first birthday'}. Children die often. Knowing it is no comfort.`, choices: [{ label: 'Continue', ops: [] }] });
     } else c.care = clamp(c.care - 2);
   }

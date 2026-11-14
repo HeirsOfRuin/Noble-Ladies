@@ -35,6 +35,8 @@ import { finish } from './ending.js';
 import { CAST } from '../data/cast.data.js';
 
 export { newGame };
+import { chronicle } from './chronicle.js';
+export { chronicle };
 
 const MULTI = new Set(['gift', 'letter', 'distance']); // may be taken twice in a half-year, for different people
 
@@ -323,7 +325,8 @@ export function houseView(s) {
   const h = s.husband;
   return {
     lady: s.lady, age: ladyAge(Math.min(s.turn, LAST_TURN)), lands: s.lands, landsStart: s.landsStart,
-    husband: h ? { name: h.name, status: h.status, lean: h.lean === 'none' ? 'no party' : factionLabel(h.lean, s.turn), heed: heedWord(s), ransom: h.ransom, traits: { competence: h.competence, loyalty: h.loyalty, temper: h.temper, spending: h.spending } } : null,
+    husbandHouse: h?.short || s.flags.husbandShort || null,
+    husband: h ? { name: h.name, short: h.short, status: h.status, lean: h.lean === 'none' ? 'no party' : factionLabel(h.lean, s.turn), heed: heedWord(s), ransom: h.ransom, traits: { competence: h.competence, loyalty: h.loyalty, temper: h.temper, spending: h.spending } } : null,
     widowed: s.widowed, counsel: s.counsel, counselOptions: COUNSEL,
     children: s.children.map((c) => ({ id: c.id, name: c.name, sex: c.sex, age: childAge(s, c), alive: c.alive, care: c.care, betrothed: c.betrothed, risk: childRisk(s, c) })),
     pregnant: !!s.pregnant, birthRisk: { court: birthRisk(s, 'court'), estates: birthRisk(s, 'estates') },
@@ -336,9 +339,19 @@ export function houseView(s) {
     colours: s.colours, coloursOpen: coloursOpen(s), coloursOptions: Object.fromEntries(Object.entries(COLOURS).map(([k, f]) => [k, f(s)])),
     offices: s.offices.map((o) => ({ ...o })),
     betweenHusband: storyOf(s, ['husband', 'arms']), brecourtStory: storyOf(s, ['brecourt']),
-    owedToYou: debtsIn(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w, hold: d.hold })),
-    youOwe: debtsOut(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w })),
+    owedToYou: grouped(debtsIn(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w, hold: d.hold }))),
+    youOwe: grouped(debtsOut(s).map((d) => ({ who: nameOf(s, d.who), why: d.why, w: d.w }))),
   };
+}
+
+/** The same debt for the same reason, said once ("your New Year's gift, twice"). */
+function grouped(ds) {
+  const out = [];
+  for (const d of ds) {
+    const same = out.find((x) => x.who === d.who && x.why.replace(/, \w+ times$|, twice$/, '') === d.why);
+    if (same) { same.n = (same.n || 1) + 1; same.why = `${d.why}, ${same.n === 2 ? 'twice' : `${['', '', '', 'three', 'four', 'five'][same.n] || same.n} times`}`; } else out.push({ ...d });
+  }
+  return out;
 }
 
 const regardWord = (r) => (r >= 65 ? 'He trusts your judgment.' : r >= 45 ? 'He respects you.' : r >= 30 ? 'He is civil to you.' : 'You are strangers under one roof.');

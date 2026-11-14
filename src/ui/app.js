@@ -7,7 +7,10 @@
 //  - A throw never leaves a dead button: busy is released in finally, and the
 //    error screen offers the save (Touchline lost a career to a greyed-out Continue).
 
-import { newGame, advance, view, houseView, peopleView, newsView, planProblem, planCost } from '../engine/turn.js';
+import { newGame, advance, view, houseView, peopleView, newsView, planProblem, planCost, chronicle } from '../engine/turn.js';
+import { impaledSvg, shieldSvg } from '../engine/heraldry.js';
+import { artDefs, gildedInitial, giltRule, miniature } from './art.js';
+import { soundOn, setSound, halfYearBell, choiceChime, knell } from './sound.js';
 import { SAVE_KEY, serialize, deserialize, toCode, fromCode } from '../engine/state.js';
 import { STORAGE_OK, lsGet, lsSet } from './storage.js';
 import { DIFFICULTY } from '../data/config.data.js';
@@ -69,7 +72,9 @@ function freshDraft() {
 function title() {
   const saved = load();
   app.innerHTML = `
+    ${artDefs()}
     <main class="title">
+      <div class="title-art">${miniature(180)}</div>
       <p class="kicker">Paris, 1400 to 1422</p>
       <h1>The Lady of Saint&#8209;Pol</h1>
       <p class="lede">You are seventeen, of a middling house, and your father is negotiating your marriage. The king is mad, the princes are quarrelling, and you cannot command anyone. You can only persuade, write, wait, and choose whom to trust.</p>
@@ -86,7 +91,7 @@ function title() {
         <button data-act="load-code">Load a save code</button>
         ${install ? '<button data-act="install">Install on this device</button>' : ''}
       </div>
-      <p class="hint">A first playable build. Text only; the art comes later.</p>
+      <p class="hint">About an hour and a half for a whole life. The game saves itself after every choice.</p>
     </main>`;
 }
 
@@ -95,9 +100,9 @@ function title() {
 function render() {
   if (!state) return title();
   const v = view(state);
-  const tabs = [['play', 'Play'], ['house', 'House'], ['people', 'People'], ['news', 'News'], ['menu', 'Menu']];
+  const tabs = [['play', 'Play'], ['house', 'House'], ['people', 'People'], ['news', 'News'], ['years', 'Years'], ['menu', 'Menu']];
   const hp = v.health < 30 ? 'low' : '';
-  app.innerHTML = `
+  app.innerHTML = `${artDefs()}
     <header class="hud">
       <span class="turn">${esc(v.date)}</span>
       <span class="act">Act ${v.act} · age ${v.age}</span>
@@ -106,7 +111,7 @@ function render() {
       <span class="${hp}">Health ${v.health}</span>
     </header>
     ${banner ? `<p class="banner">${esc(banner)} ${reloadNow ? '<button data-act="reload-now">Reload</button>' : ''}<button data-act="dismiss">OK</button></p>` : ''}
-    <main class="panel">${tab === 'play' ? playTab(v) : tab === 'house' ? hint('house') + houseTab() : tab === 'people' ? hint('people') + peopleTab() : tab === 'news' ? hint('news') + newsTab() : menuTab()}</main>
+    <main class="panel">${tab === 'play' ? playTab(v) : tab === 'house' ? hint('house') + houseTab() : tab === 'people' ? hint('people') + peopleTab() : tab === 'news' ? hint('news') + newsTab() : tab === 'years' ? yearsTab() : menuTab()}</main>
     <nav class="tabs">${tabs.map(([id, label]) => `<button data-tab="${id}" class="${tab === id ? 'on' : ''}">${label}</button>`).join('')}</nav>
     ${modal ? `<div class="scrim"><div class="sheet">${modal}</div></div>` : ''}`;
 }
@@ -153,8 +158,13 @@ function playTab(v) {
       <blockquote class="margin">${esc(c.text)}<cite>${esc(state.lady.name)}, in her own hand</cite></blockquote>
       ${c.lines.length ? `<p class="hint">${esc(c.lines.join(' '))}</p>` : ''}
       ${choiceButtons(c.choices)}`;
+    // An act opens like a chapter in a book of hours: a gilt rule and a gilded initial.
+    if (/^act\d/.test(c.id)) { const body = c.text.replace(/^Act \w+\.\s*/, ''); return `${outcomeBox()}${giltRule()}<h2 class="act-title">${esc(c.title)}</h2>
+      <p class="illuminated">${gildedInitial(body.charAt(0))}<span>${esc(body.slice(1))}</span></p>${giltRule()}
+      ${choiceButtons(c.choices)}`; }
     return `${outcomeBox()}<p class="kicker">${esc(c.when || '')}${c.arc ? ` · ${esc(c.arc)}` : ''}${v.cardsLeft > 1 ? ` · ${v.cardsLeft - 1} more after this` : ''}</p>
       <h2 class="${c.history ? 'history' : ''}">${esc(c.title)}</h2>
+      ${c.history ? giltRule() : ''}
       ${c.choices.length > 1 ? hint('card') : ''}
       ${c.recall ? `<p class="recall">${esc(c.recall)}</p>` : ''}
       ${c.text ? paras(c.text) : ''}
@@ -246,7 +256,9 @@ function houseTab() {
   const traits = H ? Object.entries(H.traits).map(([k, n]) => `${k} ${'●'.repeat(n)}${'○'.repeat(5 - n)}`).join(' · ') : '';
   const counsel = H && v.phase === 'plan' ? `<p class="label">Your counsel to him</p><div class="chips">${Object.entries(h.counselOptions).map(([k, label]) => `<button data-counsel="${k}" class="${h.counsel === k ? 'on' : ''}">${esc(label)}</button>`).join('')}</div><p class="hint">Counsel travels by letter: write to him (an action) and he may take it. He listens ${esc(H.heed)}.</p>` : '';
   const W = h.want;
-  return `<h2>${esc(h.lady.title)}</h2>
+  const husbandHouse = h.husbandHouse;
+  const arms = husbandHouse ? impaledSvg(husbandHouse, h.lady.house, { size: 64 }) : shieldSvg(h.lady.house, { size: 56 });
+  return `<div class="arms-head">${arms}<div><h2>${esc(h.lady.title)}</h2><p class="small">${husbandHouse ? `Her arms: ${esc(husbandHouse)} impaling ${esc(h.lady.house)}, her father's.` : `The arms of ${esc(h.lady.house)}, her father's house.`}</p></div></div>
     ${h.said.length ? `<p class="said">What is said of her: <em>${esc(h.said.join(', '))}</em>.</p>` : '<p class="hint">Nobody has made up their mind about her yet. Her choices will.</p>'}
     ${W ? `<div class="box ${W.achieved ? 'done' : ''}"><p class="label">What you want: ${esc(W.label)}</p><p>${esc(W.goal)}</p><p class="small">${esc(W.progress)}${W.achieved ? ' <b>Achieved.</b>' : ''}</p></div>` : ''}
     <div class="box"><p class="label">Brécourt</p><p class="small">${esc(h.brecourt)}</p></div>
@@ -270,12 +282,12 @@ function houseTab() {
       ${h.hedging ? '<p class="warn">You stand well with both parties. Either can find that out.</p>' : ''}
       <p class="hint">Ties to the losing side bring fines and confiscation; ties to the winners bring rewards. Being on your estates when it happens halves the cost.</p></div>
     <h2>Your husband</h2>
-    ${H ? `<p><strong>${esc(H.name)}</strong>. ${esc({ present: 'At home with you.', away: 'Away with the army.', captured: 'A prisoner in England.', dead: 'Dead.' }[H.status])} His party: ${esc(H.lean)}. ${esc(h.regard || '')}</p><p class="small">${traits}</p>
+    ${H ? `<p>${shieldSvg(H.short, { size: 28 })} <strong>${esc(H.name)}</strong>. ${esc({ present: 'At home with you.', away: 'Away with the army.', captured: 'A prisoner in England.', dead: 'Dead.' }[H.status])} His party: ${esc(H.lean)}. ${esc(h.regard || '')}</p><p class="small">${traits}</p>
       ${h.betweenHusband.length ? `<details class="between"><summary>Between you (${h.betweenHusband.length})</summary><ul>${h.betweenHusband.map((e) => `<li><small>${esc(e.date)}</small> ${esc(e.memo[0].toUpperCase() + e.memo.slice(1))}.</li>`).join('')}</ul></details>` : ''}
       ${H.ransom ? `<p class="warn">Ransom: ${num(H.ransom.paid)} of ${num(H.ransom.total)} l. paid.</p>` : ''}${counsel}`
       : h.widowed ? '<p>You are a widow, and govern your own affairs: one more action each half-year.</p>' : '<p class="empty">Not yet married.</p>'}
     <h2>Children</h2>
-    ${h.children.length ? `<ul class="kids">${h.children.map((c) => `<li>${esc(c.name)}, ${c.sex}${c.alive ? `, ${c.age || 'under one'}${c.age ? ' years' : ''}${c.betrothed ? ` · promised to ${esc(c.betrothed.name)}` : ''}${c.risk ? ` · sickness risk ${pct(c.risk)} this half-year` : ''}` : ' (died)'}</li>`).join('')}</ul>` : '<p class="empty">No children yet. They come while your husband is at home with you.</p>'}
+    ${h.children.length ? `<ul class="kids">${h.children.map((c) => `<li>${esc(c.name)}, ${c.sex}${c.alive ? `, ${c.age || 'under one'}${c.age ? ' years' : ''}${c.betrothed ? ` · promised to ${shieldSvg(c.betrothed.name, { size: 18 })} ${esc(c.betrothed.name)}` : ''}${c.risk ? ` · sickness risk ${pct(c.risk)} this half-year` : ''}` : ' (died)'}</li>`).join('')}</ul>` : '<p class="empty">No children yet. They come while your husband is at home with you.</p>'}
     ${h.pregnant ? `<p class="hint">Risk in childbed: ${pct(h.birthRisk.estates)} on the estates, ${pct(h.birthRisk.court)} at court. Rest and good health lower it.</p>` : ''}
     <h2>Offices</h2>
     ${h.offices.length ? `<ul>${h.offices.map((o) => `<li>${esc(o.label[0].toUpperCase() + o.label.slice(1))}: ${num(o.income)} l. a half-year at court${o.absent ? ` · <b>unpaid, away ${o.absent} half-year${o.absent > 1 ? 's' : ''}</b>` : ''}</li>`).join('')}</ul><p class="hint">Paid only while you are at court. Two half-years away and the place goes to someone who was there. If the party that granted it falls, it is taken back and counted against you.</p>` : '<p class="empty">No office. Seek one for your husband at court, or win a place among the queen\'s ladies.</p>'}
@@ -309,8 +321,16 @@ function newsTab() {
     <ul class="news">${ns.map((n) => `<li><small>${esc(n.date)} · ${esc(n.from)} (${esc(n.word)})${n.status === 'true' ? ' · <b>came true</b>' : n.status === 'false' ? ' · came to nothing' : ''}</small><p>${esc(n.text)}</p></li>`).join('')}</ul>`;
 }
 
+function yearsTab() {
+  const ys = chronicle(state);
+  if (!ys.length) return '<h2>The years</h2><p class="empty">Nothing written yet. The chronicle begins with your marriage contract.</p>';
+  return `<h2>The years</h2><p class="hint">Your life a year at a time, newest first: what history did, where you were, what you chose.</p>
+    ${ys.map((y) => `<div class="year"><p class="label">${y.year}</p><p>${esc(y.lines.join(' '))}</p></div>`).join(giltRule())}`;
+}
+
 function menuTab() {
   return `<h2>Menu</h2><div class="stack">
+    <button data-act="sound">Sound: ${soundOn() ? 'on' : 'off'}</button>
     <button data-act="export">Copy a save code</button>
     <button data-act="load-code">Load a save code</button>
     <button data-act="quit">Back to the title</button>
@@ -359,6 +379,12 @@ function fail(err) {
   render();
 }
 
+/** A low knell when the next card is a death, or history turning against the house. */
+function sorrow() {
+  const c = state?.phase === 'card' ? state.cards[0] : null;
+  if ((c && (c.id === 'child_death' || c.id === 'widowed' || /^history:(1407b|1413a|1415b|1418a|1420a|1422b)$/.test(c.id))) || state?.over) knell();
+}
+
 function step(input) {
   const { state: next, record } = advance(state, input);
   state = next;
@@ -374,7 +400,7 @@ app.addEventListener('click', (e) => {
     const d = t.dataset;
     if (d.diff) { ladyName = document.getElementById('lady-name')?.value ?? ladyName; difficulty = d.diff; }
     else if (d.tab) { if (['house', 'people', 'news'].includes(tab) && d.tab !== tab) hintDone(tab); tab = d.tab; }
-    else if (d.choice !== undefined) { const ch = view(state); const rec = step({ type: state.phase === 'scene' ? 'scene' : 'card', choice: Number(d.choice) }); outcome = { ...rec, chose: rec.chose || ch.scene?.choices[Number(d.choice)]?.label }; if (ch.card?.choices.length > 1) hintDone('card'); draft = null; }
+    else if (d.choice !== undefined) { const ch = view(state); const rec = step({ type: state.phase === 'scene' ? 'scene' : 'card', choice: Number(d.choice) }); outcome = { ...rec, chose: rec.chose || ch.scene?.choices[Number(d.choice)]?.label }; if (ch.card?.choices.length > 1) hintDone('card'); draft = null; if (!ch.card || ch.card.choices.length > 1) choiceChime(); sorrow(); }
     else if (d.place) { draft = { place: d.place, actions: draft.actions.filter((a) => view(state).plan.places.find((p) => p.place === d.place).actions.find((x) => x.id === a.id)?.ok) }; }
     else if (d.pick) {
       const P = view(state).plan.places.find((p) => p.place === draft.place);
@@ -396,6 +422,7 @@ app.addEventListener('click', (e) => {
       const record = step({ type: 'plan', place: draft.place, actions: draft.actions.map(({ id, target }) => ({ id, target })) });
       draft = null; tab = 'play'; outcome = null; hintDone('plan');
       modal = report(record);
+      halfYearBell(); sorrow();
     } else {
       const act = d.act;
       if (act === 'new' || act === 'new-go') {
@@ -417,6 +444,7 @@ app.addEventListener('click', (e) => {
       else if (act === 'close') { modal = null; picking = null; }
       else if (act === 'dismiss') { banner = null; }
       else if (act === 'hint-ok') { hintDone(d.hint); }
+      else if (act === 'sound') { setSound(!soundOn()); }
       else if (act === 'reload-now') { reloadNow?.(); }
       else if (act === 'quit') { state = null; modal = null; draft = null; }
       else if (act === 'install') { install?.(); }

@@ -150,3 +150,15 @@ details summary { cursor: pointer; color: var(--ink-dim); font-size: .9em; min-h
 .box.world { border-style: dashed; }
 .box.hintbox { border-color: var(--blue); background: #eef1f6; }
 .box.hintbox p { margin-bottom: .2em; }
+
+.title-art { text-align: center; margin: -1rem 0 .6rem; }
+.title-art svg { max-width: 60vw; height: auto; }
+.gilt-rule { display: block; width: 70%; height: 14px; margin: .6em auto 1em; }
+.illuminated { overflow: hidden; }
+.illuminated .gilded-initial { float: left; margin: .15em .5em 0 0; }
+h2.act-title { text-align: center; font-variant: small-caps; letter-spacing: .05em; }
+.arms-head { display: flex; gap: .8em; align-items: flex-start; }
+.arms-head h2 { margin-top: 0; }
+.arms-head .shield { flex: none; }
+svg.shield { vertical-align: middle; }
+.year p { margin-bottom: .4em; }
