@@ -48,6 +48,11 @@ export function epitaph(s) {
   if (s.flags.queenAnswered) out.push('At Troyes she asked the queen why, and the queen told her; she never repeated it.');
   const T = { sworn: 'She swore to the treaty of Troyes with the rest, and kept her lands.', ill: 'She was ill on the day the oath to the English king was taken, and nobody came back to ask again.', dauphin: 'In the year of Troyes she wrote to the Dauphin at Bourges, and the letter was never found.' }[s.flags.troyes];
   if (T) out.push(T);
+  if (s.flags.queensLady) out.push('She was one of Queen Isabeau\'s ladies, which in those years was an honour and a danger both.');
+  else if ((s.stats?.officeHalves || 0) >= 8) out.push('Her lord held a place in the king\'s household for many years, because she kept him in Paris to hold it.');
+  if ((s.flags.christineBooks || 0) >= 2) out.push('She carried Christine de Pizan\'s books to the queen, more than once.');
+  if ((s.flags.lettersOpened || 0) >= 2) out.push('Her letters were opened at the gates more than once, and copies kept.');
+  if (s.flags.securedPaid) out.push('When Paris changed masters, her plate was with the Lombards.');
   if (s.flags.raoulSaved) out.push('She kept her husband\'s oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep.');
   else if (s.flags.brokeContract) out.push('She refused her husband\'s brother-in-arms at the gate, and was spoken of for it.');
   const r = s.flags.remarried ? null : (s.husband?.regard ?? s.flags.lastRegard);

@@ -155,7 +155,8 @@ function plan(s, v, policy, rng, deafened = false) {
     const ids = rng.shuffle(Object.keys(ok));
     for (const id of ids) add(id, pickTarget(ok[id]) ?? (ok[id].targets ? undefined : undefined));
   } else {
-    // Obligations first, for every policy.
+    // Obligations first, for every policy. A believed warning: the plate goes to the Lombards.
+    if (claim) add('secure');
     if (ok.ransom) add('ransom', pickTarget(ok.ransom, [(t) => t.ok && Number(t.id) <= s.money - 300, () => true]));
     if (ok.callin && s.money < 500) add('callin', pickTarget(ok.callin));
     if (ok.lawsuit && s.money >= 600) add('lawsuit', pickTarget(ok.lawsuit, [(t) => t.id === 'cause', (t) => t.id === 'brecourt']));

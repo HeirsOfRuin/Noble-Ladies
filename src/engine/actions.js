@@ -89,7 +89,8 @@ export function resolveAction(s, act, rng, lines, ctx) {
       break;
     }
     case 'accounts': {
-      ctx.accounts = true;
+      ctx.accounts = s.flags.accountsLast === s.turn - 1 ? 'again' : true;
+      s.flags.accountsLast = s.turn;
       s.npcs.steward.seen += 2;
       lines.push(say(s, 'accounts', { steward: nameOf(s, 'steward') }));
       break;
@@ -128,6 +129,11 @@ export function resolveAction(s, act, rng, lines, ctx) {
       s.npcs.maid.seen += 1;
       s.queue.push({ due: s.turn + 1, kind: 'intercept', who: t, p: 0.3 + s.npcs.maid.rel * 0.6, caught: (1 - s.npcs.maid.loyalty) * 0.4 });
       lines.push(`${nameOf(s, 'maid')} has a cousin who carries letters for ${CAST[t].short}'s household.`);
+      break;
+    }
+    case 'secure': {
+      s.flags.secured = s.turn + 1;
+      lines.push('Your plate, your mother\'s cups and three hundred livres in coin go to a Lombard house in the rue des Lombards, against a receipt. If the city turns, a fine will find little to take.');
       break;
     }
     case 'chapel': {
@@ -236,7 +242,11 @@ export function resolveDue(s, q, rng, lines) {
     if (rng.chance(q.traced)) {
       bump(s, 'rep', ACTIONS.rumour.tracedRep); fav(s, r.faction, ACTIONS.rumour.tracedFavour); r.trust = clamp(r.trust - 20);
       lines.push(`The story about Jacqueline d'Aubercourt went round, and it was traced to your household. Good name ${ACTIONS.rumour.tracedRep}.`);
-    } else lines.push('The story about Jacqueline d\'Aubercourt went round the court. Nobody knows where it started.');
+    } else {
+      // A rival's loss is a place at the queen's side: the ladies stop asking her to sit with them.
+      fav(s, 'queen', 3);
+      lines.push('The story about Jacqueline d\'Aubercourt went round the court. Nobody knows where it started, and the queen\'s ladies stop asking her to sit with them. The queen\'s favour +3.');
+    }
   } else if (q.kind === 'letter') {
     if (q.to === 'husband') {
       const h = s.husband;

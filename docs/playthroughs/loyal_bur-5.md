@@ -755,10 +755,10 @@ Blanche is seven, devout, and old enough to be sent away, as children of good fa
 ---
 ## Summer 1413 · on the estates
 
-Actions: distance (queen), gift (margaret)
+Actions: secure, distance (queen)
 
+- Your plate, your mother's cups and three hundred livres in coin go to a Lombard house in the rue des Lombards, against a receipt. If the city turns, a fine will find little to take.
 - You burned their letters in the kitchen fire and stopped going to their masses. The queen's ladies noticed within the week. Favour -12.
-- A gift to Margaret of Bavaria: trust +3.
 - Christine de Pizan has answered your letter.
 
 ### Summer 1413 · The Cabochiens
@@ -766,7 +766,7 @@ Actions: distance (queen), gift (margaret)
 In April the butchers of Paris, led by the skinner Caboche and backed by Burgundy, take the city. They break into the Dauphin's house and into the queen's, and drag away her brother and her ladies. For three months the white hoods rule Paris.
 
 - Your pension from the queen stopped.
-- You are counted among their enemies' friends, and fined 118 livres.
+- You are counted among their enemies' friends, and fined 63 livres. Your plate and coin were with the Lombards: the fine found half as much to take.
 
 **Chose:** Have your household wear the white hood
 
@@ -779,6 +779,8 @@ The white hoods came into the queen's house in May with a list, and took the que
 So, Perrette says, was something about a letter to the Celestines. Your name was not. Yet.
 
 She still owes you two hundred livres from the queen's tables. You find you do not care.
+
+The news reached you on your estates three weeks late, in a letter from Perrette's cousin. Paris is a long day's ride. Whatever you do, you do it from a distance or on horseback.
 
 The butchers are talking about trials.
 
@@ -808,9 +810,9 @@ Actions: office, attend, petition (queen)
 The city tires of the butchers. In August the Armagnac princes ride in and John of Burgundy flees. Now it is the Burgundians' turn to lose their offices and their houses.
 
 - Your pension from the Duchess of Burgundy stopped.
-- You are counted among their enemies' friends, and fined 589 livres.
+- You are counted among their enemies' friends, and fined 282 livres. Your plate and coin were with the Lombards: the fine found half as much to take.
 - 1 of your holdings is confiscated and given to one of their captains. A case in the Parlement might recover it.
-- You were in Paris when it happened, and were taken with the others. You bought your way out of the Châtelet for 110 livres. Health -11.
+- You were in Paris when it happened, and were taken with the others. You bought your way out of the Châtelet for 100 livres. Health -10.
 
 **Chose:** Continue
 
@@ -874,7 +876,7 @@ Actions: lawsuit (cause), attend, petition (charles_o)
 - Your procureur argued the case. 2 of 3 hearings.
 - You held the queen's book at vespers, and she spoke to you twice. The queen's favour +6.
 - Your petition went to the Duke of Orléans's household. An answer may come next half-year.
-- Your petition is granted: a pension of 180 livres a half-year from the Duchess of Burgundy. A pension is also a debt: one day they will ask for something.
+- Your petition to the Duchess of Burgundy was refused.
 - Your petition is granted: a pension of 150 livres a half-year from the queen. A pension is also a debt: one day they will ask for something.
 - Cramailles is home from the war.
 
@@ -946,11 +948,11 @@ A rider from Raoul de Fléchin, with a purse and a notary's note: Raoul took a B
 ---
 ## Winter 1415 · at court
 
-Actions: office, attend, petition (charles_o)
+Actions: office, attend, petition (margaret)
 
 - You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
 - You rode behind the queen's litter to Vincennes and back. The queen's favour +6.
-- Your petition went to the Duke of Orléans's household. An answer may come next half-year.
+- Your petition went to the Duchess of Burgundy's household. An answer may come next half-year.
 
 ### Winter 1415 · Agincourt
 
@@ -993,7 +995,7 @@ Actions: accounts, rest
 - You sat with Jehan Malet over the rent rolls and the tallies, line by line.
 - You stayed out of the hall and let the household run without you for a while. Health +15.
 - The council gives your husband a place in the king's household, from the Armagnacs: 220 livres a half-year while you are at court to collect it.
-- Your petition to the Duke of Orléans was never answered.
+- Your petition is granted: a pension of 180 livres a half-year from the Duchess of Burgundy. A pension is also a debt: one day they will ask for something.
 - Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
 - Jean, Duke of Berry died.
 - Your pension from the Duke of Berry ends with it.
@@ -1262,13 +1264,13 @@ Gérard holds Brécourt, and is old. Jacqueline writes to propose the oldest set
 
 > Good name +2 · Jacqueline trusts you more
 
-### Winter 1420 · The queen calls in a debt
+### Winter 1420 · English soldiers
 
-Isabeau of Bavaria has not forgotten the pension granted to you. A letter comes, polite and specific: a word for one of their people before the council, or, failing that, 120 livres, which is what such a word is worth.
+Twenty English archers and their captain, a Lancashire knight with a Norman clerk to speak for him, ride into your courtyard with a billeting order sealed in the king's name, the English king's. They want the hall, the stables and the winter's hay, until Easter.
 
-**Chose:** Lend your name to their request at court
+**Chose:** Pay the captain to lodge them elsewhere
 
-> The queen's favour -4 · the queen trusts you more
+> -260 livres · Good name -1
 
 ---
 ## Summer 1421 · at court
@@ -1346,7 +1348,7 @@ On 21 October Charles VI dies at the Hôtel Saint-Pol, after forty-two years as 
 
 ## The end
 
-Item, of Marguerite of the house of Brécourt, born in the year 1383, married at eighteen to Messire Hue de Cramailles. She wanted her father's house back in her own blood, and had it. Her lord was not at Agincourt, and lived because of it. She bore four children, of whom two were living at the end. Isabeau was promised to the house of Brécourt. She made peace with her cousin over Brécourt by a marriage, so that her grandchildren would hold it. She hid her friend Ysabel de Fontenoy from the Armagnacs at the risk of her own house. She took in her enemy Jacqueline d'Aubercourt and her children when they had nowhere to go, and was repaid. Blanche took the veil at Poissy. When the queen was sent to Tours, she stayed at home. She swore to the treaty of Troyes with the rest, and kept her lands. She kept her husband's oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep. Her lord trusted her judgment, and said so. Her house held more land at the end than at the beginning. She was a lady well spoken of, and was called devout, very bold and very warm. She outlived the mad king, which was more than many managed.
+Item, of Marguerite of the house of Brécourt, born in the year 1383, married at eighteen to Messire Hue de Cramailles. She wanted her father's house back in her own blood, and had it. Her lord was not at Agincourt, and lived because of it. She bore four children, of whom two were living at the end. Isabeau was promised to the house of Brécourt. She made peace with her cousin over Brécourt by a marriage, so that her grandchildren would hold it. She hid her friend Ysabel de Fontenoy from the Armagnacs at the risk of her own house. She took in her enemy Jacqueline d'Aubercourt and her children when they had nowhere to go, and was repaid. Blanche took the veil at Poissy. When the queen was sent to Tours, she stayed at home. She swore to the treaty of Troyes with the rest, and kept her lands. Her lord held a place in the king's household for many years, because she kept him in Paris to hold it. When Paris changed masters, her plate was with the Lombards. She kept her husband's oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep. Her lord trusted her judgment, and said so. Her house held more land at the end than at the beginning. She was a lady of middling report, and was called devout, very bold and very warm. She outlived the mad king, which was more than many managed.
 
 "My grandchildren will be born at Brécourt. That will do."
 

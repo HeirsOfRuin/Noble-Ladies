@@ -291,6 +291,7 @@ export const BEATS = [
       { if: ['flag', 'carriedLetter'], text: `So, Perrette says, was something about a letter to the Celestines. Your name was not. Yet.` },
       { if: ['flag', 'seenWithLetter'], text: `And somebody among the butchers remembers a lady with the Duchess of Orléans' almoner at the Celestines, in the spring of 1408.` },
       { if: ['flag', 'ysabelOwes'], text: `She still owes you two hundred livres from the queen's tables. You find you do not care.` },
+      { if: ['place', 'estates'], text: `The news reached you on your estates three weeks late, in a letter from Perrette's cousin. Paris is a long day's ride. Whatever you do, you do it from a distance or on horseback.` },
       { text: `The butchers are talking about trials.` },
     ],
     choices: [

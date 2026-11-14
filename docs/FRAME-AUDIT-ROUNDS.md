@@ -29,3 +29,39 @@ expansion. A commit after each, with `npm run check` clean.
 
 Measured (50 runs per policy): taps per run 98-102 down to 88-96; every test,
 the bot batch, the bundle check and the phone smoke clean.
+
+## Round 2: stakes (2026-11-14)
+| Audit item | What changed | Where |
+|---|---|---|
+| 2.1 Playing safe wins | A new score part, **Standing at court** (15): half-years an office was held and paid, a place among the queen's ladies, pensions still paid, children placed as pages or in the queen's household, the queen's ear. Wealth now counts 10 (was 15) and stops counting at about 4,000 livres; children 20 (was 25); good name 15 (was 20) | `courtStanding`, `score` in `derive.js` |
+| 2.2 The plan is solved | Going through the accounts two half-years running finds 40% as much; a rumour that is not traced costs the rival her seat beside the queen (the queen's favour +3) | `actions.data.js`, `actions.js`, `turn.js` |
+| 2.5 Act 4 goes flat | From 1420 English soldiers are billeted on every house, at court or at home: pay, take them in, or (with Burgundian friends) write for an exemption. Troyes asks for the oath (round 1) | `billeted` in `events.js` |
+| 2.6 News worth nothing | New action: **lodge your plate and coin with the Lombards**, open only while a warning is live; it halves the fine if Paris changes hands within two half-years | `secure` |
+| 2.7 Endings converge | Thresholds from the measured spread: "rose" 85+, "held" 65+, "diminished" 45+ (were 75/55/35, so 60% of games "rose"). Six new epitaph sentences: the Troyes oath (3 ways), the queen's lady, years in the king's household, Christine's books, letters opened, plate with the Lombards | `ending.js` |
+| Home runs read as Paris | The Châtelet scene says when she is on her estates | `arcs.data.js` |
+
+### Measured (400 runs per policy)
+| Policy | Survived | Score before | Score now |
+|---|---|---|---|
+| loyal_bur | 85% | 80 | 83 |
+| deaf | 85% | 80 | 81 |
+| burgundy | 69% | 72 | 80 |
+| christine | 83% | 74.5-76.5 | 79 |
+| loyal_arm | 85% | 76-78 | 78 |
+| courtier | 57% | 63-66 | 73.5 |
+| **homebody** | 95% | **83** | **73** |
+| seasonal | 88% | 70 | 72 |
+| random | 60% | 41 | 40 |
+
+Staying home is now the safe, modest life: it almost never dies (95%) and
+ends with the most money (8,000 livres), but scores below every committed
+strategy. Committing to a party pays most; the court is risky (57% survive) and
+now worth it.
+
+**News (K2):** reading warnings now protects the house (150 games: fines 688
+livres a game against 1,596 for the bot that ignores news; the plate goes to the
+Lombards about twice a game). The score is still even (christine 79, deaf 81),
+because the bot that reads news leaves Paris on every credible warning and loses
+court standing doing it. That is the trade-off the K2 fix chose: news protects
+the house at the price of position. A player who reads sources better than the
+bot should come out ahead; the author's playtest decides.

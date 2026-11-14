@@ -34,7 +34,7 @@ export function officesTurn(s, place, coin) {
       lines.push(`${o.label[0].toUpperCase()}${o.label.slice(1)} has gone to another man: yours is not there to hold it.`);
       continue;
     }
-    if (place === 'court') { o.absent = 0; coin(s, o.income, `wages: ${o.label}`); }
+    if (place === 'court') { o.absent = 0; coin(s, o.income, `wages: ${o.label}`); s.stats = s.stats || {}; s.stats.officeHalves = (s.stats.officeHalves || 0) + 1; }
     else {
       o.absent += 1;
       if (o.absent >= CONFIG.officeAbsenceLimit) {

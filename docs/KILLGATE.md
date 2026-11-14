@@ -85,3 +85,10 @@ runs): survival 90.5% / 84.0% / 78.5%, median score 72.5 / 67 / 59.
 - **K4. Mortality.** Careful play dies 10 to 15% of the time before 1422, mostly in
   childbed and the 1418 epidemic. Plausible for the period; the author should
   say whether it feels fair.
+
+## Re-measured after audit round 2 (2026-11-14)
+400 runs per policy. See `FRAME-AUDIT-ROUNDS.md` for the changes.
+K1 (staying home dominates): **closed**. Homebody 73 (95% survive) is below
+courtier 73.5, christine 79, burgundy 80 and loyal_bur 83.
+K2 (news worth little): **a trade-off, as designed**. Listening halves fines
+(688 vs 1,596 livres a game) and costs court standing; score even (79 vs 81).

@@ -180,6 +180,27 @@ const E = {
       };
     },
   },
+  billeted: {
+    // After Troyes the English garrisons lodge where they like, on the estates and in Paris alike:
+    // the Act 4 test a lady cannot stay home to avoid (audit 2.5).
+    weight: (s) => (yearOf(s.turn) >= 1420 && !s.flags.billetedDone ? 0.9 : 0),
+    card: (s, rng, n, place) => {
+      s.flags.billetedDone = true;
+      const home = s.place !== 'court';
+      return {
+        title: 'English soldiers', text: home
+          ? `Twenty English archers and their captain, a Lancashire knight with a Norman clerk to speak for him, ride into your courtyard with a billeting order sealed in the king's name, the English king's. They want the hall, the stables and the winter's hay, until Easter.`
+          : `An English captain of the Paris garrison has a billeting order for your house in the city: his men in the lower rooms and his horses in your stable, by order of the council that governs in the name of two kings.`,
+        choices: [
+          { label: 'Pay the captain to lodge them elsewhere', note: 'English captains take money like any others. The village down the road will have them instead.', ops: [['purse', -costOf(s, 260), 'the English captain, to lodge elsewhere'], ['rep', -1]] },
+          { label: 'Take them in, and lock up the plate', note: 'They will eat the hay and the hens and break the benches. They will also leave, eventually.', ops: [['hh', -15], ['purse', -costOf(s, 90), 'feeding an English garrison'], ['health', -4]] },
+          s.fav.bur >= 45
+            ? { label: 'Write to the Burgundian council for an exemption', note: 'A lady the Duke of Burgundy\'s people know can have a house struck off the list.', kind: 'chance', p: 0.5 + s.fav.bur / 200, win: [['fav', 'bur', -3]], lose: [['hh', -15], ['fav', 'bur', -3]] }
+            : { label: 'Write to the Burgundian council for an exemption', locked: true, why: 'Nobody in the Burgundian council knows you well enough (Burgundy favour 45).', ops: [] },
+        ],
+      };
+    },
+  },
   christine_letter: {
     weight: (s) => (present(s, 'christine') && s.npcs.christine.trust >= 35 ? 0.15 : 0),
     card: (s, rng, n) => ({

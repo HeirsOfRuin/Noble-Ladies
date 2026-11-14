@@ -212,6 +212,8 @@ export function actionPreview(s, id, place = s.place) {
   else if (id === 'callin' && !debtsIn(s).length) why = 'Nobody owes you anything yet.';
   else if (id === 'ransom' && s.husband?.status !== 'captured') why = 'Nobody of yours is held for ransom.';
   else if (id === 'petition' && !patrons(s).length) why = 'No patron is at court.';
+  else if (id === 'secure' && (s.flags.secured ?? -1) >= s.turn) why = 'Your plate is already with the Lombards.';
+  else if (id === 'secure' && !s.news.some((n) => n.claim && s.turn - n.turn <= 2 && n.status === null)) why = 'Only worth it when you have heard that Paris is about to change hands.';
   const cost = costOf(s, a.cost);
   if (!why && cost > 0 && s.money < cost) why = `Costs ${cost}; you have ${Math.max(0, s.money)}.`;
   const targets = targetsFor(s, id);
@@ -260,14 +262,16 @@ export function swingOutcome(s, key, place = s.place) {
   const mod = s.flags.swingMod?.[key];
   if (mod) p *= mod.mult;
   if (place === 'estates') p *= CONFIG.awayFromSwing; // out of sight when the purges come
-  const fine = p > 0.1 ? costOf(s, Math.round(p * 1000)) : 0;
+  const secured = (s.flags.secured ?? -1) >= s.turn;
+  const fine0 = p > 0.1 ? costOf(s, Math.round(p * 1000)) : 0;
+  const fine = secured ? Math.round(fine0 * ACTIONS.secure.fineCut) : fine0;
   const confiscate = p > 0.8 ? 2 : p > 0.4 ? 1 : 0;
   const harm = place === 'court' && w.danger ? Math.round(p * w.danger * 60 * D(s).dangerMult) : 0;
   const reward = win >= 0.5;
   const spoils = win >= 0.8 ? 1 : 0;     // the winners hand out what they took from the losers
   const lethal = w.danger >= 1;           // only the 1418 massacre kills; earlier risings imprison
   const prison = harm && !lethal ? costOf(s, harm * 10) : 0;
-  return { p, fine, confiscate, harm, lethal, prison, reward, spoils, win, lose, modNote: mod?.note || null };
+  return { p, fine, confiscate, harm, lethal, prison, reward, spoils, win, lose, modNote: mod?.note || null, secured: secured && fine0 > 0 };
 }
 
 /** The House tab's "if Paris changed hands now" lines, one per side. */
@@ -305,25 +309,41 @@ export function hedging(s) {
 
 // ---- score ----------------------------------------------------------------
 
+/**
+ * Standing at court, for the score (audit 2.1: nothing rewarded being there, so
+ * staying home won). Offices held and kept, a place among the queen's ladies,
+ * pensions still paid, children placed in great households, the queen's ear.
+ */
+export function courtStanding(s) {
+  const halves = s.stats?.officeHalves || 0;
+  const placed = s.children.filter((c) => c.alive && ['page', 'queen'].includes(c.placement)).length;
+  const n = Math.round(halves * 0.5) + (s.flags.queensLady ? 4 : 0) + s.pensions.length * 2 + placed * 2 + (s.fav.queen >= 60 ? 2 : 0);
+  return Math.min(15, n);
+}
+
 export function score(s) {
   const lady = s.outcome === 'dead' ? 0 : s.widowed && !s.husband ? 10 : s.flags.convent ? 6 : 7;
   const house = s.landsStart ? Math.round(20 * clamp(s.lands / s.landsStart, 0, 1)) : 0;
   let kids = 0;
   for (const c of s.children) if (c.alive) kids += 2 + (c.betrothed ? c.betrothed.rank * 4 : 0) + Math.round(c.care / 100);
-  kids = Math.min(25, kids);
+  kids = Math.min(20, kids);
   const want = s.want && wantStatus(s).achieved ? 10 : 0;
-  const rep = Math.round(s.rep / 5);
-  const wealth = clamp(Math.round((s.money + 2000) / 400), 0, 15);
+  const rep = Math.round(s.rep * 15 / 100);
+  // Money is the means, not the legacy: past about 4,000 livres it buys no more points (audit 2.1: homebody ended on 9,000).
+  const wealth = clamp(Math.round((s.money + 2000) / 600), 0, 10);
+  const court = courtStanding(s);
   const parts = [
     { key: 'house', label: 'The house\'s lands', n: house, of: 20 },
-    { key: 'children', label: 'Children living and placed', n: kids, of: 25 },
-    { key: 'rep', label: 'Her good name', n: rep, of: 20 },
-    { key: 'wealth', label: 'Wealth after debts', n: wealth, of: 15 },
+    { key: 'children', label: 'Children living and placed', n: kids, of: 20 },
+    { key: 'rep', label: 'Her good name', n: rep, of: 15 },
+    { key: 'court', label: 'Standing at court', n: court, of: 15 },
+    { key: 'wealth', label: 'Wealth after debts', n: wealth, of: 10 },
     { key: 'lady', label: 'Her own fate', n: lady, of: 10 },
     { key: 'want', label: s.want ? `What she wanted: ${WANTS[s.want].label}` : 'What she wanted', n: want, of: 10 },
   ];
   const total = parts.reduce((a, p) => a + p.n, 0);
-  return { parts, total, grade: total >= 75 ? 'A house that rose' : total >= 55 ? 'A house that held' : total >= 35 ? 'A house diminished' : 'A house undone' };
+  return { parts, total, grade: total >= 85 ? 'A house that rose' : total >= 65 ? 'A house that held' : total >= 45 ? 'A house diminished' : 'A house undone' };
+  // Thresholds from the measured spread (600 careful games, 2026-11-14): about a quarter of careful lives rise; random play mostly ends diminished.
 }
 
 // ---- her own story --------------------------------------------------------

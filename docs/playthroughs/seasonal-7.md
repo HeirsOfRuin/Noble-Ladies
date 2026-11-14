@@ -1325,13 +1325,13 @@ Another captain, another list. A Picard squire called Colart Hennequin, who hold
 
 **Chose:** Ask the queen for a safe-conduct
 
-### Summer 1421 · Trouble on the lands
+### Summer 1421 · The Duchess of Burgundy calls in a debt
 
-Two of your villages are at law with each other over a mill-race, and Gilet Poulain writes that they will not accept his judgment.
+Margaret of Bavaria has not forgotten the pension granted to you. A letter comes, polite and specific: a word for one of their people before the council, or, failing that, 120 livres, which is what such a word is worth.
 
-**Chose:** Ride home and judge it yourself
+**Chose:** Speak for their man, openly
 
-> Good name +1 · House in order +3 · Health -3 · The queen's favour -3
+> Orléans favour -1 · Burgundy favour +3 · the Duchess of Burgundy trusts you more
 
 ---
 ## Winter 1421 · on the estates
@@ -1372,13 +1372,13 @@ Actions: attend, letter (christine|own), chapel
 
 *Elsewhere in France: The English king is dead. At the end of August Henry V dies at Vincennes of a flux, at thirty-five. His heir is a baby nine months old.*
 
-### Summer 1422 · The queen calls in a debt
+### Summer 1422 · English soldiers
 
-Isabeau of Bavaria has not forgotten a safe-conduct for your villages from Clermont. A letter comes, polite and specific: a word for one of their people before the council, or, failing that, 120 livres, which is what such a word is worth.
+An English captain of the Paris garrison has a billeting order for your house in the city: his men in the lower rooms and his horses in your stable, by order of the council that governs in the name of two kings.
 
-**Chose:** Lend your name to their request at court
+**Chose:** Pay the captain to lodge them elsewhere
 
-> The queen's favour -4 · the queen trusts you more
+> -260 livres · Good name -1
 
 ---
 ## Winter 1422 · on the estates
@@ -1396,18 +1396,18 @@ On 21 October Charles VI dies at the Hôtel Saint-Pol, after forty-two years as 
 
 **Chose:** Continue
 
-### Winter 1422 · A letter from Christine
+### Winter 1422 · The queen calls in a debt
 
-Christine writes from her house near Sainte-Geneviève. The war has stopped the book trade; she is writing anyway. She asks after your children by name, and then tells you what the Parlement is saying.
+Isabeau of Bavaria has not forgotten a safe-conduct for your villages from Clermont. A letter comes, polite and specific: a word for one of their people before the council, or, failing that, 120 livres, which is what such a word is worth.
 
-**Chose:** Answer with twenty livres for her copyists
+**Chose:** Lend your name to their request at court
 
-> -20 livres
+> The queen's favour -4 · the queen trusts you more
 
 
 ## The end
 
-Item, of Marguerite of the house of Brécourt, born in the year 1383, married at eighteen to Messire Hue de Cramailles. She wanted to endow two chapels and die with a good name, and had it. Her lord was taken at Agincourt, and she bought him back. She was left a widow, and governed her own affairs thereafter. She bore four children, of whom four were living at the end. Robert was promised to the house of Montrevel. Louis was promised to the house of Saint-Lié. Catherine was promised to the house of Brécourt. She made peace with her cousin over Brécourt by a marriage, so that her grandchildren would hold it. She brought her friend Ysabel de Fontenoy out of the Châtelet in the year of the butchers. She took in her enemy Jacqueline d'Aubercourt and her children when they had nowhere to go, and was repaid. Pierre went to the Church. In the year of Troyes she wrote to the Dauphin at Bourges, and the letter was never found. She kept her husband's oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep. Her lord trusted her judgment, and said so. Her house held more land at the end than at the beginning. She was a lady of great good name, and was called very devout, bold and very warm. She ended her days among the Poor Clares, and was buried in their church.
+Item, of Marguerite of the house of Brécourt, born in the year 1383, married at eighteen to Messire Hue de Cramailles. She wanted to endow two chapels and die with a good name, and had it. Her lord was taken at Agincourt, and she bought him back. She was left a widow, and governed her own affairs thereafter. She bore four children, of whom four were living at the end. Robert was promised to the house of Montrevel. Louis was promised to the house of Saint-Lié. Catherine was promised to the house of Brécourt. She made peace with her cousin over Brécourt by a marriage, so that her grandchildren would hold it. She brought her friend Ysabel de Fontenoy out of the Châtelet in the year of the butchers. She took in her enemy Jacqueline d'Aubercourt and her children when they had nowhere to go, and was repaid. Pierre went to the Church. In the year of Troyes she wrote to the Dauphin at Bourges, and the letter was never found. Her lord held a place in the king's household for many years, because she kept him in Paris to hold it. She kept her husband's oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep. Her lord trusted her judgment, and said so. Her house held more land at the end than at the beginning. She was a lady of great good name, and was called very devout, bold and very warm. She ended her days among the Poor Clares, and was buried in their church.
 
 "The masses are paid for. Let them sing."
 

@@ -134,10 +134,10 @@ Your mother asks for 300 livres toward your younger sister's dowry. She has aske
 ---
 ## Summer 1402 · on the estates
 
-Actions: gift (margaret), accounts
+Actions: secure, gift (margaret)
 
+- Your plate, your mother's cups and three hundred livres in coin go to a Lombard house in the rue des Lombards, against a receipt. If the city turns, a fine will find little to take.
 - A gift to Margaret of Bavaria: trust +10.
-- You went through the rolls with Jehan Malet.
 - Your petition to the Duke of Berry was refused.
 - Forty days after the birth you were churched at the parish church, in a new veil, and the women of the household walked behind you with candles.
 
@@ -159,13 +159,13 @@ At a christening you find yourself seated between Ysabel de Fontenoy and Jacquel
 
 > Good name +1
 
-### Summer 1402 · A fever
+### Summer 1402 · The rents are short
 
-You wake with a fever that does not break. The household is frightened, which does not help.
+The rolls from your lands are short again: 18 livres this half-year that Jehan Malet says the tenants could not pay. Some of them, perhaps, could not.
 
-**Chose:** Make a vow to Saint Geneviève
+**Chose:** Let it go
 
-> Good name +1 · Health -14 · your confessor trusts you more
+> your steward trusts you more
 
 ---
 ## Winter 1402 · at court
@@ -184,13 +184,13 @@ A letter from your mother, written by the steward because her own hand shakes: y
 
 > your confessor trusts you more
 
-### Winter 1402 · The rents are short
+### Winter 1402 · Talk at court
 
-The rolls from your lands are short again: 50 livres this half-year that Jehan Malet says the tenants could not pay. Some of them, perhaps, could not.
+Jacqueline d'Aubercourt has been amusing the queen's ladies with stories about your household: your husband's debts, your country manners, the state of your best gown.
 
-**Chose:** Let it go
+**Chose:** Have Ysabel answer her for you
 
-> your steward trusts you more
+> It went as you hoped. Good name +1 · Ysabel trusts you less
 
 ---
 ## Summer 1403 · at court
@@ -213,13 +213,13 @@ Within the month your cousin, Gérard de Brécourt, a knight of the Duke of Burg
 
 > -150 livres · House in order -5 · your mother trusts you more
 
-### Summer 1403 · Trouble on the lands
+### Summer 1403 · The queen calls in a debt
 
-Two of your villages are at law with each other over a mill-race, and Jehan Malet writes that they will not accept his judgment.
+Isabeau of Bavaria has not forgotten the pension granted to you. A letter comes, polite and specific: a word for one of their people before the council, or, failing that, 120 livres, which is what such a word is worth.
 
-**Chose:** Ride home and judge it yourself
+**Chose:** Lend your name to their request at court
 
-> Good name +2 · House in order +3 · Health -3 · The queen's favour -3
+> The queen's favour -4 · the queen trusts you more
 
 ---
 ## Winter 1403 · at court
@@ -241,15 +241,15 @@ Ysabel de Fontenoy finds you in the gallery of the Hôtel Barbette with her face
 > -200 livres · Ysabel trusts you more
 
 ---
-## Summer 1404 · at court
+## Summer 1404 · on the estates
 
-Actions: attend, petition (margaret), letter (christine|own)
+Actions: accounts, repair
 
-- You played at tables with the queen's ladies and lost what it was polite to lose. The queen's favour +6.
-- Your petition went to the Duchess of Burgundy's household. An answer may come next half-year.
-- Your groom takes a letter to Christine de Pizan, sewn into his doublet.
+- You went through the rolls with Jehan Malet.
+- The house is repaired and watched. House in order +15.
 - The council gives your husband a place in the king's household, from the Orléans party: 220 livres a half-year while you are at court to collect it.
 - Your petition to the Duke of Berry was refused.
+- Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
 
 *Elsewhere in France: The Duke of Burgundy is dead. Philip the Bold dies in April at Hal, so deep in debt that his widow lays her purse and keys on his coffin to refuse his creditors. His son John takes the duchy. John is harder, poorer and less patient than his father.*
 
@@ -261,32 +261,40 @@ Jacqueline d'Aubercourt is to marry your cousin Gérard in your father's chapel 
 
 > -80 livres · Good name +2 · Jacqueline trusts you less
 
-### Summer 1404 · Talk at court
+### Summer 1404 · A fever
 
-Jacqueline d'Aubercourt has been amusing the queen's ladies with stories about your household: your husband's debts, your country manners, the state of your best gown.
+You wake with a fever that does not break. The household is frightened, which does not help.
 
-**Chose:** Have Ysabel answer her for you
+**Chose:** Make a vow to Saint Geneviève
 
-> It went badly. Good name -3 · Ysabel trusts you less
+> Good name +1 · Health -14 · your confessor trusts you more
 
 ---
-## Winter 1404 · on the estates
+## Winter 1404 · at court
 
-Actions: accounts, rest
+Actions: attend, petition (berry), letter (christine|own)
 
-- You sat with Jehan Malet over the rent rolls and the tallies, line by line.
-- You rested. Health +15.
-- Your petition to the Duchess of Burgundy was refused.
-- A reply from Christine de Pizan, in a careful hand.
-- Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
+- You played at tables with the queen's ladies and lost what it was polite to lose. The queen's favour +7.
+- Your petition went to the Duke of Berry's household. An answer may come next half-year.
+- Your groom takes a letter to Christine de Pizan, sewn into his doublet.
 
-### Winter 1404 · A joust at Saint-Pol (Your husband's honour)
+### Winter 1404 · The king's night (The queen)
 
-There is to be a joust in the rue Saint-Antoine for the queen's churching, the lists set up in front of the Hôtel Saint-Pol, and every knight of standing must ride or be noticed not riding. Cramailles needs a horse that will not shy at trumpets. Yours will not. His will.
+The king is ill again. Tonight in the Hôtel Saint-Pol he did not know his wife: he asked who that woman was, and had her put out of his rooms by his own servants. The queen comes into her chamber, where you are on duty, in her nightgown and a fur, and sits on the end of the bed, and says nothing for a long time. Then she asks for wine.
 
-**Chose:** Lend him the grey from your own stable
+**Chose:** Sit with her until morning, and never speak of it
 
-> Good name +1 · He thinks more of you
+> The queen's favour +10
+
+### Winter 1404 · Christine at work (Christine)
+
+*The last time, in the summer of 1402: you carried her letters against the Romance of the Rose into the queen's chamber.*
+
+Christine is writing the life of the late King Charles V for the Duke of Burgundy, and the duke died in April before she finished. She is finishing it anyway. She reads you the chapter on the king's library in the Louvre, nine hundred books, and stops at the end to say, "He let me read there when I was a girl. Nobody else did."
+
+**Chose:** Listen, and ask for the next chapter
+
+> What you know +3 · Christine trusts you more
 
 ### Winter 1404 · The Duchess of Orléans calls in a debt
 
@@ -299,11 +307,13 @@ Valentina Visconti has not forgotten the pension granted to you. A letter comes,
 ---
 ## Summer 1405 · at court
 
-Actions: attend, petition (berry), letter (christine|own)
+Actions: attend, petition (margaret), letter (christine|own)
 
 - You waited on the queen. The queen's favour +6.
-- Your petition went to the Duke of Berry's household. An answer may come next half-year.
+- Your petition went to the Duchess of Burgundy's household. An answer may come next half-year.
 - A letter to Christine de Pizan goes with your man, under your seal.
+- Your petition is granted: a pension of 130 livres a half-year from the Duke of Berry. A pension is also a debt: one day they will ask for something.
+- A reply from Christine de Pizan, in a careful hand.
 
 ### Summer 1405 · Burgundy marches on Paris
 
@@ -311,7 +321,40 @@ In August John of Burgundy comes to Paris with an army. The queen and the Duke o
 
 **Chose:** Continue
 
-### Summer 1405 · Two letters (Your husband)
+### Summer 1405 · The road to Melun (The queen)
+
+The queen is leaving Paris for Melun with the Duke of Orléans, ahead of the Burgundian army, and she asks her ladies to follow. Litters are being loaded in the courtyard of the Hôtel Barbette before dawn. In Paris they are already calling it a flight, and worse.
+
+**Chose:** Go with her
+
+> Health -3 · The queen's favour +10 · Orléans favour +5
+
+### Summer 1405 · A letter from Ysabel (Ysabel)
+
+Ysabel writes from the Hôtel Barbette, three pages crossed and recrossed: the Duke of Orléans has given his new order of the Porcupine to half the court, the queen has a parrot that says "Louis", and the Count of Saint-Pol's man, the one she owed, has been sent home for cheating. "Come back to Paris. Nobody here says anything worth hearing except me."
+
+**Chose:** Write back in kind
+
+> What you know +1 · Ysabel trusts you more
+
+### Summer 1405 · Jeanne is dead
+
+Jeanne died of a fever at three years old. Children die often. Knowing it is no comfort.
+
+**Chose:** Continue
+
+---
+## Winter 1405 · at court
+
+Actions: attend, letter (christine|own), courtly
+
+- You carried the queen's train at mass in the chapel of the Hôtel Saint-Pol. The queen's favour +5.
+- Your man rides with a letter to Christine de Pizan.
+- A ballade was written in your honour, a decent one.
+- Your petition is granted: a pension of 180 livres a half-year from the Duchess of Burgundy. A pension is also a debt: one day they will ask for something.
+- An answer from Christine de Pizan came with the carrier from Paris.
+
+### Winter 1405 · Two letters (Your husband)
 
 *The last time, in the winter of 1401: you listened to him by the fire, that first winter.*
 
@@ -323,49 +366,23 @@ August 1405. The Duke of Burgundy's army is at the gates of Paris, the queen and
 
 > Orléans favour +6 · He thinks more of you
 
-### Summer 1405 · A letter from Ysabel (Ysabel)
-
-Ysabel writes from the Hôtel Barbette, three pages crossed and recrossed: the Duke of Orléans has given his new order of the Porcupine to half the court, the queen has a parrot that says "Louis", and the Count of Saint-Pol's man, the one she owed, has been sent home for cheating. "Come back to Paris. Nobody here says anything worth hearing except me."
-
-**Chose:** Write back in kind
-
-> What you know +4 · Ysabel trusts you more
-
-### Summer 1405 · Jeanne is dead
-
-Jeanne died of a fever at three years old. Children die often. Knowing it is no comfort.
-
-**Chose:** Continue
-
----
-## Winter 1405 · on the estates
-
-Actions: accounts, repair
-
-- You counted the granary yourself and set it against Jehan Malet's figures.
-- The house is repaired and watched. House in order +15.
-- Your petition is granted: a pension of 130 livres a half-year from the Duke of Berry. A pension is also a debt: one day they will ask for something.
-- An answer from Christine de Pizan came with the carrier from Paris.
-- Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
-
 ### Winter 1405 · A book for ladies (Christine)
-
-*The last time, in the summer of 1402: you carried her letters against the Romance of the Rose into the queen's chamber.*
 
 Christine is writing a book of instruction for ladies, from the queen down to the wives of artisans, and she wants to get it right. She sits in your window with a wax tablet. "Not what the sermons say. How it is. The accounts, the husband, the steward, the queen's people, the debts. What a lady actually does when the men are away and the rents are short."
 
 **Chose:** Tell her the truth, all of it
 
-> What you know +4 · Christine trusts you more
+> Christine trusts you more
 
 ---
 ## Summer 1406 · at court
 
-Actions: attend, petition (margaret), letter (christine|own)
+Actions: attend, letter (christine|own), courtly
 
-- You carried the queen's train at mass in the chapel of the Hôtel Saint-Pol. The queen's favour +6.
-- Your petition went to the Duchess of Burgundy's household. An answer may come next half-year.
-- Your man rides with a letter to Christine de Pizan.
+- You sat with the queen's ladies over their sewing and heard who had quarrelled with whom. The queen's favour +5.
+- Your groom takes a letter to Christine de Pizan, sewn into his doublet.
+- A ballade was written in your honour, a decent one.
+- Christine de Pizan has answered your letter.
 - You are with child. It will come next half-year.
 
 ### Summer 1406 · Your mother's dower (Brécourt)
@@ -388,10 +405,9 @@ She says it at your own table, in front of the servants.
 Actions: lawsuit (brecourt), attend, letter (christine|own)
 
 - Master Lorfèvre argued Brécourt before the Parlement. 1 of 6 hearings.
-- You sat with the queen's ladies over their sewing and heard who had quarrelled with whom. The queen's favour +6.
-- Your groom takes a letter to Christine de Pizan, sewn into his doublet.
-- Your petition is granted: a pension of 180 livres a half-year from the Duchess of Burgundy. A pension is also a debt: one day they will ask for something.
-- Christine de Pizan has answered your letter.
+- You held the queen's book at vespers, and she spoke to you twice. The queen's favour +4.
+- A letter to Christine de Pizan goes with your man, under your seal.
+- A reply from Christine de Pizan, in a careful hand.
 
 ### Winter 1406 · A song in the kitchens (Ysabel)
 
@@ -401,7 +417,7 @@ A song is going round the kitchens of the Hôtel Saint-Pol about a lady of the q
 
 **Chose:** Swear to it
 
-> It went badly. Good name -8 · Ysabel trusts you more
+> It went as you hoped. Ysabel trusts you more
 
 ### Winter 1406 · A son
 
@@ -413,23 +429,22 @@ The wet nurse who fed Jeanne has milk again, and her husband has already asked t
 
 > -40 livres · Health +6
 
-### Winter 1406 · The rents are short
+### Winter 1406 · Christine asks a favour
 
-The rolls from your lands are short again: 49 livres this half-year that Jehan Malet says the tenants could not pay. Some of them, perhaps, could not.
+Christine de Pizan has finished 1403: a dream of the Sibyl leading her to the heavens, to ask who should rule the world. A copy is ready, on good parchment, at her own cost. She asks you to put it into the queen's hands, at a moment when the queen is likely to open it.
 
-**Chose:** Let it go
+**Chose:** Do it
 
-> your steward trusts you more
+> The queen's favour -2 · Christine trusts you more
 
 ---
 ## Summer 1407 · on the estates
 
-Actions: lawsuit (brecourt), gift (margaret)
+Actions: secure, lawsuit (brecourt)
 
+- Your plate, your mother's cups and three hundred livres in coin go to a Lombard house in the rue des Lombards, against a receipt. If the city turns, a fine will find little to take.
 - Master Lorfèvre argued Brécourt before the Parlement. 2 of 6 hearings.
-- Perrette delivered the gift late and badly.
-- A gift to Margaret of Bavaria: trust +5.
-- A reply from Christine de Pizan, in a careful hand.
+- An answer from Christine de Pizan came with the carrier from Paris.
 - Forty days after the birth you were churched at the parish church, in a new veil, and the women of the household walked behind you with candles.
 - Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
 
@@ -437,9 +452,9 @@ Actions: lawsuit (brecourt), gift (margaret)
 
 There is a place among the queen's ladies of the chamber: wages, lodging in the Hôtel Barbette, the queen's ear at night. Jacqueline d'Aubercourt, Dame de Brécourt now, is said to have it as good as settled.
 
-**Chose:** Let her have it
+**Chose:** Press your own claim, through Ysabel
 
-> Good name +1
+> It went badly. Jacqueline trusts you less
 
 ### Summer 1407 · The City of Ladies (Christine)
 
@@ -452,10 +467,10 @@ A copy of Christine's new book arrives, the Book of the City of Ladies, bound in
 ---
 ## Winter 1407 · on the estates
 
-Actions: lawsuit (brecourt), gift (margaret)
+Actions: lawsuit (brecourt), distance (arm)
 
 - Master Lorfèvre argued Brécourt before the Parlement. 3 of 6 hearings.
-- A gift to Margaret of Bavaria: trust +5.
+- You burned their letters in the kitchen fire and stopped going to their masses. Their people noticed within the week. Favour -12.
 - Your husband's place in the king's household has been given to someone who was there.
 
 ### Winter 1407 · The murder in the Rue Vieille-du-Temple
@@ -463,15 +478,15 @@ Actions: lawsuit (brecourt), gift (margaret)
 On the evening of 23 November, Louis, Duke of Orléans, leaves the queen's house in the Rue Vieille-du-Temple and is cut down in the street by masked men. Within days John of Burgundy admits he ordered it, and rides for Flanders. Paris cheers him.
 
 - Your pension from the Duchess of Orléans stopped.
-- You are counted among their enemies' friends, and fined 188 livres.
+- You are counted among their enemies' friends, and fined 120 livres. Your plate and coin were with the Lombards: the fine found half as much to take.
 
 **Chose:** Go to the Blancs-Manteaux, where the body lies, and pray
 
-> Good name +2
+> Good name +1
 
 ### Winter, 1407 · In the margins of her book of hours
 
-I have said my hours every day, and some days they were the only quiet I had. Cramailles is what I was told he would be: no better, no worse, and away a good deal. Robert is living, and one is in the churchyard. Master Lorfèvre says the Parlement is slow but not deaf. It has heard us three times, and Gérard still sleeps in my father's bed. In November they killed the Duke of Orléans in the street, and the whole city held its breath, and then let it out again. I lied for Ysabel and was found out. She still curtseys to me. I am not sure I deserve it. Jacqueline has the queen's ear at night. I can tell when she has used it. I carried Christine's letters against the Romance of the Rose into the queen's chamber. The King's secretary has not smiled at me since. Good.
+I have said my hours every day, and some days they were the only quiet I had. Cramailles is what I was told he would be: no better, no worse, and away a good deal. Robert is living, and one is in the churchyard. Master Lorfèvre says the Parlement is slow but not deaf. It has heard us three times, and Gérard still sleeps in my father's bed. In November they killed the Duke of Orléans in the street, and the whole city held its breath, and then let it out again. I lied for Ysabel before the queen's women. God forgive me, I would do it again. Jacqueline has the queen's ear at night. I can tell when she has used it. I carried Christine's letters against the Romance of the Rose into the queen's chamber. The King's secretary has not smiled at me since. Good. I know what the king said to the queen that night. I have never told anyone, and she knows it.
 
 - What is said of her: devout, careful, very warm.
 
@@ -500,7 +515,7 @@ In March, at the Hôtel Saint-Pol, the theologian Jean Petit speaks for four hou
 
 ### Summer 1408 · After the justification (Your husband)
 
-*The last time, in the summer of 1405: you told him to answer Orléans's summons in 1405.*
+*The last time, in the winter of 1405: you told him to answer Orléans's summons in 1405.*
 
 Cramailles comes home from the Hôtel Saint-Pol after four hours of Master Jean Petit proving from Scripture and Aristotle that the murder of the Duke of Orléans was a lawful act.
 
@@ -516,7 +531,7 @@ Ysabel presses a letter into your hand in the chapel, under cover of the offerto
 
 **Chose:** Carry it yourself
 
-> It went as you hoped. Orléans favour +10 · the Duchess of Orléans trusts you more · Ysabel trusts you more
+> It went badly. Orléans favour +6 · Ysabel trusts you more
 
 ---
 ## Winter 1408 · at court
@@ -524,7 +539,7 @@ Ysabel presses a letter into your hand in the chapel, under cover of the offerto
 Actions: lawsuit (brecourt), attend, letter (husband|robert)
 
 - Master Lorfèvre argued Brécourt before the Parlement. 5 of 6 hearings.
-- You held the queen's book at vespers, and she spoke to you twice. The queen's favour +7.
+- You rode behind the queen's litter to Vincennes and back. The queen's favour +5.
 - Brother Robert takes your letter to Cramailles in his satchel, with his breviary. It will be slow.
 - The council gives your husband a place in the king's household, from the Burgundians: 220 livres a half-year while you are at court to collect it.
 - You are with child. It will come next half-year.
@@ -532,23 +547,23 @@ Actions: lawsuit (brecourt), attend, letter (husband|robert)
 
 *Elsewhere in France: The Duchess of Orléans is dead. Valentina Visconti dies at Blois in December, still asking for justice for her husband. Her son Charles, fourteen years old, is now Duke of Orléans.*
 
-### Winter 1408 · The princess Catherine (The queen)
+### Winter 1408 · A joust at Saint-Pol (Your husband's honour)
 
-The queen's youngest daughter, Catherine, is eight and cannot yet read, because nobody has had time. The queen asks you, as a favour, to take her letters in hand this winter. She is a quiet child with bitten nails who likes horses and dislikes Latin.
+There is to be a joust in the rue Saint-Antoine for the queen's churching, the lists set up in front of the Hôtel Saint-Pol, and every knight of standing must ride or be noticed not riding. Cramailles needs a horse that will not shy at trumpets. Yours will not. His will.
 
-**Chose:** Teach her yourself, every morning
+**Chose:** Lend him the grey from your own stable
 
-> The queen's favour +6
+> Good name +1 · He thinks more of you
 
 ---
-## Summer 1409 · at court
+## Summer 1409 · on the estates
 
-Actions: lawsuit (brecourt), attend, letter (husband|robert)
+Actions: lawsuit (brecourt), letter (husband|robert)
 
 - Judgment in the Parlement: the court upholds Gérard. Master Lorfèvre says there is no appeal worth making, and does not meet your eye.
-- You rode behind the queen's litter to Vincennes and back. The queen's favour +6.
 - Brother Robert takes your letter to Cramailles in his satchel, with his breviary. It will be slow.
 - Cramailles takes your counsel.
+- Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
 
 *Elsewhere in France: The Peace of Chartres. In March, in the cathedral at Chartres, the Duke of Burgundy asks the king's pardon, and the young Orléans princes are made to forgive their father's murderer. Nobody believes it.*
 
@@ -579,9 +594,9 @@ The wet nurse who fed Robert has milk again, and her husband has already asked t
 
 Actions: attend, petition (charles_o), letter (christine|own)
 
-- You played at tables with the queen's ladies and lost what it was polite to lose. The queen's favour +6.
+- You played at tables with the queen's ladies and lost what it was polite to lose. The queen's favour +5.
 - Your petition went to the Duke of Orléans's household. An answer may come next half-year.
-- A letter to Christine de Pizan goes with your man, under your seal.
+- Your man rides with a letter to Christine de Pizan.
 - Cramailles reads your letter and does as he pleases.
 - Forty days after the birth you were churched at the parish church, in a new veil, and the women of the household walked behind you with candles.
 
@@ -595,7 +610,7 @@ She asks to see your procureur's brief on Brécourt. "I have lost more lawsuits 
 
 **Chose:** Lend her two hundred livres, and ask for her eye on your brief
 
-> -200 livres · Christine trusts you more
+> -200 livres
 
 ### Winter 1409 · New Year's gifts
 
@@ -610,18 +625,16 @@ On the first day of January the court gives gifts, and everyone notes who gave w
 
 Actions: accounts, rest
 
-- You heard the reeves' accounts in the hall, with Jehan Malet standing behind them.
-- You kept to your chamber for a month, and ate what the physician said. Health +15.
+- You sat with Jehan Malet over the rent rolls and the tallies, line by line.
+- You rested. Health +15.
 - Cramailles reads your letter and does as he pleases.
 - Your petition to the Duke of Orléans was refused.
-- An answer from Christine de Pizan came with the carrier from Paris.
+- Christine de Pizan has answered your letter.
 - Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
 
 *Elsewhere in France: The League of Gien. In April the princes opposed to Burgundy swear a league at Gien: Orléans, Berry, Bourbon, Alençon, and Bernard, Count of Armagnac, whose daughter marries the young Duke of Orléans. From now on Paris calls them the Armagnacs.*
 
 ### Summer 1410 · Brothers in arms (Your husband's honour)
-
-*The last time, in the winter of 1404: you lent him the grey for the joust in the rue Saint-Antoine.*
 
 Cramailles has sworn brotherhood in arms with Messire Raoul de Fléchin, a Picard knight he has known since they were pages. The contract is drawn by a notary: they will share every ransom and every spoil, buy each other out of captivity, and never take the field against each other.
 
@@ -634,14 +647,14 @@ The notary wants your seal as a witness.
 > He thinks more of you
 
 ---
-## Winter 1410 · at court
+## Winter 1410 · on the estates
 
-Actions: attend, petition (charles_o), letter (christine|own)
+Actions: accounts, repair
 
-- You waited on the queen. The queen's favour +6.
-- Your petition went to the Duke of Orléans's household. An answer may come next half-year.
-- Your man rides with a letter to Christine de Pizan.
-- Soldiers passed near your lands. Your letters of protection were honoured.
+- You counted the granary yourself and set it against Jehan Malet's figures.
+- The house is repaired and watched. House in order +15.
+- Soldiers passed near your lands. The watch you set kept them off.
+- Your husband's place in the king's household has been given to someone who was there.
 - You are with child. It will come next half-year.
 
 ### Winter 1410 · Your mother (Brécourt)
@@ -654,37 +667,35 @@ She asked to lie beside your father in the chapel at Brécourt. The chapel is G�
 
 **Chose:** Ask Gérard to let her lie beside your father
 
-> It went badly. Good name -1 · Jacqueline trusts you less
+> It went badly. Good name -1
 
-### Winter 1410 · The rents are short
+### Winter 1410 · Christine asks a favour
 
-The rolls from your lands are short again: 48 livres this half-year that Jehan Malet says the tenants could not pay. Some of them, perhaps, could not.
+Christine de Pizan has finished 1405: a book of advice for women of every rank, from queens to the wives of labourers. A copy is ready, on good parchment, at her own cost. She asks you to put it into the queen's hands, at a moment when the queen is likely to open it.
 
-**Chose:** Let it go
+**Chose:** Do it
 
-> your steward trusts you more
+> What you know +5 · The queen's favour -2
 
 ---
-## Summer 1411 · on the estates
+## Summer 1411 · at court
 
-Actions: accounts, repair
+Actions: office, attend, petition (charles_o)
 
-- You checked the mill tolls and the wood sales against what Jehan Malet had written.
-- The house is repaired and watched. House in order +15.
-- Your petition to the Duke of Orléans was refused.
-- Christine de Pizan has answered your letter.
+- You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
+- You waited on the queen. The queen's favour +5.
+- Your petition went to the Duke of Orléans's household. An answer may come next half-year.
 - Soldiers passed near your lands. The watch you set kept them off.
-- Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
 
-### Summer 1411 · Jacqueline at court (Jacqueline)
+### Summer 1411 · The princess Catherine (The queen)
 
-*The last time, in the summer of 1407: you let her have the place in the queen's chamber.*
+*The last time, in the summer of 1405: you rode with her to Melun in 1405.*
 
-You meet Jacqueline on the stairs of the Hôtel Barbette, coming down as you go up. She is pregnant again and carries it like a banner. Neither of you can pass without one stepping aside, and the stairs are narrow, and the queen's ladies are watching from the landing.
+The queen's youngest daughter, Catherine, is eight and cannot yet read, because nobody has had time. The queen asks you, as a favour, to take her letters in hand this winter. She is a quiet child with bitten nails who likes horses and dislikes Latin.
 
-**Chose:** Step aside, and wish her a safe delivery
+**Chose:** Teach her yourself, every morning
 
-> Good name +1 · Jacqueline trusts you more
+> The queen's favour +6
 
 ### Summer 1411 · A son
 
@@ -699,13 +710,14 @@ The wet nurse who fed Guillaume has milk again, and her husband has already aske
 ---
 ## Winter 1411 · on the estates
 
-Actions: gift (margaret), accounts
+Actions: secure, gift (margaret)
 
+- Your plate, your mother's cups and three hundred livres in coin go to a Lombard house in the rue des Lombards, against a receipt. If the city turns, a fine will find little to take.
 - A gift to Margaret of Bavaria: trust +10.
-- You went through the rolls with Jehan Malet.
+- The office went to someone with better friends on the council.
+- Your petition to the Duke of Orléans was refused.
 - Forty days after the birth you were churched at the parish church, in a new veil, and the women of the household walked behind you with candles.
 - Soldiers passed near your lands. The watch you set kept them off.
-- Your husband's place in the king's household has been given to someone who was there.
 
 ### Winter 1411 · A letter from the army (Your husband)
 
@@ -731,41 +743,39 @@ Margaret of Bavaria has not forgotten the pension granted to you. A letter comes
 Actions: office, attend, petition (charles_o)
 
 - You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
-- You carried the queen's train at mass in the chapel of the Hôtel Saint-Pol. The queen's favour +6.
+- You carried the queen's train at mass in the chapel of the Hôtel Saint-Pol. The queen's favour +5.
 - Your petition went to the Duke of Orléans's household. An answer may come next half-year.
 - Soldiers passed near your lands. The watch you set kept them off.
 - The sickness is in Paris, and in your house. You lived through it. Health -8.
 
-### Summer 1412 · A christening (Ysabel)
+### Summer 1412 · The queen's offer (Your own life)
 
-*The last time, in the summer of 1408: you carried her letter to the Duchess of Orléans' almoner yourself.*
+The queen's mistress of the household asks to see you after vespers, in a window bay where nobody can stand close enough to hear. Would you accept a place among the queen's ladies? Wages of three hundred livres a year, a room in the Hôtel Barbette, and the queen's company whenever the queen wants it, which is often, and at night, when she cannot sleep.
 
-Ysabel's brother has a son at last, and she asks you to stand godmother at the font in Saint-Paul's, beside her. "You are the only person I know who will not drop him."
+**Chose:** Accept
 
-**Chose:** Stand godmother, with a silver cup
-
-> -40 livres · Good name +1 · Ysabel trusts you more
+> The queen's favour +10 · He thinks less of you
 
 ---
 ## Winter 1412 · at court
 
 Actions: attend, petition (bernard), letter (christine|own)
 
-- You sat with the queen's ladies over their sewing and heard who had quarrelled with whom. The queen's favour +6.
+- You sat with the queen's ladies over their sewing and heard who had quarrelled with whom. The queen's favour +5.
 - Your petition went to the Count of Armagnac's household. An answer may come next half-year.
 - Your groom takes a letter to Christine de Pizan, sewn into his doublet.
 - The office went to someone with better friends on the council.
 - The Duke of Orléans's household has not answered your petition yet.
 
-### Winter 1412 · A book of arms (Christine)
+### Winter 1412 · Jacqueline at court (Jacqueline)
 
-*The last time, in the winter of 1409: you lent her two hundred livres when the bailiff came.*
+*The last time, in the summer of 1407: you pressed your own claim to the place in the queen's chamber she wanted.*
 
-Christine has written a book on the deeds of arms and of chivalry: how to provision a siege, the laws of war, who may take ransom from whom, what a safe-conduct is worth. A woman writing for knights. "They will read it," she says, "and say a man wrote it. Let them, if they read it."
+You meet Jacqueline on the stairs of the Hôtel Barbette, coming down as you go up. She is pregnant again and carries it like a banner. Neither of you can pass without one stepping aside, and the stairs are narrow, and the queen's ladies are watching from the landing.
 
-**Chose:** Read the chapter on ransoms yourself
+**Chose:** Step aside, and wish her a safe delivery
 
-> What you know +4
+> Good name +1 · Jacqueline trusts you more
 
 ### Winter 1412 · Talk at court
 
@@ -773,7 +783,7 @@ Jacqueline d'Aubercourt has been amusing the queen's ladies with stories about y
 
 **Chose:** Have Ysabel answer her for you
 
-> It went as you hoped. Good name +2 · Ysabel trusts you less
+> It went badly. Good name -3 · Ysabel trusts you less
 
 ---
 ## Summer 1413 · at court
@@ -781,7 +791,7 @@ Jacqueline d'Aubercourt has been amusing the queen's ladies with stories about y
 Actions: office, attend, letter (christine|own)
 
 - You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
-- You held the queen's book at vespers, and she spoke to you twice. The queen's favour +5.
+- You held the queen's book at vespers, and she spoke to you twice. The queen's favour +4.
 - A letter to Christine de Pizan goes with your man, under your seal.
 - The Count of Armagnac's household has not answered your petition yet.
 - A reply from Christine de Pizan, in a careful hand.
@@ -791,10 +801,12 @@ Actions: office, attend, letter (christine|own)
 
 In April the butchers of Paris, led by the skinner Caboche and backed by Burgundy, take the city. They break into the Dauphin's house and into the queen's, and drag away her brother and her ladies. For three months the white hoods rule Paris.
 
+- Someone remembered seeing you with the Duchess of Orléans' almoner in 1408.
+- A place among the queen's ladies: taken back by the new council, and counted against you.
 - Your pension from the queen stopped.
-- You are counted among their enemies' friends, and fined 605 livres.
-- 1 of your holdings is confiscated and given to one of their captains. A case in the Parlement might recover it.
-- You were in Paris when it happened, and were taken with the others. You bought your way out of the Châtelet for 290 livres. Health -29.
+- You are counted among their enemies' friends, and fined 1490 livres.
+- 2 of your holdings are confiscated and given to one of their captains. A case in the Parlement might recover them.
+- You were in Paris when it happened, and were taken with the others. You bought your way out of the Châtelet for 720 livres. Health -72.
 
 **Chose:** Send food to the prisoners in the Châtelet
 
@@ -802,9 +814,13 @@ In April the butchers of Paris, led by the skinner Caboche and backed by Burgund
 
 ### Summer 1413 · Ysabel in the Châtelet (Ysabel)
 
+*The last time, in the summer of 1408: you carried her letter to the Duchess of Orléans' almoner yourself.*
+
 The white hoods came into the queen's house in May with a list, and took the queen's brother and eleven of her ladies through the streets to the Châtelet. Ysabel's name was on the list.
 
 So, Perrette says, was something about a letter to the Celestines. Your name was not. Yet.
+
+And somebody among the butchers remembers a lady with the Duchess of Orléans' almoner at the Celestines, in the spring of 1408.
 
 She still owes you two hundred livres from the queen's tables. You find you do not care.
 
@@ -820,7 +836,7 @@ The butchers are talking about trials.
 Actions: lawsuit (cause), accounts
 
 - Your procureur argued the case. 1 of 3 hearings.
-- You sat with Jehan Malet over the rent rolls and the tallies, line by line.
+- You heard the reeves' accounts in the hall, with Jehan Malet standing behind them.
 - The office went to someone with better friends on the council.
 - An answer from Christine de Pizan came with the carrier from Paris.
 - Your petition is granted: a pension of 180 livres a half-year from the Count of Armagnac. A pension is also a debt: one day they will ask for something.
@@ -859,12 +875,10 @@ Robert is seven, sickly, and old enough to be sent away, as children of good fam
 Actions: lawsuit (cause), accounts
 
 - Your procureur argued the case. 2 of 3 hearings.
-- You counted the granary yourself and set it against Jehan Malet's figures.
+- You checked the mill tolls and the wood sales against what Jehan Malet had written.
 - Soldiers passed near your lands. Your letters of protection were honoured.
 
 ### Summer 1414 · Jacqueline at your door (Jacqueline)
-
-*The last time, in the summer of 1411: you stepped aside for her on the stairs and wished her a safe delivery.*
 
 Jacqueline d'Aubercourt comes to your door in a plain cloak with two children behind her and a third on her hip. Gérard is still in the Châtelet. The Armagnacs have put a captain into Brécourt and her out of it.
 
@@ -880,27 +894,25 @@ Jacqueline d'Aubercourt comes to your door in a plain cloak with two children be
 Actions: lawsuit (cause), accounts
 
 - Judgment in the Parlement: you lose. There is no appeal worth making.
-- You heard the reeves' accounts in the hall, with Jehan Malet standing behind them.
+- You went through the rolls with Jehan Malet.
 
 *Elsewhere in France: The Peace of Arras. In September a peace is agreed at Arras between the king and the Duke of Burgundy. It settles little, and the English king is watching.*
 
-### Winter 1414 · The queen after the summer (The queen)
+### Winter 1414 · The Book of Peace (Christine)
 
-*The last time, in the winter of 1408: you taught the little princess Catherine her letters.*
+*The last time, in the winter of 1409: you lent her two hundred livres when the bailiff came.*
 
-The butchers let the queen's brother go in the end. She has him back, and four of her ladies, and a household that jumps when a door bangs. She has grown heavy and stopped riding. At supper she asks you, apropos of nothing, how much a house in the country costs.
+After the butchers' summer Christine is writing a book of peace for the young Dauphin Louis, telling a boy of sixteen how to govern a city that has just tried to murder his friends. She asks whether you think he will read it. You have seen the Dauphin. He plays the harp until three in the morning.
 
-**Chose:** Tell her, honestly
-
-> What you know +3 · The queen's favour +4
+**Chose:** "He will, if you make it short"
 
 ---
 ## Summer 1415 · on the estates
 
 Actions: accounts, rest
 
-- You checked the mill tolls and the wood sales against what Jehan Malet had written.
-- You stayed out of the hall and let the household run without you for a while. Health +15.
+- You sat with Jehan Malet over the rent rolls and the tallies, line by line.
+- You kept to your chamber for a month, and ate what the physician said. Health +15.
 
 ### Summer 1415 · The English at Harfleur
 
@@ -942,7 +954,7 @@ Louis died of a fever at four years old. Children die often. Knowing it is no co
 Actions: office, attend, petition (queen)
 
 - You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
-- You rode behind the queen's litter to Vincennes and back. The queen's favour +6.
+- You rode behind the queen's litter to Vincennes and back. The queen's favour +5.
 - Your petition went to the queen's household. An answer may come next half-year.
 
 ### Winter 1415 · Agincourt
@@ -954,7 +966,7 @@ On 25 October, in a muddy field between two woods near Agincourt, the English ar
 
 **Chose:** Send to Abbeville after the wounded of your county
 
-> -60 livres · Good name +2
+> -60 livres · Good name +3
 
 ### Winter 1415 · After Agincourt (Your husband)
 
@@ -966,7 +978,7 @@ Cramailles came home on foot, without his horse or his banner, and has not said 
 
 ### Winter, 1415 · In the margins of her book of hours
 
-Cramailles came back from Agincourt. Some nights I think part of him did not. The Parlement found for Gérard. Master Lorfèvre sent his account the same week. I opened my door to Jacqueline and her children. I do not know yet whether that was charity or a very long investment. I got Ysabel out of the Châtelet. She has not thanked me, which is how I know she means to. Christine read Master Lorfèvre's brief and found the hole in it in an afternoon. He has been politer to me since. Robert is a page in a great household and writes to me twice a year, when he needs something. Gérard would not let my mother lie beside my father. I have added it to the account. What I wanted, I do not have. 0 of 2 children promised to good houses.
+Cramailles came back from Agincourt. Some nights I think part of him did not. The Parlement found for Gérard. Master Lorfèvre sent his account the same week. I opened my door to Jacqueline and her children. I do not know yet whether that was charity or a very long investment. I got Ysabel out of the Châtelet. She has not thanked me, which is how I know she means to. Christine read Master Lorfèvre's brief and found the hole in it in an afternoon. He has been politer to me since. I rode to Melun with the queen in 1405. Some Burgundians still call me the queen's runaway. Robert is a page in a great household and writes to me twice a year, when he needs something. Gérard would not let my mother lie beside my father. I have added it to the account. What I wanted, I do not have. 0 of 2 children promised to good houses.
 
 - What is said of her: very devout, very warm.
 
@@ -983,7 +995,7 @@ Act Four. The aftermath, 1416 to 1422. What survives now depends on what you bui
 
 Actions: attend, petition (margaret), letter (christine|own)
 
-- You played at tables with the queen's ladies and lost what it was polite to lose. The queen's favour +6.
+- You played at tables with the queen's ladies and lost what it was polite to lose. The queen's favour +5.
 - Your petition went to the Duchess of Burgundy's household. An answer may come next half-year.
 - Your man rides with a letter to Christine de Pizan.
 - The council gives your husband a place in the king's household, from the Armagnacs: 220 livres a half-year while you are at court to collect it.
@@ -994,6 +1006,8 @@ Actions: attend, petition (margaret), letter (christine|own)
 *Elsewhere in France: The Duke of Berry is dead. In June Jean, Duke of Berry, the king's last uncle, dies in Paris at seventy-five, owing so much that his jewels and books are sold to pay his debts.*
 
 ### Summer 1416 · The queen's son (The queen)
+
+*The last time, in the summer of 1411: you taught the little princess Catherine her letters.*
 
 In December the Dauphin Louis, the queen's eldest living son, eighteen years old, dies of a fever, two months after Agincourt. The queen has buried more of her children than most women bear. She asks for you, not her chaplain. She wants someone to read to her who will not try to comfort her.
 
@@ -1022,7 +1036,7 @@ The queen goes to her house at Vincennes for the summer and asks you to come, at
 
 Actions: attend, petition (queen), letter (christine|own)
 
-- You waited on the queen. The queen's favour +5.
+- You waited on the queen. The queen's favour +4.
 - Your petition went to the queen's household. An answer may come next half-year.
 - Your groom takes a letter to Christine de Pizan, sewn into his doublet.
 - Your petition is granted: a pension of 180 livres a half-year from the Duchess of Burgundy. A pension is also a debt: one day they will ask for something.
@@ -1049,10 +1063,10 @@ Bernard, Count of Armagnac has not forgotten the pension granted to you. A lette
 ---
 ## Summer 1417 · on the estates
 
-Actions: distance (queen), gift (bernard)
+Actions: secure, distance (queen)
 
+- Your plate, your mother's cups and three hundred livres in coin go to a Lombard house in the rue des Lombards, against a receipt. If the city turns, a fine will find little to take.
 - You burned their letters in the kitchen fire and stopped going to their masses. The queen's ladies noticed within the week. Favour -12.
-- A gift to Bernard, Count of Armagnac: trust +10.
 - Your petition is granted: a pension of 150 livres a half-year from the queen. A pension is also a debt: one day they will ask for something.
 - A reply from Christine de Pizan, in a careful hand.
 - Your husband's place in the king's household: unpaid this half-year, because you were away. Another half-year away and it will go to someone else.
@@ -1062,6 +1076,7 @@ Actions: distance (queen), gift (bernard)
 In April the Count of Armagnac, now master of Paris, accuses the queen's household of disorder. Her steward, Louis de Bosredon, is tortured and drowned in the Seine. The queen is sent under guard to Tours. In August the English land again, in Normandy.
 
 - Your pension from the queen stopped.
+- You are counted among their enemies' friends, and fined 70 livres. Your plate and coin were with the Lombards: the fine found half as much to take.
 
 **Chose:** Continue
 
@@ -1077,7 +1092,15 @@ It is the second time you would be saving her life. She knows it, and hates aski
 
 **Chose:** Hide her
 
-> It went badly. -400 livres · Orléans favour -8
+> It went as you hoped.
+
+### Summer 1417 · Tours (The queen)
+
+The Count of Armagnac has broken up the queen's household and is sending her to Tours under guard, with three ladies of his choosing and a gaoler he calls a steward. She is allowed one lady of her own. Through her almoner, she asks for you.
+
+**Chose:** Go to Tours with her
+
+> Health -5 · The queen's favour +15 · Orléans favour -2
 
 ---
 ## Winter 1417 · on the estates
@@ -1085,7 +1108,7 @@ It is the second time you would be saving her life. She knows it, and hates aski
 Actions: gift (margaret), accounts
 
 - A gift to Margaret of Bavaria: trust +10.
-- You went through the rolls with Jehan Malet.
+- You counted the granary yourself and set it against Jehan Malet's figures.
 - Your husband's place in the king's household has been given to someone who was there.
 
 ### Winter 1417 · The queen goes to Burgundy
@@ -1106,17 +1129,18 @@ You hid her when it could have cost you everything. This is her paying it back.
 
 ### Winter 1417 · A captain sends word
 
-A Lombard crossbowman named Boniface, who holds the castle at Pontoise for whoever paid him last, sends a man to your steward with a list of your villages and a price: 100 livres, and he will see that no harm comes to them until the vintage. The man waits in the kitchen and eats like a soldier.
+A Lombard crossbowman named Boniface, who holds the castle at Pontoise for whoever paid him last, sends a man to your steward with a list of your villages and a price: 94 livres, and he will see that no harm comes to them until the vintage. The man waits in the kitchen and eats like a soldier.
 
-**Chose:** Ask the Count of Armagnac for a safe-conduct
+**Chose:** Ask the queen for a safe-conduct
 
 ---
-## Summer 1418 · on the estates
+## Summer 1418 · at court
 
-Actions: gift (margaret), accounts
+Actions: office, attend, petition (queen)
 
-- A gift to Margaret of Bavaria: trust +5.
-- You sat with Jehan Malet over the rent rolls and the tallies, line by line.
+- You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
+- You carried the queen's train at mass in the chapel of the Hôtel Saint-Pol. The queen's favour +4.
+- Your petition went to the queen's household. An answer may come next half-year.
 - Soldiers passed near your lands. The watch you set kept them off.
 
 ### Summer 1418 · The Burgundians take Paris
@@ -1126,6 +1150,7 @@ On the night of 28 May a gate is opened to Burgundian men-at-arms. The Dauphin C
 - Bernard, Count of Armagnac was killed by the Paris mob.
 - Your pension from the Count of Armagnac ends with it.
 - Jacqueline d'Aubercourt had your name struck from the Burgundian lists.
+- You were in Paris when it happened. You got out, with your household, barely. Health -4.
 
 **Chose:** Continue
 
@@ -1158,11 +1183,13 @@ Guillaume is a page in the household of the Orléans household at Blois, and the
 ---
 ## Winter 1418 · at court
 
-Actions: office, attend, petition (queen)
+Actions: attend, letter (christine|own), chapel
 
-- You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
-- You carried the queen's train at mass in the chapel of the Hôtel Saint-Pol. The queen's favour +6.
-- Your petition went to the queen's household. An answer may come next half-year.
+- You sat with the queen's ladies over their sewing and heard who had quarrelled with whom. The queen's favour +4.
+- A letter to Christine de Pizan goes with your man, under your seal.
+- The chapel is endowed. Masses will be said for your dead, and the county will notice.
+- The office went to someone with better friends on the council.
+- Your petition is granted: a pension of 150 livres a half-year from the queen. A pension is also a debt: one day they will ask for something.
 - Soldiers passed near your lands. The watch you set kept them off.
 
 ### Winter 1418 · The great sickness, and Rouen
@@ -1181,7 +1208,7 @@ Messire Raoul de Fléchin is at your gate, with one squire and no horse, with th
 
 **Chose:** Honour the contract
 
-> It went badly. -200 livres · Good name +3 · He thinks more of you
+> It went as you hoped. -200 livres · Good name +3 · He thinks more of you
 
 ### Winter 1418 · Robert's fever
 
@@ -1192,20 +1219,18 @@ The fever Robert had as a baby has come back, worse, with a cough that wakes the
 > -120 livres
 
 ---
-## Summer 1419 · at court
+## Summer 1419 · on the estates
 
-Actions: attend, letter (christine|own), chapel
+Actions: accounts, rest
 
-- You sat with the queen's ladies over their sewing and heard who had quarrelled with whom. The queen's favour +6.
-- A letter to Christine de Pizan goes with your man, under your seal.
-- The chapel is endowed. Masses will be said for your dead, and the county will notice.
-- The office went to someone with better friends on the council.
-- Your petition to the queen was refused.
+- You heard the reeves' accounts in the hall, with Jehan Malet standing behind them.
+- You stayed out of the hall and let the household run without you for a while. Health +15.
+- An answer from Christine de Pizan came with the carrier from Paris.
 - Soldiers passed near your lands. The watch you set kept them off.
 
 ### Summer 1419 · A letter from Poissy (Christine)
 
-*The last time, in the winter of 1412: you read her chapter on ransoms.*
+*The last time, in the winter of 1414: you told her the Dauphin would read her Book of Peace if she kept it short.*
 
 Christine has left Paris. After the June killings she went to the royal priory at Poissy, where her daughter has been a nun for twenty years. She writes in a hand that has got smaller. "I have stopped writing for princes. They do not read, and when they do they do not learn. I am writing for women now, and for God, who at least finishes the page."
 
@@ -1218,11 +1243,11 @@ Christine has left Paris. After the June killings she went to the royal priory a
 ---
 ## Winter 1419 · on the estates
 
-Actions: gift (margaret), accounts
+Actions: secure, gift (margaret)
 
-- A gift to Margaret of Bavaria: trust +5.
-- You counted the granary yourself and set it against Jehan Malet's figures.
-- An answer from Christine de Pizan came with the carrier from Paris.
+- Your plate, your mother's cups and three hundred livres in coin go to a Lombard house in the rue des Lombards, against a receipt. If the city turns, a fine will find little to take.
+- A gift to Margaret of Bavaria: trust +10.
+- The first masses are said in your chapel. Good name +7.
 - Soldiers passed near your lands. The watch you set kept them off.
 
 ### Winter 1419 · Montereau
@@ -1231,13 +1256,13 @@ On 10 September, on the bridge at Montereau, John the Fearless kneels before the
 
 **Chose:** Continue
 
-### Winter 1419 · Christine asks a favour
+### Winter 1419 · The rents are short
 
-Christine de Pizan has finished 1403: a dream of the Sibyl leading her to the heavens, to ask who should rule the world. A copy is ready, on good parchment, at her own cost. She asks you to put it into the queen's hands, at a moment when the queen is likely to open it.
+The rolls from your lands are short again: 14 livres this half-year that Jehan Malet says the tenants could not pay. Some of them, perhaps, could not.
 
-**Chose:** Do it
+**Chose:** Let it go
 
-> What you know +5 · The queen's favour -2
+> your steward trusts you more
 
 ---
 ## Summer 1420 · on the estates
@@ -1245,27 +1270,40 @@ Christine de Pizan has finished 1403: a dream of the Sibyl leading her to the he
 Actions: gift (margaret), accounts
 
 - A gift to Margaret of Bavaria: trust +5.
-- You heard the reeves' accounts in the hall, with Jehan Malet standing behind them.
-- The first masses are said in your chapel. Good name +7.
+- You checked the mill tolls and the wood sales against what Jehan Malet had written.
 
 ### Summer 1420 · The Treaty of Troyes
 
 In May the mad king seals a treaty at Troyes that disinherits his own son and makes Henry of England heir to France. In June Henry marries the king's daughter Catherine. In Paris the lands of the Dauphin's supporters are given away.
 
-- You are counted among their enemies' friends, and fined 137 livres.
+- It passes you by. You were not important enough to punish or to reward.
 
 **Chose:** Send a letter to the Dauphin's people at Bourges
 
 > Orléans favour +8
 
+### Summer 1420 · Troyes (The queen)
+
+*The last time, in the summer of 1417: you went with her into exile at Tours.*
+
+In May, in the cathedral at Troyes, the queen seals the treaty that makes the English king heir to France and leaves her own son with nothing but the south and a name. Half France says she has sold him. That night she sends for you.
+
+You were with her at Tours. She has not forgotten.
+
+The bride is Catherine, the girl you taught her letters one winter, nineteen now and very composed. She signs the marriage contract in a good clear hand.
+
+**Chose:** Stay with her
+
+> Good name -2 · The queen's favour +6 · Orléans favour -8 · Burgundy favour +5
+
 ---
 ## Winter 1420 · at court
 
-Actions: betroth (49), office, attend
+Actions: betroth (52), office, attend
 
 - Your mother writes to the houses that might take Robert.
 - You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
-- You held the queen's book at vespers, and she spoke to you twice. The queen's favour +6.
+- You held the queen's book at vespers, and she spoke to you twice. The queen's favour +5.
 
 ### Winter 1420 · The end of the matter (Brécourt)
 
@@ -1279,21 +1317,22 @@ Gérard holds Brécourt, and is old. Jacqueline writes to propose the oldest set
 
 ### Winter 1420 · A match for Robert
 
-Two houses have answered for Robert. A betrothal is a contract: the wedding waits until Robert is grown, but the alliance and the money are settled now.
+Three houses have answered for Robert. A betrothal is a contract: the wedding waits until Robert is grown, but the alliance and the money are settled now.
 
-**Chose:** the lord of Gamaches-le-Petit (a small house, Armagnac)
+**Chose:** the lord of Montrevel (a good house, Burgundy)
 
-> +500 livres · Good name +1 · Orléans favour +8
+> +1000 livres · Good name +1 · Burgundy favour +8
 
 ---
 ## Summer 1421 · at court
 
-Actions: attend, petition (queen), letter (christine|own)
+Actions: attend, letter (christine|own), chapel
 
-- You rode behind the queen's litter to Vincennes and back. The queen's favour +6.
-- Your petition went to the queen's household. An answer may come next half-year.
+- You rode behind the queen's litter to Vincennes and back. The queen's favour +4.
 - Your man rides with a letter to Christine de Pizan.
+- The chapel is endowed. Masses will be said for your dead, and the county will notice.
 - The office went to someone with better friends on the council.
+- Soldiers passed near your lands. Your letters of protection were honoured.
 
 ### Summer 1421 · Guillaume has gone
 
@@ -1303,46 +1342,45 @@ Guillaume is gone, with a horse from the stable and his father's old sword. A ca
 
 > -40 livres · Health -4
 
-### Summer 1421 · Christine asks a favour
+### Summer 1421 · The fever again
 
-Christine de Pizan has finished 1405: a book of advice for women of every rank, from queens to the wives of labourers. A copy is ready, on good parchment, at her own cost. She asks you to put it into the queen's hands, at a moment when the queen is likely to open it.
+The fever is back, the same one or its cousin. Your women know the signs now, and have the bed made before you ask.
 
-**Chose:** Do it
+**Chose:** Make a vow to Saint Geneviève
 
-> What you know +5 · The queen's favour -2
+> Good name +1 · Health -14 · your confessor trusts you more
 
 ---
-## Winter 1421 · at court
+## Winter 1421 · on the estates
 
-Actions: office, attend, letter (christine|own)
+Actions: accounts, rest
 
-- You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
-- You played at tables with the queen's ladies and lost what it was polite to lose. The queen's favour +6.
-- Your groom takes a letter to Christine de Pizan, sewn into his doublet.
-- Your petition is granted: a pension of 150 livres a half-year from the queen. A pension is also a debt: one day they will ask for something.
+- You went through the rolls with Jehan Malet.
+- You rested. Health +15.
 - Christine de Pizan has answered your letter.
 
 ---
 ## Summer 1422 · at court
 
-Actions: attend, letter (christine|own), chapel
+Actions: office, attend, letter (christine|own)
 
-- You waited on the queen. The queen's favour +6.
-- A letter to Christine de Pizan goes with your man, under your seal.
-- The chapel is endowed. Masses will be said for your dead, and the county will notice.
-- The office went to someone with better friends on the council.
-- A reply from Christine de Pizan, in a careful hand.
+- You put your husband's name before the council's people, with a gift to the right secretary. An answer next half-year.
+- You played at tables with the queen's ladies and lost what it was polite to lose. The queen's favour +5.
+- Your groom takes a letter to Christine de Pizan, sewn into his doublet.
+- The first masses are said in your chapel. Good name +7.
 
 *Elsewhere in France: The English king is dead. At the end of August Henry V dies at Vincennes of a flux, at thirty-five. His heir is a baby nine months old.*
 
 ---
-## Winter 1422 · on the estates
+## Winter 1422 · at court
 
-Actions: accounts, rest
+Actions: attend, letter (christine|own), chapel
 
-- You checked the mill tolls and the wood sales against what Jehan Malet had written.
-- You rested. Health +15.
-- An answer from Christine de Pizan came with the carrier from Paris.
+- You waited on the queen. The queen's favour +4.
+- A letter to Christine de Pizan goes with your man, under your seal.
+- The chapel is endowed. Masses will be said for your dead, and the county will notice.
+- The council gives your husband a place in the king's household, from the Burgundians: 220 livres a half-year while you are at court to collect it.
+- A reply from Christine de Pizan, in a careful hand.
 
 ### Winter 1422 · The king is dead
 
@@ -1352,16 +1390,16 @@ On 21 October Charles VI dies at the Hôtel Saint-Pol, after forty-two years as 
 
 ### Winter 1422 · The fever again
 
-The fever is back, the same one or its cousin. Your women know the signs now, and have the bed made before you ask.
+A fever again. Brother Robert comes without being sent for, which tells you what the household thinks.
 
 **Chose:** Make a vow to Saint Geneviève
 
-> Good name +1 · Health -14 · your confessor trusts you more
+> Good name +1 · Health -14
 
 
 ## The end
 
-Item, of Marguerite of the house of Brécourt, born in the year 1383, married at eighteen to Messire Hue de Cramailles. She wanted to see two of her children placed in good houses, and did not have it. Her lord came home from Agincourt, which few did. She bore four children, of whom two were living at the end. Robert was promised to the house of Gamaches-le-Petit. She made peace with her cousin over Brécourt by a marriage, so that her grandchildren would hold it. She hid her friend Ysabel de Fontenoy from the Armagnacs at the risk of her own house. She took in her enemy Jacqueline d'Aubercourt and her children when they had nowhere to go, and was repaid. In the year of Troyes she wrote to the Dauphin at Bourges, and the letter was never found. She kept her husband's oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep. Her lord trusted her judgment, and said so. Of 11 holdings, 1 were lost in the troubles. She was a lady well spoken of, and was called very devout, bold and very warm. She outlived the mad king, which was more than many managed.
+Item, of Marguerite of the house of Brécourt, born in the year 1383, married at eighteen to Messire Hue de Cramailles. She wanted to see two of her children placed in good houses, and did not have it. Her lord came home from Agincourt, which few did. She bore four children, of whom two were living at the end. Robert was promised to the house of Montrevel. She made peace with her cousin over Brécourt by a marriage, so that her grandchildren would hold it. She hid her friend Ysabel de Fontenoy from the Armagnacs at the risk of her own house. She took in her enemy Jacqueline d'Aubercourt and her children when they had nowhere to go, and was repaid. She went with Queen Isabeau into exile at Tours, when few would. In the year of Troyes she wrote to the Dauphin at Bourges, and the letter was never found. She was one of Queen Isabeau's ladies, which in those years was an honour and a danger both. She carried Christine de Pizan's books to the queen, more than once. When Paris changed masters, her plate was with the Lombards. She kept her husband's oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep. Her lord trusted her judgment, and said so. Of 11 holdings, 2 were lost in the troubles. She was a lady well spoken of, and was called very devout, bold and very warm. She outlived the mad king, which was more than many managed.
 
 "I could not place them as I wanted. I could keep them alive. Most years that was enough."
 
@@ -1375,32 +1413,34 @@ Item, of Marguerite of the house of Brécourt, born in the year 1383, married at
 - Summer 1403: Gérard took Brécourt, and you took your mother into your own house
 - Winter 1403: you lent her two hundred livres to pay her losses at the queen's tables
 - Summer 1404: you went to Jacqueline's wedding at Brécourt and were gracious
-- Winter 1404: you lent him the grey for the joust in the rue Saint-Antoine
-- Summer 1405: you told him to answer Orléans's summons in 1405
+- Winter 1404: you sat with her until morning the night the king did not know her
+- Winter 1404: you listened to her read from her life of King Charles
+- Summer 1405: you rode with her to Melun in 1405
 - Summer 1405: you traded gossip by letter
+- Winter 1405: you told him to answer Orléans's summons in 1405
 - Winter 1405: you told her the truth about a lady's life for her book
 - Summer 1406: you joined your mother's dower claim to your own case
 - Winter 1406: you swore to her alibi when the kitchens sang about her
-- Summer 1407: you let her have the place in the queen's chamber
+- Summer 1407: you pressed your own claim to the place in the queen's chamber she wanted
 - Summer 1407: you read her City of Ladies aloud to your women
 
 **Act 3: The Faction War.** History: The justification; The Cabochiens; The Armagnacs take Paris; The English at Harfleur; Agincourt.
 
 - Summer 1408: you agreed with him about Master Jean Petit's justification
 - Summer 1408: you carried her letter to the Duchess of Orléans' almoner yourself
-- Winter 1408: you taught the little princess Catherine her letters
+- Winter 1408: you lent him the grey for the joust in the rue Saint-Antoine
 - Summer 1409: you rested your case on Brother Robert's statement
 - Winter 1409: you lent her two hundred livres when the bailiff came
 - Summer 1410: you set your seal to his brotherhood in arms with Raoul de Fléchin
 - Winter 1410: you asked Gérard to let your mother lie beside your father
-- Summer 1411: you stepped aside for her on the stairs and wished her a safe delivery
+- Summer 1411: you taught the little princess Catherine her letters
 - Winter 1411: you wrote him about the children and the harvest
-- Summer 1412: you stood godmother to her brother's son
-- Winter 1412: you read her chapter on ransoms
+- Summer 1412: you accepted a place among the queen's ladies
+- Winter 1412: you stepped aside for her on the stairs and wished her a safe delivery
 - Summer 1413: you paid her keepers in the Châtelet
 - Winter 1413: you asked the Parlement to judge Brécourt while Gérard could not bribe anyone
 - Summer 1414: you took her and her children in when the Armagnacs turned her out
-- Winter 1414: you told her honestly what a house in the country costs
+- Winter 1414: you told her the Dauphin would read her Book of Peace if she kept it short
 - Summer 1415: you asked him not to answer the summons of 1415
 - Summer 1415: you sent Raoul's ransom money back to the squire's mother
 - Winter 1415: you sat up with him after Agincourt
@@ -1410,9 +1450,11 @@ Item, of Marguerite of the house of Brécourt, born in the year 1383, married at
 - Summer 1416: you read to her when her son the Dauphin died
 - Winter 1416: you answered her note from Brécourt
 - Summer 1417: you hid her from the Armagnacs
+- Summer 1417: you went with her into exile at Tours
 - Winter 1417: she warned you from Troyes to be out of Paris after Ascension
 - Summer 1418: you wrote Gérard a letter and let Brécourt go
 - Winter 1418: you honoured the contract with Raoul de Fléchin at your gate
 - Summer 1419: you kept writing to her at Poissy
+- Summer 1420: you stayed with her the night she sealed the treaty at Troyes
 - Winter 1420: you made peace with Gérard's house by a betrothal
 

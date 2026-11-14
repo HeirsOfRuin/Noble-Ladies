@@ -26,7 +26,8 @@ function applySwing(s, key, place) {
     s.pensions = s.pensions.filter((p) => !w.losers.includes(p.faction));
     lines.push(`Your pension${lost.length > 1 ? 's' : ''} from ${lost.map((p) => CAST[p.from].short).join(' and ')} stopped.`);
   }
-  if (o.fine) { coin(s, -o.fine, `fined by ${factionLabel(w.winner, s.turn)}`); lines.push(`You are counted among their enemies' friends, and fined ${o.fine} livres.`); }
+  if (o.fine) { coin(s, -o.fine, `fined by ${factionLabel(w.winner, s.turn)}`); lines.push(`You are counted among their enemies' friends, and fined ${o.fine} livres.${o.secured ? ' Your plate and coin were with the Lombards: the fine found half as much to take.' : ''}`); }
+  if (o.secured) s.flags.securedPaid = (s.flags.securedPaid || 0) + 1;
   if (o.confiscate) {
     const n = Math.min(o.confiscate, Math.max(0, s.lands - 2));
     if (n > 0) {

@@ -26,8 +26,8 @@ export const ACTIONS = {
     favour: 3, info: 5, rep: 3, from: '1401a', until: '1407b',
     note: 'Ballades, judgments on questions of love, and every party in one room. A place to be seen with both sides.' },
   accounts: { label: 'Go through the accounts', where: 'estates', cost: 0, via: 'steward', delay: 0,
-    rentBonus: 0.15,
-    note: 'Sit with your steward over the rolls. Rents come in fuller, and you learn how honest he is.' },
+    rentBonus: 0.15, againBonus: 0.4,   // a second sitting in a row finds less: the rolls are as you left them
+    note: 'Sit with your steward over the rolls. Rents come in fuller, and you learn how honest he is. Done every half-year, it finds less each time.' },
   repair: { label: 'Repair and defend the house', where: 'estates', cost: 200, via: null, delay: 0,
     household: 15, guardTurns: 4,
     note: 'Roofs, walls, a watch on the gate. Protects the house against the war for two years.' },
@@ -51,6 +51,8 @@ export const ACTIONS = {
     note: 'Lawsuits are slow and expensive, and they can be won.' },
   distance: { label: 'Put distance between you and a party', where: 'any', target: 'party', cost: 0, via: null, delay: 0, favour: -12,
     note: 'Burn their letters, take off their badge, stop hearing mass in their chapels. If Paris turns against them, it may save you. If it does not, you have thrown away years of favour.' },
+  secure: { label: 'Lodge your plate and coin with the Lombards', where: 'any', cost: 60, via: null, delay: 0, fineCut: 0.5,
+    note: 'Worth it only if Paris is about to change hands: a fine cannot take what is in a Lombard\'s strongroom. Their fee is the same whether or not anything happens.' },
   office: { label: 'Seek an office for your husband', where: 'court', cost: 120, via: null, delay: 1, income: 220,
     note: 'A place in the king\'s household, from whoever holds the council: wages every half-year you are in Paris to collect them. Offices go to the people who are there, and are taken back the same way.' },
   callin: { label: 'Call in a favour', where: 'any', target: 'debt', cost: 0, via: null, delay: 0,
@@ -67,4 +69,4 @@ export const ACTIONS = {
 };
 
 /** Order the plan screen lists them in. */
-export const ACTION_ORDER = ['attend', 'petition', 'courtly', 'gossip', 'gift', 'rumour', 'accounts', 'tenants', 'repair', 'rest', 'children', 'letter', 'chapel', 'lawsuit', 'intercept', 'distance', 'office', 'callin', 'betroth', 'ransom', 'servant'];
+export const ACTION_ORDER = ['attend', 'petition', 'courtly', 'gossip', 'gift', 'rumour', 'accounts', 'tenants', 'repair', 'rest', 'children', 'letter', 'chapel', 'lawsuit', 'intercept', 'distance', 'secure', 'office', 'callin', 'betroth', 'ransom', 'servant'];

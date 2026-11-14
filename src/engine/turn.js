@@ -76,7 +76,7 @@ export function planProblem(s, input) {
 function income(s, rng, place, ctx, lines) {
   const gross = rentsGross(s, place);
   coin(s, gross, 'rents');
-  if (ctx.accounts) coin(s, Math.round(gross * ACTIONS.accounts.rentBonus), 'rents recovered in the accounts');
+  if (ctx.accounts) coin(s, Math.round(gross * ACTIONS.accounts.rentBonus * (ctx.accounts === 'again' ? ACTIONS.accounts.againBonus : 1)), 'rents recovered in the accounts');
   const st = s.npcs.steward;
   const skim = ctx.accounts ? 0 : Math.round(gross * (1 - st.rel) * (place === 'court' ? 0.5 : 0.15));
   if (skim > 0) coin(s, -skim, 'rents short');

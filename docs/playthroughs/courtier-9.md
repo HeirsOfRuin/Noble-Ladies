@@ -1261,13 +1261,13 @@ Actions: attend, gossip (maid)
 - The council gives your husband a place in the king's household, from the Burgundians: 220 livres a half-year while you are at court to collect it.
 - Soldiers passed near your lands. Your letters of protection were honoured.
 
-### Summer 1421 · Trouble on the lands
+### Summer 1421 · The queen's summons
 
-Two of your villages are at law with each other over a mill-race, and Jehan Malet writes that they will not accept his judgment.
+The queen goes to her house at Vincennes for the summer and asks you to come, at your own cost, with your own women and your own horses.
 
-**Chose:** Ride home and judge it yourself
+**Chose:** Go
 
-> Good name +2 · House in order +3 · Health -3 · The queen's favour -3
+> -150 livres · Health -4 · The queen's favour +2
 
 ---
 ## Winter 1421 · at court
@@ -1277,13 +1277,13 @@ Actions: attend, gossip (maid)
 - You waited on the queen. The queen's favour +3.
 - Perrette listened for you. What you know +15.
 
-### Winter 1421 · The queen's summons
+### Winter 1421 · New Year's gifts
 
-The queen goes to her house at Vincennes for the summer and asks you to come, at your own cost, with your own women and your own horses.
+On the first day of January the court gives gifts, and everyone notes who gave what to whom. The queen's ladies compare. The princes keep lists. Your husband says a lady of your rank is expected to give something, and something that will be talked about.
 
-**Chose:** Go
+**Chose:** To Isabeau of Bavaria: a little book of hours from a workshop in the rue Neuve-Notre-Dame
 
-> -150 livres · Health -4 · The queen's favour +4
+> -220 livres · The queen's favour +2 · the queen trusts you more
 
 ---
 ## Summer 1422 · at court
@@ -1312,7 +1312,7 @@ On 21 October Charles VI dies at the Hôtel Saint-Pol, after forty-two years as 
 
 ## The end
 
-Item, of Marguerite of the house of Brécourt, born in the year 1383, married at eighteen to Messire Jean de Rouvroy, lord of Fresnoy. She wanted a place among the queen's own ladies, and had it. Her lord came home from Agincourt, which few did. She bore four children, of whom one was living at the end. Robert was promised to the house of Ronquerolles. She made peace with her cousin over Brécourt by a marriage, so that her grandchildren would hold it. She brought her friend Ysabel de Fontenoy out of the Châtelet in the year of the butchers. She took in her enemy Jacqueline d'Aubercourt and her children when they had nowhere to go, and was repaid. She went with Queen Isabeau into exile at Tours, when few would. In the year of Troyes she wrote to the Dauphin at Bourges, and the letter was never found. She kept her husband's oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep. Her lord trusted her judgment, and said so. Her house kept every holding it had, through all the troubles. She was a lady of middling report, and was called very devout, very bold and very warm. She outlived the mad king, which was more than many managed.
+Item, of Marguerite of the house of Brécourt, born in the year 1383, married at eighteen to Messire Jean de Rouvroy, lord of Fresnoy. She wanted a place among the queen's own ladies, and had it. Her lord came home from Agincourt, which few did. She bore four children, of whom one was living at the end. Robert was promised to the house of Ronquerolles. She made peace with her cousin over Brécourt by a marriage, so that her grandchildren would hold it. She brought her friend Ysabel de Fontenoy out of the Châtelet in the year of the butchers. She took in her enemy Jacqueline d'Aubercourt and her children when they had nowhere to go, and was repaid. She went with Queen Isabeau into exile at Tours, when few would. In the year of Troyes she wrote to the Dauphin at Bourges, and the letter was never found. She was one of Queen Isabeau's ladies, which in those years was an honour and a danger both. She kept her husband's oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep. Her lord trusted her judgment, and said so. Her house kept every holding it had, through all the troubles. She was a lady of middling report, and was called very devout, very bold and very warm. She outlived the mad king, which was more than many managed.
 
 "I sat with the queen through the worst nights of her life. Somebody had to."
 
