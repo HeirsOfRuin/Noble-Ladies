@@ -15,6 +15,16 @@ import { addNews } from './news.js';
 import { addDebt, callInCard } from './favours.js';
 import { grantOffice } from './offices.js';
 import { matchOffers } from './family.js';
+import { SAY } from '../data/lines.data.js';
+
+/** The next wording of a routine result, in order, so a line does not repeat until the list has gone round. */
+export function say(s, key, tokens = {}) {
+  const said = (s.flags.said ||= {});
+  const list = SAY[key];
+  const line = list[(said[key] || 0) % list.length];
+  said[key] = (said[key] || 0) + 1;
+  return line.replace(/\{(\w+)\}/g, (m, k) => (k in tokens ? tokens[k] : m));
+}
 
 const REPLACEMENTS = {
   steward: ['Colin Ravier', 'Thibaut Hennequin', 'Gilet Poulain', 'Jacquet Morel'],
@@ -35,7 +45,7 @@ export function resolveAction(s, act, rng, lines, ctx) {
     case 'attend': {
       const g = Math.round(a.favour * (1 - s.fav.queen / 160));
       fav(s, 'queen', g); s.npcs.queen.use = clamp(s.npcs.queen.use + a.use); bump(s, 'info', a.info);
-      lines.push(`You waited on the queen. Her household favour +${g}.`);
+      lines.push(`${say(s, 'attend')} The queen's favour +${g}.`);
       break;
     }
     case 'petition': {
@@ -61,8 +71,8 @@ export function resolveAction(s, act, rng, lines, ctx) {
       const gain = Math.round(a.info * (0.5 + src.rel / 2));
       bump(s, 'info', gain);
       for (let i = 0; i < a.rumours; i++) addNews(s, rng, { quality: 0.3 + 0.6 * src.rel, src: t, horizon: 3 });
-      lines.push(`${nameOf(s, t)} listened for you. Information +${gain}.`);
-      if (rng.chance((1 - src.loyalty) * 0.25)) { bump(s, 'rep', -3); lines.push(`${nameOf(s, t)} talked about your questions as well. Reputation -3.`); }
+      lines.push(`${nameOf(s, t)} listened for you. What you know +${gain}.`);
+      if (rng.chance((1 - src.loyalty) * 0.25)) { bump(s, 'rep', -3); lines.push(`${nameOf(s, t)} talked about your questions as well. Good name -3.`); }
       break;
     }
     case 'rumour': {
@@ -75,22 +85,22 @@ export function resolveAction(s, act, rng, lines, ctx) {
       fav(s, 'queen', a.favour); fav(s, 'arm', a.favour); fav(s, 'bur', a.favour); bump(s, 'info', a.info);
       const good = rng.chance(0.7);
       bump(s, 'rep', good ? a.rep : -2);
-      lines.push(good ? 'A ballade was written in your honour, a decent one.' : 'A ballade was written about you. People laughed in the wrong places. Reputation -2.');
+      lines.push(good ? 'A ballade was written in your honour, a decent one.' : 'A ballade was written about you. People laughed in the wrong places. Good name -2.');
       break;
     }
     case 'accounts': {
       ctx.accounts = true;
       s.npcs.steward.seen += 2;
-      lines.push(`You went through the rolls with ${nameOf(s, 'steward')}.`);
+      lines.push(say(s, 'accounts', { steward: nameOf(s, 'steward') }));
       break;
     }
-    case 'repair': bump(s, 'hh', a.household); s.guard = a.guardTurns; lines.push(`The house is repaired and watched. Household +${a.household}.`); break;
-    case 'tenants': bump(s, 'rep', a.rep); bump(s, 'hh', a.household); bump(s, 'info', a.info); lines.push('You sat in judgment in the hall. People will speak of it.'); break;
-    case 'rest': bump(s, 'health', a.health); lines.push(`You rested. Health +${a.health}.`); break;
+    case 'repair': bump(s, 'hh', a.household); s.guard = a.guardTurns; lines.push(`The house is repaired and watched. House in order +${a.household}.`); break;
+    case 'tenants': bump(s, 'rep', a.rep); bump(s, 'hh', a.household); bump(s, 'info', a.info); lines.push(say(s, 'tenants')); break;
+    case 'rest': bump(s, 'health', a.health); lines.push(`${say(s, 'rest')} Health +${a.health}.`); break;
     case 'children': {
       for (const c of s.children) if (c.alive) c.care = clamp(c.care + a.upbringing);
       ctx.care = true;
-      lines.push('You saw to the children: their health, their letters, their manners.');
+      lines.push(say(s, 'children'));
       break;
     }
     case 'letter': {
@@ -102,7 +112,7 @@ export function resolveAction(s, act, rng, lines, ctx) {
         lines.push(`Brother Robert takes your letter to ${name} in his satchel, with his breviary. It will be slow.`);
       } else {
         s.queue.push({ due: s.turn + 1, kind: 'letter', to });
-        lines.push(`Your man rides with a letter to ${name}.`);
+        lines.push(say(s, 'letter', { name }));
         if (rng.chance(letterOpenChance(s, to))) {
           const f = letterSide(s, to), c = controlAt(s.turn);
           s.flags.exposedTo = { ...(s.flags.exposedTo || {}) };
@@ -225,7 +235,7 @@ export function resolveDue(s, q, rng, lines) {
     r.use = clamp(r.use + ACTIONS.rumour.rivalUse);
     if (rng.chance(q.traced)) {
       bump(s, 'rep', ACTIONS.rumour.tracedRep); fav(s, r.faction, ACTIONS.rumour.tracedFavour); r.trust = clamp(r.trust - 20);
-      lines.push(`The story about Jacqueline d'Aubercourt went round, and it was traced to your household. Reputation ${ACTIONS.rumour.tracedRep}.`);
+      lines.push(`The story about Jacqueline d'Aubercourt went round, and it was traced to your household. Good name ${ACTIONS.rumour.tracedRep}.`);
     } else lines.push('The story about Jacqueline d\'Aubercourt went round the court. Nobody knows where it started.');
   } else if (q.kind === 'letter') {
     if (q.to === 'husband') {
@@ -245,13 +255,13 @@ export function resolveDue(s, q, rng, lines) {
     // Correspondents are the best road for news: better than talk at court.
     bump(s, 'info', ACTIONS.letter.info);
     addNews(s, rng, { quality: q.to === 'christine' ? 0.9 : q.to === 'friend' ? 0.45 + 0.5 * n.rel : CAST[q.to].role === 'patron' ? 0.65 : 0.55, src: q.to, horizon: 3 });
-    lines.push(`${CAST[q.to].name} has answered your letter.`);
+    lines.push(say(s, 'answered', { name: CAST[q.to].name }));
   } else if (q.kind === 'intercept') {
     const n = s.npcs[q.who];
     if (!n?.alive) return;
     if (rng.chance(q.caught)) {
       gainRep(s, -8); n.trust = clamp(n.trust - 30); if (n.faction !== 'none') fav(s, n.faction, -8);
-      lines.push(`The cousin was caught with ${CAST[q.who].short}'s letters open on a kitchen table, and said whose woman sent him. Reputation -8.`);
+      lines.push(`The cousin was caught with ${CAST[q.who].short}'s letters open on a kitchen table, and said whose woman sent him. Good name -8.`);
       return;
     }
     if (rng.chance(q.p)) {
@@ -272,7 +282,7 @@ export function resolveDue(s, q, rng, lines) {
     lines.push('Forty days after the birth you were churched at the parish church, in a new veil, and the women of the household walked behind you with candles.');
   } else if (q.kind === 'chapel') {
     bump(s, 'rep', ACTIONS.chapel.repLater); s.npcs.confessor.trust = clamp(s.npcs.confessor.trust + ACTIONS.chapel.confessorTrust);
-    lines.push(`The first masses are said in your chapel. Reputation +${ACTIONS.chapel.repLater}.`);
+    lines.push(`The first masses are said in your chapel. Good name +${ACTIONS.chapel.repLater}.`);
   }
 }
 

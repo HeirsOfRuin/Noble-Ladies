@@ -13,6 +13,18 @@ import { hedging, present, nameOf, protector, costOf } from './derive.js';
 import { debtsOut } from './favours.js';
 import { WAR } from './family.js';
 import { lateCard } from './act1.js';
+import { yearOf } from './clock.js';
+
+// Christine's books by the year she finished them, for her favours (each asks once).
+const CHRISTINE_BOOKS = [
+  [1403, 'The Path of Long Study', 'a dream of the Sibyl leading her to the heavens, to ask who should rule the world'],
+  [1405, 'The Treasure of the City of Ladies', 'a book of advice for women of every rank, from queens to the wives of labourers'],
+  [1407, 'The Body Politic', 'a book on how a prince should rule and how his people should bear it'],
+  [1410, 'The Deeds of Arms and of Chivalry', 'a book of war: sieges, ransoms, safe-conducts and the law of arms'],
+  [1413, 'The Book of Peace', 'a book for the Dauphin, on how a kingdom tears itself apart and how it might stop'],
+  [1418, 'The Letter on the Prison of Human Life', 'a letter of consolation to the widows of Agincourt'],
+];
+
 
 const E = {
   rival_talk: {
@@ -44,8 +56,17 @@ const E = {
     weight: (s) => (['mother', 'christine'].some((id) => present(s, id) && s.npcs[id].trust >= 45) ? 0.35 : 0),
     card: (s, rng) => {
       const who = rng.pick(['mother', 'christine'].filter((id) => present(s, id) && s.npcs[id].trust >= 45));
-      if (who === 'christine') return { title: 'Christine asks a favour', text: 'Christine de Pizan has finished a new book, a treatise for the instruction of ladies. She asks you to put a copy into the queen\'s hands.',
-        choices: [{ label: 'Do it', ops: [['fav', 'queen', -2], ['trust', 'christine', 15], ['info', 5]] }, { label: 'Make your excuses', ops: [['trust', 'christine', -6]] }] };
+      if (who === 'christine') {
+        const asked = s.flags.christineBooks || 0;
+        const book = CHRISTINE_BOOKS.filter(([y]) => y <= yearOf(s.turn))[asked] || null;
+        if (book) {
+          s.flags.christineBooks = asked + 1;
+          return { title: 'Christine asks a favour', text: `Christine de Pizan has finished ${book[0]}: ${book[2]}. A copy is ready, on good parchment, at her own cost. She asks you to put it into the queen's hands, at a moment when the queen is likely to open it.`,
+            choices: [{ label: 'Do it', note: 'The queen\'s ladies do not like a lady who carries other people\'s books.', ops: [['fav', 'queen', -2], ['trust', 'christine', 15], ['info', 5]] }, { label: 'Make your excuses', ops: [['trust', 'christine', -6]] }] };
+        }
+      }
+      if (who === 'christine' || s.flags.sisterDowry) return null; // each asks once
+      s.flags.sisterDowry = true;
       return { title: 'Your mother writes', text: 'Your mother asks for 300 livres toward your younger sister\'s dowry. She has asked nobody else, she says, which you believe.',
         choices: [{ label: 'Send it', ops: [['purse', -300, 'your sister\'s dowry'], ['trust', 'mother', 10], ['rep', 2]] }, { label: 'Refuse', ops: [['trust', 'mother', -12]] }] };
     },
@@ -73,12 +94,18 @@ const E = {
   },
   sickness: {
     weight: (s, place) => 0.1 + (PLAGUE[keyOf(s.turn)] || 0) * 0.5 + (place === 'court' ? 0.05 : 0),
-    card: (s) => ({
-      title: 'A fever', text: 'You wake with a fever that does not break. The household is frightened, which does not help.',
+    card: (s, rng, n) => ({
+      title: n ? 'The fever again' : 'A fever',
+      text: [
+        'You wake with a fever that does not break. The household is frightened, which does not help.',
+        'The fever is back, the same one or its cousin. Your women know the signs now, and have the bed made before you ask.',
+        'A fever again. Brother Robert comes without being sent for, which tells you what the household thinks.',
+      ][Math.min(n, 2)],
+      // Three different prices: money, the soul and the body, or her place at court.
       choices: [
-        { label: 'Send for the physicians', ops: [['purse', -costOf(s, 150), 'physicians'], ['health', -8, 'grave']] },
-        { label: 'Pray, and let it run its course', ops: [['health', -18, 'grave'], ['trust', 'confessor', 3]] },
-        { label: 'Have yourself carried home to the country', ops: [['purse', -costOf(s, 60), 'the journey home'], ['health', -10, 'grave'], ['info', -10]] },
+        { label: 'Send for the physicians from Paris', note: 'Bleeding, a diet, a room kept warm. Expensive, and it helps.', ops: [['purse', -costOf(s, 150), 'physicians'], ['health', -6, 'grave']] },
+        { label: 'Make a vow to Saint Geneviève', note: 'Candles, a pilgrimage when you are well, and a promise you will be held to.', ops: [['health', -14, 'grave'], ['trait', 'devout', 1], ['trust', 'confessor', 5], ['rep', 1]] },
+        { label: 'Have yourself carried home to the country', note: 'Clean air and quiet. Paris will forget you for a season.', ops: [['purse', -costOf(s, 60), 'the journey home'], ['health', -8, 'grave'], ['info', -10], ['fav', 'queen', -4]] },
       ],
     }),
   },
@@ -96,8 +123,12 @@ const E = {
   },
   queen_service: {
     weight: (s, place) => (place === 'court' && present(s, 'queen') && s.fav.queen >= 45 ? 0.3 : 0),
-    card: (s) => ({
-      title: 'The queen\'s summons', text: 'The queen goes to her house at Vincennes for the summer and asks you to come, at your own cost, with your own women and your own horses.',
+    card: (s, rng, n) => ({
+      title: 'The queen\'s summons', text: [
+        'The queen goes to her house at Vincennes for the summer and asks you to come, at your own cost, with your own women and your own horses.',
+        'The queen moves to Melun for the hunting and the air, and wants you with her: your own women, your own horses, your own purse.',
+        'The queen goes to Saint-Germain-en-Laye while the Hôtel Saint-Pol is cleaned, and you are on her list again. It is an honour that costs a hundred and fifty livres.',
+      ][n % 3],
       choices: [
         { label: 'Go', ops: [['purse', -costOf(s, 150), 'the queen\'s summer'], ['fav', 'queen', 8], ['use', 'queen', 6], ['health', -4]] },
         { label: 'Plead your health', ops: [['fav', 'queen', -5]] },
@@ -151,9 +182,17 @@ const E = {
   },
   christine_letter: {
     weight: (s) => (present(s, 'christine') && s.npcs.christine.trust >= 35 ? 0.15 : 0),
-    card: () => ({
-      title: 'A letter from Christine', text: 'Christine de Pizan writes, as she sometimes does, with news and advice. A lady, she says, should keep her household in order and her purse closed, cultivate the queen without belonging to anyone, and never be the last to leave a city that is about to fall.',
-      choices: [{ label: 'Keep the letter', kind: 'christine', ops: [['trust', 'christine', 3]] }],
+    card: (s, rng, n) => ({
+      title: 'A letter from Christine', text: [
+        'Christine de Pizan writes, as she sometimes does, with news and advice. A lady, she says, should keep her household in order and her purse closed, cultivate the queen without belonging to anyone, and never be the last to leave a city that is about to fall.',
+        'Christine writes again. Her son has a place at last; her mother is ill; the copyists in the rue Neuve-Notre-Dame have raised their prices. And, in the last lines, what she hears from the Duke of Berry\'s people about the council.',
+        'A letter from Christine, short, in her own hand rather than a clerk\'s. She has heard something she does not like, and she would rather you heard it from her.',
+        'Christine writes from her house near Sainte-Geneviève. The war has stopped the book trade; she is writing anyway. She asks after your children by name, and then tells you what the Parlement is saying.',
+      ][n % 4],
+      choices: [
+        { label: 'Read it twice, and keep it', note: 'What she knows is usually so.', kind: 'christine', ops: [['trust', 'christine', 3]] },
+        { label: 'Answer with twenty livres for her copyists', note: 'Her pen is her living. She will not mention it, and she will not forget it.', kind: 'christine', ops: [['purse', -20, 'for Christine\'s copyists'], ['trust', 'christine', 8], ['owe', 'christine', 1, 'money for her copyists']] },
+      ],
     }),
   },
 };
@@ -200,6 +239,7 @@ const CAPTAINS = ['a Gascon called Arnaud de Lartigue', 'a Breton who calls hims
  */
 export function appatisCard(s, rng, gross, w) {
   const garrison = rng.pick(GARRISONS), captain = rng.pick(CAPTAINS);
+  s.flags.appatisSeen = s.flags.appatisSeen || 0;
   const price = costOf(s, 40 + s.lands * 6);
   const loss = Math.round(gross * 0.45);
   const ruling = controlAt(s.turn);
@@ -207,7 +247,7 @@ export function appatisCard(s, rng, gross, w) {
   const burn = [['purse', -loss, 'barns burned by soldiers'], ['hh', -10]];
   return {
     id: 'appatis', title: 'A captain sends word',
-    text: `${captain[0].toUpperCase()}${captain.slice(1)}, who holds the castle at ${garrison} for whoever paid him last, sends a man to your steward with a list of your villages and a price: ${price} livres, and he will see that no harm comes to them until the vintage. The man waits in the kitchen and eats like a soldier.`,
+    text: `${s.flags.appatisSeen++ ? 'Another captain, another list. ' : ''}${captain[0].toUpperCase()}${captain.slice(1)}, who holds the castle at ${garrison} for whoever paid him last, sends a man to your steward with a list of your villages and a price: ${price} livres, and he will see that no harm comes to them until the vintage. The man waits in the kitchen and eats like a soldier.`,
     lines: [],
     choices: [
       { label: `Pay the ${price} livres`, note: 'Every lady in the Beauvaisis pays someone. It is cheaper than barns.', ops: [['purse', -price, `appatis to the captain at ${garrison}`], ['guard', 2]] },
@@ -237,7 +277,11 @@ export function eventsTurn(s, rng, place, beats = 0) {
   const pick = rng.weighted(pool);
   if (!pick) return;
   s.flags.evLast[pick.id] = s.turn;
-  s.cards.push({ id: pick.id, ...E[pick.id].card(s, rng) });
+  s.flags.evCount = s.flags.evCount || {};
+  const n = s.flags.evCount[pick.id] || 0;
+  s.flags.evCount[pick.id] = n + 1;
+  const card = E[pick.id].card(s, rng, n);
+  if (card) s.cards.push({ id: pick.id, ...card });
 }
 
 export const EVENT_IDS = Object.keys(E);

@@ -10,6 +10,7 @@
 import { newGame, advance, view, houseView, peopleView, newsView, planProblem, planCost } from '../engine/turn.js';
 import { SAVE_KEY, serialize, deserialize, toCode, fromCode } from '../engine/state.js';
 import { STORAGE_OK, lsGet, lsSet } from './storage.js';
+import { DIFFICULTY } from '../data/config.data.js';
 import { registerSW, installPrompt } from './sw-register.js';
 import { dateLabel } from '../engine/clock.js';
 
@@ -22,6 +23,29 @@ let banner = null;
 let install = null;
 let draft = null;      // { place, actions: [{ id, target, label }] } while planning
 let picking = null;    // an action id waiting for its target
+let outcome = null;
+let difficulty = 'normal';
+let ladyName = 'Marguerite';
+let reloadNow = null;  // the service worker's reload, kept so the banner's button survives a render
+const HINTS_KEY = `${'the-lady-of-saint-pol'}.hints`;
+let hintsSeen = (() => { try { return JSON.parse(lsGet(HINTS_KEY) || '{}'); } catch { return {}; } })();
+// One hint per screen, the first time it matters; gone once the player has done the thing (The Lists, Farmyard).
+const HINTS = {
+  plan: 'Each half-year you choose where to live, then up to your number of actions. At court you earn favour, news and offices; on the estates, rents, rest and a quieter life. Most actions go through someone (a patron, your steward, Perrette) who can be slow, careless or false. When the plan is ready, end the half-year.',
+  house: 'Your standing at a glance. Read "If Paris changed hands tomorrow" before every turning point: it is what the next change of masters would cost you.',
+  people: 'Trust is whether someone believes you. Need is whether you matter to them. You learn how reliable a go-between is by using them twice.',
+  news: 'Some of what you hear is false. Each line says who told you, and later whether it came true. Learn whose word is good.',
+  card: 'A choice shows its price before you make it. "Remembered later" means someone will bring it up again, years on.',
+};
+function hint(id) {
+  if (hintsSeen[id]) return '';
+  return `<div class="box hintbox"><p class="small">${esc(HINTS[id])}</p><button class="link" data-act="hint-ok" data-hint="${id}">Understood</button></div>`;
+}
+function hintDone(id) { if (!hintsSeen[id]) { hintsSeen = { ...hintsSeen, [id]: 1 }; lsSet(HINTS_KEY, JSON.stringify(hintsSeen)); } }
+let confirmNew = false; // New game over a game in progress asks first (Touchline lost a career to one tap)
+const BACKUP_KEY = `${SAVE_KEY}.previous`;
+// Measured survival for a careful player, 400 runs per level (docs/KILLGATE.md).
+const DIFF_NOTE = { easy: 'Lower costs and milder dangers. A careful lady lives to the end about nine times in ten.', normal: 'Prices and dangers as the period had them. About five in six careful ladies live to the end.', hard: 'Dearer, and more dangerous. About four in five careful ladies live to the end.' };    // what came of the last choice, shown above the next screen (playbook F5: Centennial Farm hid results)
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const num = (n) => Number(n).toLocaleString('en-GB');
@@ -47,14 +71,18 @@ function title() {
   app.innerHTML = `
     <main class="title">
       <p class="kicker">Paris, 1400 to 1422</p>
-      <h1>The Lady of Saint-Pol</h1>
+      <h1>The Lady of Saint&#8209;Pol</h1>
       <p class="lede">You are seventeen, of a middling house, and your father is negotiating your marriage. The king is mad, the princes are quarrelling, and you cannot command anyone. You can only persuade, write, wait, and choose whom to trust.</p>
       ${STORAGE_OK ? '' : '<p class="warn">This browser is refusing to store anything for this page, so progress will not be kept. Open the game in its own tab, or copy a save code from the menu before you leave.</p>'}
       ${banner ? `<p class="warn">${esc(banner)}</p>` : ''}
       <div class="stack">
         ${saved ? `<button class="primary" data-act="continue">Continue <small>${esc(view(saved).date)}</small></button>` : ''}
-        <label class="namefield">Her name <input id="lady-name" maxlength="24" value="Marguerite" autocomplete="off" spellcheck="false"></label>
-        <button ${saved ? '' : 'class="primary"'} data-act="new">New game</button>
+        <label class="namefield">Her name <input id="lady-name" maxlength="24" value="${esc(ladyName)}" autocomplete="off" spellcheck="false"></label>
+        <div class="chips" role="group" aria-label="Difficulty">${Object.entries(DIFFICULTY).map(([k, d]) => `<button data-diff="${k}" class="${difficulty === k ? 'on' : ''}">${esc(d.label)}</button>`).join('')}</div>
+        <p class="hint">${esc(DIFF_NOTE[difficulty])}</p>
+        ${confirmNew ? `<div class="box warnbox"><p>This replaces the game in progress (${esc(view(saved).date)}). It will be kept as a backup you can restore from this page.</p><div class="stack"><button class="primary" data-act="new-go">Start a new game</button><button data-act="new-cancel">Keep playing the old one</button></div></div>`
+          : `<button ${saved ? '' : 'class="primary"'} data-act="new">New game</button>`}
+        ${lsGet(BACKUP_KEY) ? '<button data-act="restore">Restore the previous game</button>' : ''}
         <button data-act="load-code">Load a save code</button>
         ${install ? '<button data-act="install">Install on this device</button>' : ''}
       </div>
@@ -74,11 +102,11 @@ function render() {
       <span class="turn">${esc(v.date)}</span>
       <span class="act">Act ${v.act} · age ${v.age}</span>
       <span class="purse ${v.money < 0 ? 'low' : ''}">${num(v.money)} l.</span>
-      <span>Name ${v.rep}</span>
+      <span>Good name ${v.rep}</span>
       <span class="${hp}">Health ${v.health}</span>
     </header>
-    ${banner ? `<p class="banner">${esc(banner)} <button data-act="dismiss">OK</button></p>` : ''}
-    <main class="panel">${tab === 'play' ? playTab(v) : tab === 'house' ? houseTab() : tab === 'people' ? peopleTab() : tab === 'news' ? newsTab() : menuTab()}</main>
+    ${banner ? `<p class="banner">${esc(banner)} ${reloadNow ? '<button data-act="reload-now">Reload</button>' : ''}<button data-act="dismiss">OK</button></p>` : ''}
+    <main class="panel">${tab === 'play' ? playTab(v) : tab === 'house' ? hint('house') + houseTab() : tab === 'people' ? hint('people') + peopleTab() : tab === 'news' ? hint('news') + newsTab() : menuTab()}</main>
     <nav class="tabs">${tabs.map(([id, label]) => `<button data-tab="${id}" class="${tab === id ? 'on' : ''}">${label}</button>`).join('')}</nav>
     ${modal ? `<div class="scrim"><div class="sheet">${modal}</div></div>` : ''}`;
 }
@@ -99,11 +127,20 @@ function paras(text, cls = 'prose') {
   return String(text).split(/\n\n+/).map((p, i) => `<p class="${i ? 'para' : cls}">${esc(p)}</p>`).join('');
 }
 
+function outcomeBox() {
+  if (!outcome) return '';
+  const said = [...outcome.lines];
+  if (!said.length && !outcome.changes.length) return '';
+  return `<div class="box outcome"><p class="label">What came of it${outcome.chose ? `: ${esc(outcome.chose)}` : ''}</p>
+    ${said.length ? `<p>${esc(said.join(' '))}</p>` : ''}
+    ${outcome.changes.length ? `<p class="small">${esc(outcome.changes.join(' · '))}</p>` : ''}</div>`;
+}
+
 function playTab(v) {
-  if (v.over || state.over) return endingView();
+  if (v.over || state.over) return outcomeBox() + endingView();
   if (v.phase === 'scene') {
     const sc = v.scene;
-    return `<p class="kicker">${esc(sc.when)} · Lesson: ${esc(sc.lesson)}</p>
+    return `${outcomeBox()}<p class="kicker">${esc(sc.when)} · Lesson: ${esc(sc.lesson)}</p>
       <blockquote class="governess">${esc(sc.governess)}<cite>Dame Guillemette, your governess</cite></blockquote>
       ${paras(sc.text)}
       ${sc.reports.length ? `<div class="box"><p class="label">What you have been told</p><ul>${sc.reports.map((r) => `<li>${esc(r)}</li>`).join('')}</ul><p class="hint">Reports are only as good as the people who bring them.</p></div>` : ''}
@@ -111,19 +148,20 @@ function playTab(v) {
   }
   if (v.phase === 'card') {
     const c = v.card;
-    if (c.margin) return `<p class="kicker">${esc(c.when || '')}</p>
+    if (c.margin) return `${outcomeBox()}<p class="kicker">${esc(c.when || '')}</p>
       <h2>${esc(c.title)}</h2>
       <blockquote class="margin">${esc(c.text)}<cite>${esc(state.lady.name)}, in her own hand</cite></blockquote>
       ${c.lines.length ? `<p class="hint">${esc(c.lines.join(' '))}</p>` : ''}
       ${choiceButtons(c.choices)}`;
-    return `<p class="kicker">${esc(c.when || '')}${c.arc ? ` · ${esc(c.arc)}` : ''}${v.cardsLeft > 1 ? ` · ${v.cardsLeft - 1} more after this` : ''}</p>
+    return `${outcomeBox()}<p class="kicker">${esc(c.when || '')}${c.arc ? ` · ${esc(c.arc)}` : ''}${v.cardsLeft > 1 ? ` · ${v.cardsLeft - 1} more after this` : ''}</p>
       <h2 class="${c.history ? 'history' : ''}">${esc(c.title)}</h2>
+      ${c.choices.length > 1 ? hint('card') : ''}
       ${c.recall ? `<p class="recall">${esc(c.recall)}</p>` : ''}
       ${c.text ? paras(c.text) : ''}
       ${c.lines.length ? `<ul class="lines">${c.lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
       ${choiceButtons(c.choices)}`;
   }
-  return planView(v);
+  return outcomeBox() + planView(v);
 }
 
 function planView(v) {
@@ -135,6 +173,7 @@ function planView(v) {
   return `
     <p class="kicker">${esc(v.actTitle)} · Paris is ${esc(v.plan.controlLabel)}</p>
     ${v.plan.warnings.length ? `<div class="box warnbox"><p class="label">Talk you have heard lately</p><ul>${v.plan.warnings.map((w) => `<li>${esc(w)}</li>`).join('')}</ul><p class="hint">Some of this is true. The News tab says who told you.</p></div>` : ''}
+    ${hint('plan')}
     <h2>Where will you spend the half-year?</h2>
     <div class="places">${v.plan.places.map((p) => `
       <button data-place="${p.place}" class="place ${draft.place === p.place ? 'on' : ''}">
@@ -184,7 +223,16 @@ function endingView() {
       <tr class="total"><td>Legacy</td><td class="num">${e.total} / 100</td></tr></table>
     <blockquote class="chronicle">${esc(e.epitaph)}</blockquote>
     ${e.lastWords ? `<blockquote class="margin">${esc(e.lastWords)}<cite>${esc(state.lady.name)}</cite></blockquote>` : ''}
-    <button class="primary" data-act="new">Begin again</button>`;
+    ${e.made ? `<h2>How this life was made</h2>
+      <p class="hint">On the left, what history did: the same in every life. On the right, what you chose: yours alone.</p>
+      ${e.made.married ? `<p class="small">Act One, the contract: you were married to ${esc(e.made.married)}.</p>` : ''}
+      ${e.made.acts.map((a) => `<div class="made"><p class="label">Act ${['', 'One', 'Two', 'Three', 'Four'][a.act]}: ${esc(a.title)}</p>
+        <div class="made-cols"><ul class="made-history">${a.history.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
+        <ul class="made-mine">${a.mine.map((m) => `<li><small>${esc(m.date)}</small> ${esc(m.memo[0].toUpperCase() + m.memo.slice(1))}.</li>`).join('') || '<li class="empty">Nothing of your own in these years.</li>'}</ul></div></div>`).join('')}` : ''}
+    <div class="stack">
+      <button data-act="copy-chronicle">Copy her chronicle</button>
+      <button class="primary" data-act="new">Begin again</button>
+    </div>`;
 }
 
 // ---- house, people, news, menu -------------------------------------------
@@ -210,8 +258,8 @@ function houseTab() {
     <p>Age ${h.age}. ${h.lands} holding${h.lands === 1 ? '' : 's'}${h.landsStart ? ` of the ${h.landsStart} the house began with` : ''}.${h.pregnant ? ' You are with child.' : ''}</p>
     <table class="stats">
       <tr><td>Good name</td><td>${bar(v.rep)}</td><td class="num">${v.rep}</td></tr>
-      <tr><td>Information</td><td>${bar(v.info)}</td><td class="num">${v.info}</td></tr>
-      <tr><td>Household</td><td>${bar(v.hh)}</td><td class="num">${v.hh}</td></tr>
+      <tr><td>What you know</td><td>${bar(v.info)}</td><td class="num">${v.info}</td></tr>
+      <tr><td>House in order</td><td>${bar(v.hh)}</td><td class="num">${v.hh}</td></tr>
       <tr><td>Health</td><td>${bar(v.health)}</td><td class="num">${v.health}</td></tr>
       <tr><td>Queen's favour</td><td>${bar(v.fav.queen)}</td><td class="num">${v.fav.queen}</td></tr>
       <tr><td>${esc(h.exposure[0].label)} favour</td><td>${bar(v.fav.arm)}</td><td class="num">${v.fav.arm}</td></tr>
@@ -280,7 +328,7 @@ function menuTab() {
 // The half-year read as a page, not a list of system messages: the narrative in
 // prose, the numbers that rode along with it gathered in a footer, the money
 // folded away under "Accounts".
-const STAT_TAIL = /\s*((?:Her household favour|Household|Health|Reputation|Information|Favour|[A-Z][a-z]+ favour)\s*[+−-]\d+)\.?\s*$/;
+const STAT_TAIL = /\s*((?:The queen's favour|House in order|Health|Good name|What you know|Favour|[A-Z][a-z]+ favour)\s*[+−-]\d+)\.?\s*$/;
 function report(r) {
   const acct = Object.entries(r.account || {});
   const net = acct.reduce((a, [, n]) => a + n, 0);
@@ -295,6 +343,7 @@ function report(r) {
   return `<h2>${esc(r.date)}</h2>
     <p class="prose">${esc([opening, ...prose].join(' '))}</p>
     ${stats.length ? `<p class="small">${esc(stats.join(' · '))}</p>` : ''}
+    ${r.world ? `<div class="box world"><p class="label">Elsewhere in France: ${esc(r.world.title)}</p><p class="small">${esc(r.world.text)}</p></div>` : ''}
     <details class="accounts"><summary>Accounts: ${signed(net)} livres this half-year · purse ${num(r.money)}</summary>
       ${acct.length ? `<table class="ledger">${acct.map(([k, n]) => `<tr><td>${esc(k)}</td><td class="num">${signed(n)}</td></tr>`).join('')}</table>` : ''}</details>
     <button class="primary" data-act="close">Continue</button>`;
@@ -318,13 +367,14 @@ function step(input) {
 }
 
 app.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-act],[data-tab],[data-action],[data-choice],[data-place],[data-pick],[data-unpick],[data-target],[data-counsel],[data-colours]');
+  const t = e.target.closest('[data-diff],[data-act],[data-tab],[data-action],[data-choice],[data-place],[data-pick],[data-unpick],[data-target],[data-counsel],[data-colours]');
   if (!t || busy) return;
   busy = true;
   try {
     const d = t.dataset;
-    if (d.tab) { tab = d.tab; }
-    else if (d.choice !== undefined) { step({ type: state.phase === 'scene' ? 'scene' : 'card', choice: Number(d.choice) }); draft = null; }
+    if (d.diff) { ladyName = document.getElementById('lady-name')?.value ?? ladyName; difficulty = d.diff; }
+    else if (d.tab) { if (['house', 'people', 'news'].includes(tab) && d.tab !== tab) hintDone(tab); tab = d.tab; }
+    else if (d.choice !== undefined) { const ch = view(state); const rec = step({ type: state.phase === 'scene' ? 'scene' : 'card', choice: Number(d.choice) }); outcome = { ...rec, chose: rec.chose || ch.scene?.choices[Number(d.choice)]?.label }; if (ch.card?.choices.length > 1) hintDone('card'); draft = null; }
     else if (d.place) { draft = { place: d.place, actions: draft.actions.filter((a) => view(state).plan.places.find((p) => p.place === d.place).actions.find((x) => x.id === a.id)?.ok) }; }
     else if (d.pick) {
       const P = view(state).plan.places.find((p) => p.place === draft.place);
@@ -344,16 +394,38 @@ app.addEventListener('click', (e) => {
     else if (d.colours) { step({ type: 'colours', value: d.colours }); }
     else if (d.action === 'commit') {
       const record = step({ type: 'plan', place: draft.place, actions: draft.actions.map(({ id, target }) => ({ id, target })) });
-      draft = null; tab = 'play';
+      draft = null; tab = 'play'; outcome = null; hintDone('plan');
       modal = report(record);
     } else {
       const act = d.act;
-      if (act === 'new') { const name = document.getElementById('lady-name')?.value; state = newGame({ seed: (Math.random() * 2 ** 31) >>> 0, name }); tab = 'play'; modal = null; draft = null; save(); }
-      else if (act === 'continue') { state = load(); draft = null; }
+      if (act === 'new' || act === 'new-go') {
+        const saved = state ? null : load();
+        ladyName = document.getElementById('lady-name')?.value ?? ladyName;
+        if (act === 'new' && saved && !saved.over) confirmNew = true;
+        else {
+          const raw = lsGet(SAVE_KEY);
+          if (raw && act === 'new-go') lsSet(BACKUP_KEY, raw);
+          state = newGame({ seed: (Math.random() * 2 ** 31) >>> 0, name: ladyName, difficulty }); tab = 'play'; modal = null; draft = null; outcome = null; confirmNew = false; save();
+        }
+      }
+      else if (act === 'new-cancel') { confirmNew = false; }
+      else if (act === 'restore') {
+        const raw = lsGet(BACKUP_KEY), cur = lsGet(SAVE_KEY);
+        try { state = deserialize(raw); if (cur) lsSet(BACKUP_KEY, cur); save(); tab = 'play'; draft = null; outcome = null; } catch (err) { banner = `The backup could not be read (${err.message}).`; }
+      }
+      else if (act === 'continue') { state = load(); draft = null; outcome = null; }
       else if (act === 'close') { modal = null; picking = null; }
       else if (act === 'dismiss') { banner = null; }
+      else if (act === 'hint-ok') { hintDone(d.hint); }
+      else if (act === 'reload-now') { reloadNow?.(); }
       else if (act === 'quit') { state = null; modal = null; draft = null; }
       else if (act === 'install') { install?.(); }
+      else if (act === 'copy-chronicle') {
+        const e = state.ending;
+        const text = [`${state.lady.name}: ${e.grade} (${e.total} / 100)`, '', e.epitaph, ...(e.lastWords ? ['', e.lastWords] : []), '', 'The Lady of Saint-Pol'].join('\n');
+        modal = `<h2>Her chronicle</h2><p class="hint">Select and copy.</p><textarea readonly rows="10">${esc(text)}</textarea><button class="primary" data-act="close">Done</button>`;
+        try { navigator.clipboard?.writeText(text).then(() => {}, () => {}); } catch { /* the box is there */ }
+      }
       else if (act === 'export') { modal = `<h2>Save code</h2><textarea readonly rows="5">${esc(toCode(state))}</textarea><button class="primary" data-act="close">Done</button>`; }
       // An in-page box, not prompt(): some hosts (claude.ai artifacts, some embeds) refuse dialogs silently.
       else if (act === 'load-code') { modal = `<h2>Load a save code</h2><p class="hint">Paste a code copied from Menu, Copy a save code.</p><textarea id="code-in" rows="5" spellcheck="false"></textarea><div class="stack"><button class="primary" data-act="load-code-go">Load this game</button><button data-act="close">Cancel</button></div>`; }
@@ -372,7 +444,7 @@ addEventListener('unhandledrejection', (e) => fail(e.reason));
 
 installPrompt((go) => { install = go; if (!state) title(); });
 render();
-registerSW({ onUpdate: (reload) => { banner = 'A new version is ready.'; modal = null; render(); app.querySelector('.banner')?.insertAdjacentHTML('beforeend', ' <button data-act="reload-now">Reload</button>'); app.querySelector('[data-act="reload-now"]')?.addEventListener('click', reload); } });
+registerSW({ onUpdate: (reload) => { banner = 'A new version is ready.'; reloadNow = reload; modal = null; render(); } });
 
 // For tools/smoke.mjs and tools/check-bundle.mjs: read-only access to the game.
 globalThis.__game = { get state() { return state; } };

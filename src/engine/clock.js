@@ -1,8 +1,8 @@
 // The calendar. Pure lookups from the turn counter, so every screen, the engine
 // and the bot agree on the date, the act and who holds Paris.
 //
-// Turns 1-7 are the Act 1 scenes (1400). Turn 8 is spring 1401; each turn after
-// is a half-year; turn 51 is autumn 1422, the last.
+// Turns 1-7 are the Act 1 scenes (1400). Turn 8 is summer 1401; each turn after
+// is a half-year; turn 51 is winter 1422, the last.
 
 import { CONFIG } from '../data/config.data.js';
 import { CONTROL, QUEEN_SIDE, ACTS } from '../data/history.data.js';
@@ -38,7 +38,7 @@ export function dateLabel(turn) {
   if (turn < FIRST_TURN) return `${CONFIG.act1Year}, scene ${turn}`;
   if (turn > LAST_TURN) return `${CONFIG.lastYear}`;
   const i = turn - FIRST_TURN;
-  return `${i % 2 ? 'Autumn' : 'Spring'} ${yearOf(turn)}`;
+  return `${i % 2 ? 'Winter' : 'Summer'} ${yearOf(turn)}`;
 }
 
 export function actOf(turn) {

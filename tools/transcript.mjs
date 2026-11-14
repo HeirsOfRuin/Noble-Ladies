@@ -27,10 +27,12 @@ while (!s.over) {
   } else if (v.phase === 'plan' && inp.type === 'plan') {
     out.push(`---\n## ${v.date} · ${inp.place === 'court' ? 'at court' : 'on the estates'}\n\nActions: ${inp.actions.map((a) => a.id + (a.target ? ` (${a.target})` : '')).join(', ') || 'none'}\n`);
   }
-  s = advance(s, inp).state;
-  if (v.phase === 'plan' && inp.type === 'plan') { const r = s.history.at(-1); if (r.lines.length) out.push(r.lines.map((l) => `- ${l}`).join('\n') + '\n'); }
+  const res = advance(s, inp); s = res.state;
+  if (v.phase === 'card' && (res.record.lines.length || res.record.changes?.length)) out.push(`> ${[...res.record.lines, res.record.changes?.join(' · ')].filter(Boolean).join(' ')}\n`);
+  if (v.phase === 'plan' && inp.type === 'plan') { const r = s.history.at(-1); if (r.lines.length) out.push(r.lines.map((l) => `- ${l}`).join('\n') + '\n'); if (r.world) out.push(`*Elsewhere in France: ${r.world.title}. ${r.world.text}*\n`); }
 }
 out.push(`\n## The end\n\n${s.ending.epitaph}\n\n${s.ending.lastWords || ''}\n`);
+if (s.ending.made) out.push(`### How this life was made\n\n${s.ending.made.acts.map((a) => `**Act ${a.act}: ${a.title}.** History: ${a.history.join('; ')}.\n\n${a.mine.map((m) => `- ${m.date}: ${m.memo}`).join('\n')}`).join('\n\n')}\n`);
 console.log(out.join('\n'));
 
 const halves = [...Array(44).keys()].map((i) => perHalf.get(8 + i) || { story: 0, other: 0, ids: [] });

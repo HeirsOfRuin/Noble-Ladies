@@ -139,3 +139,14 @@ test('every action the plan screen enables, the engine accepts', () => {
     }
   }
 });
+
+test('a child promised in marriage never also goes to the Church or takes the veil', () => {
+  // The audit found "Blanche was promised to the house of Brécourt... Blanche took the veil at Poissy" (loyal_bur seed 5).
+  for (const policy of ['loyal_bur', 'seasonal', 'christine', 'homebody']) {
+    for (let seed = 1; seed <= 25; seed++) {
+      const s = playThrough(seed, policy);
+      for (const c of s.children) assert.ok(!(c.betrothed && ['church', 'nun'].includes(c.placement)), `${policy} seed ${seed}: ${c.name} is ${c.placement} and promised to ${c.betrothed?.name}`);
+      assert.ok(!/\b\d+ years old\b/.test(s.ending.epitaph + JSON.stringify(s.history)), `${policy} seed ${seed}: a count in figures`);
+    }
+  }
+});

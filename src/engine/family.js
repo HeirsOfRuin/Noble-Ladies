@@ -8,7 +8,7 @@ import { CHILD_NAMES, MATCH_HOUSES } from '../data/cast.data.js';
 import { TEMPERS, childrenTurn } from './children.js';
 import { PLAGUE } from '../data/history.data.js';
 import { coin } from './ledger.js';
-import { clamp, gainRep } from './effects.js';
+import { clamp, gainRep, words, Words } from './effects.js';
 import { D, husbandHere, childAge, costOf } from './derive.js';
 import { keyOf, factionLabel } from './clock.js';
 
@@ -36,7 +36,7 @@ export function familyTurn(s, rng, place, ctx) {
     s.pregnant = null;
     if (rng.chance(birthRisk(s, place))) {
       s.over = true; s.outcome = 'dead'; s.flags.death = 'childbed';
-      return [`You died in childbed in the ${keyOf(s.turn).endsWith('a') ? 'spring' : 'autumn'} of ${keyOf(s.turn).slice(0, 4)}.`];
+      return [`You died in childbed in the ${keyOf(s.turn).endsWith('a') ? 'summer' : 'winter'} of ${keyOf(s.turn).slice(0, 4)}.`];
     }
     s.health = clamp(s.health - 15, Math.min(5, s.health));
     s.births += 1;
@@ -49,7 +49,18 @@ export function familyTurn(s, rng, place, ctx) {
       s.children.push({ id: s.nextId++, name, sex, born: s.turn, alive: true, care: 30, betrothed: null, temper: rng.pick(Object.keys(TEMPERS)), placement: null });
       const id = s.children.at(-1).id;
       s.queue.push({ due: s.turn + 1, kind: 'churching' });
-      s.cards.push({ id: 'birth', title: `A ${sex}`, text: `You are delivered of a ${sex}, after a day and a night, with the midwife from the town and your women holding your hands. ${name} is baptised within the week. Your health is spent for a while.\n\nThe question every lady's household asks next: a wet nurse, or your own milk.`,
+      // Each birth reads differently: the first is frightening, the fourth is a date in the household book.
+      const born = s.children.length;
+      const prev = s.children.slice(0, -1).filter((x) => x.nurse !== undefined).at(-1);
+      const hus = s.husband?.short || 'your husband';
+      const story = [
+        `You are delivered of a ${sex}, after a day and a night, with the midwife from the town and your women holding your hands. ${name} is baptised within the week. Your health is spent for a while.`,
+        `A ${sex}. The second comes quicker than the first, and the midwife says so as if it were your doing. ${name} is baptised at the parish font, with ${hus} holding the candle and looking at the baby as if it might be a trick.`,
+        `A ${sex}, ${name}, baptised on the third day, with the eldest watching from the chancel step and asking whether the baby will have to go to Mass too. Your women have done this with you before. Nobody panics, and you are glad of it.`,
+        `A ${sex}, ${name}. Brother Robert says the baptism, the steward writes the date in the household book under the others, and you sleep for two days.`,
+      ][Math.min(born, 4) - 1];
+      const ask = prev ? `${prev.nurse ? `The wet nurse who fed ${prev.name} has milk again, and her husband has already asked the steward about her wages.` : `You fed ${prev.name} yourself, and the women are waiting to see if you mean to do it again.`}` : 'The question every lady\'s household asks next: a wet nurse, or your own milk.';
+      s.cards.push({ id: 'birth', title: `A ${sex}`, text: `${story}\n\n${ask}`,
         choices: [
           { label: 'Hire a wet nurse from the village', note: 'A strong woman with her own baby, forty livres a year and her keep. You recover sooner. The child will love her first.', ops: [['purse', -40, 'a wet nurse'], ['health', 6]], kind: 'nurse', child: id },
           { label: 'Nurse the child yourself', note: 'Unusual in a lady, and the women will say so. The child stays close; you stay tired.', ops: [['health', -4], ['trait', 'warm', 1], ['rep', -1]], kind: 'ownMilk', child: id },
@@ -69,7 +80,7 @@ export function familyTurn(s, rng, place, ctx) {
     if (!c.alive) continue;
     if (rng.chance(childRisk(s, c, ctx.care))) {
       c.alive = false;
-      s.cards.push({ id: 'child_death', title: `${c.name} is dead`, text: `${c.name} died of a fever at ${childAge(s, c) || 'less than a year'}${childAge(s, c) ? ' years old' : ''}. Children die often. Knowing it is no comfort.`, choices: [{ label: 'Continue', ops: [] }] });
+      s.cards.push({ id: 'child_death', title: `${c.name} is dead`, text: `${c.name} died of a fever ${childAge(s, c) > 1 ? `at ${words(childAge(s, c))} years old` : childAge(s, c) === 1 ? 'at a year old' : 'before a first birthday'}. Children die often. Knowing it is no comfort.`, choices: [{ label: 'Continue', ops: [] }] });
     } else c.care = clamp(c.care - 2);
   }
 
@@ -86,7 +97,7 @@ export function familyTurn(s, rng, place, ctx) {
   childrenTurn(s, rng);
   if (h && h.status === 'present' && h.temper >= 4 && rng.chance(0.08)) {
     gainRep(s, -3);
-    lines.push(`${h.short} struck a man at dinner. People talk. Reputation -3.`);
+    lines.push(`${h.short} struck a man at dinner. People talk. Good name -3.`);
   }
   return lines;
 }
@@ -171,7 +182,7 @@ export function matchOffers(s, c, rng) {
   choices.push({ label: 'Decline them all for now', ops: [] });
   return {
     id: 'match', title: `A match for ${c.name}`,
-    text: offers.length ? `${offers.length} house${offers.length > 1 ? 's have' : ' has'} answered for ${c.name}. A betrothal is a contract: the wedding waits until ${c.name} is grown, but the alliance and the money are settled now.` : `No house of standing has answered for ${c.name}. A better name, more friends at court, or a better-raised child would change that.`,
+    text: offers.length ? `${Words(offers.length)} house${offers.length > 1 ? 's have' : ' has'} answered for ${c.name}. A betrothal is a contract: the wedding waits until ${c.name} is grown, but the alliance and the money are settled now.` : `No house of standing has answered for ${c.name}. A better name, more friends at court, or a better-raised child would change that.`,
     choices,
   };
 }

@@ -476,7 +476,7 @@ export const BEATS = [
   {
     id: 'brother_tested', arc: 'arms', from: '1418a', until: '1418b', title: 'Raoul at the gate', if: [['flag', 'brotherInArms']],
     text: [
-      { text: `Messire Raoul de Fléchin is at your gate in June, with one squire and no horse, with the blood of the Paris prisons on his boots. His party lost; he was nearly killed in the Châtelet. Under the contract your husband sealed, your house owes him shelter, money and a horse.` },
+      { text: `Messire Raoul de Fléchin is at your gate, with one squire and no horse, with the blood of the Paris prisons on his boots. His party lost; he was nearly killed in the Châtelet. Under the contract your husband sealed, your house owes him shelter, money and a horse.` },
       { if: ['husband', 'none'], text: `Your husband is dead. Raoul says, gently, that the contract was with the house, and the house is you.` },
     ],
     choices: [

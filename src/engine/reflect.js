@@ -5,6 +5,7 @@
 
 import { tokens } from './arcs.js';
 import { wantStatus, traitWords } from './derive.js';
+import { words } from './effects.js';
 
 const fill = (s, t) => { const k = tokens(s); return t.replace(/\{(\w+)\}/g, (m, x) => (x in k ? k[x] : m)); };
 const tr = (s, a) => s.traits?.[a] ?? 0;
@@ -34,7 +35,7 @@ function childrenLine(s) {
   if (!s.children.length) return 'No children yet. My mother-in-law has a saint for that, and a great deal to say.';
   const names = living.map((c) => c.name);
   const who = names.length ? `${names.slice(0, -1).join(', ')}${names.length > 1 ? ' and ' : ''}${names.at(-1)}` : '';
-  return `${living.length ? `${who} ${living.length > 1 ? 'are' : 'is'} living` : 'None of them lived'}${dead ? `, and ${dead === 1 ? 'one is' : `${dead} are`} in the churchyard` : ''}.`;
+  return `${living.length ? `${who} ${living.length > 1 ? 'are' : 'is'} living` : 'None of them lived'}${dead ? `, and ${dead === 1 ? 'one is' : `${words(dead)} are`} in the churchyard` : ''}.`;
 }
 
 function brecourtLine(s) {

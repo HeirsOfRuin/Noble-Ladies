@@ -18,7 +18,7 @@ import { SUITORS } from '../data/cast.data.js';
 import { streamFor } from './rng.js';
 import { coin, turnAccount } from './ledger.js';
 import { newGame, makeNpc } from './state.js';
-import { applyOps, describeOps, clamp } from './effects.js';
+import { applyOps, describeOps, clamp, snapshot, changes } from './effects.js';
 import { turnOfKey, FIRST_TURN, LAST_TURN, isAct1, dateLabel, actOf, actTitle, ladyAge, keyOf, controlAt, factionLabel } from './clock.js';
 import { coloursOpen, COLOURS, traitWords, wantStatus, brecourtOpen, brecourtChance, BRECOURT_JUDGMENT, warRisk, placePreview, actionPreview, rentsGross, slotsFor, costOf, pct, exposureNow, hedging, nameOf, COUNSEL, heedWord, relWord, pensionPays, childAge, score } from './derive.js';
 import { sceneView, resolveScene } from './act1.js';
@@ -129,7 +129,8 @@ function resolveHalfYear(s, input) {
   income(s, r('income'), place, ctx, lines);
   drift(s, place);
   lines.push(...familyTurn(s, r('family'), place, ctx));
-  if (!s.over) historyTurn(s, r('history'), place);
+  let world = null;
+  if (!s.over) { const h = historyTurn(s, r('history'), place); lines.push(...h.lines); world = h.world || null; }
   const beats = s.over ? 0 : arcsTurn(s);
   ambientNews(s, r('news'), place);
   if (!s.over) eventsTurn(s, r('events'), place, beats);
@@ -139,7 +140,7 @@ function resolveHalfYear(s, input) {
   if (!s.over && s.health <= 0) { s.over = true; s.outcome = 'dead'; s.flags.death = 'illness'; }
   if (!s.over && s.money < CONFIG.ruinDebt) { s.over = true; s.outcome = 'ruined'; }
 
-  const record = { turn: s.turn, date: dateLabel(s.turn), place, actions: (input.actions || []).map((a) => a.id), lines, account: turnAccount(s, s.turn), money: s.money };
+  const record = { turn: s.turn, date: dateLabel(s.turn), place, world, actions: (input.actions || []).map((a) => a.id), lines, account: turnAccount(s, s.turn), money: s.money };
   s.history.push(record);
   s.turn += 1;
   return record;
@@ -187,6 +188,7 @@ function resolveCard(s, idx) {
   const rng = streamFor(s.seed, s.turn * 100 + s.nextId, `card:${card.id}`);
   s.nextId += 1;
   const lines = [];
+  const before = snapshot(s);
   applyOps(s, c.ops);
   const k = c.kind;
   if (k === 'chance') {
@@ -220,7 +222,8 @@ function resolveCard(s, idx) {
       if (k === 'place') { child.placement = c.placement; child.house = c.house || null; child.care = clamp(child.care + (['page', 'queen', 'poissy'].includes(c.placement) ? 10 : 5)); }
       if (k === 'childBeat') {
         child.care = clamp(child.care + (c.care || 0));
-        if (c.placement) child.placement = c.placement;
+        // A child promised in marriage in the same half-year does not also go to the Church.
+        if (c.placement && !(child.betrothed && ['church', 'nun'].includes(c.placement))) child.placement = c.placement;
         if (c.risk && rng.chance(c.risk)) { child.care = clamp(child.care - 20); lines.push(`${child.name} was hurt in a skirmish, and came home on a cart, alive.`); }
       }
       if (k === 'pledge' && c.home) { child.placement = 'home'; child.house = null; }
@@ -230,10 +233,10 @@ function resolveCard(s, idx) {
     lines.push(`You want ${WANTS[c.want].goal.charAt(0).toLowerCase()}${WANTS[c.want].goal.slice(1)}`);
   } else if (k === 'match') {
     const child = s.children.find((x) => x.id === c.child);
-    if (child) child.betrothed = { name: c.house.name, rank: c.house.rank, faction: c.house.faction };
+    if (child && !['church', 'nun'].includes(child.placement)) child.betrothed = { name: c.house.name, rank: c.house.rank, faction: c.house.faction };
   }
   if (s.money < CONFIG.ruinDebt) { s.over = true; s.outcome = 'ruined'; }
-  return { turn: s.turn, card: card.id, choice: idx, lines };
+  return { turn: s.turn, card: card.id, choice: idx, title: card.title, chose: c.label, lines, changes: changes(before, snapshot(s)) };
 }
 
 /** advance(state, input) -> { state, record }. Throws on anything the view would not offer. */
@@ -243,9 +246,11 @@ export function advance(prev, input) {
   let record;
   if (s.phase === 'scene') {
     if (input?.type !== 'scene') throw new Error('a scene is waiting for a choice');
+    const before = snapshot(s);
+    const title = sceneView(s).lesson;
     const lines = resolveScene(s, input.choice, streamFor(s.seed, s.turn, 'scene'));
     if (s.turn === FIRST_TURN - 1) s.flags.firstHusband = s.husband.name;
-    record = { turn: s.turn, date: dateLabel(s.turn), scene: s.turn, lines, account: {} };
+    record = { turn: s.turn, date: dateLabel(s.turn), scene: s.turn, title, lines, account: {}, changes: changes(before, snapshot(s)) };
     s.history.push(record);
     s.turn += 1;
   } else if (s.phase === 'card') {
@@ -284,7 +289,8 @@ function cardStake(s, c) {
   else if (k === 'match') extra = 'Betrothed';
   else if (k === 'christine') extra = 'What she knows';
   else if (k === 'want') extra = '';
-  return [base, extra].filter(Boolean).join(' · ');
+  const out = [base, extra].filter(Boolean).join(' · ');
+  return out && out[0].toUpperCase() + out.slice(1);
 }
 
 /** Everything the UI shows, computed by the engine. The UI computes nothing. */
@@ -302,6 +308,8 @@ export function view(s) {
     v.card = { id: c.id, title: c.title, when: c.when || dateLabel(s.turn - 1), text: c.text, lines: c.lines || [], history: !!c.history, arc: c.arc || null, margin: !!c.margin, recall: c.recall || null,
       choices: c.choices.map((x) => ({ label: x.label, note: x.note || '', stake: x.locked ? '' : cardStake(s, x), locked: !!x.locked, why: x.why || '' })) };
     v.cardsLeft = s.cards.length;
+    // The top bar dates the card being read, not the half-year about to be planned (F9: two dates on one screen).
+    if (!c.margin && !/^act\d/.test(c.id)) v.date = v.card.when;
   }
   if (s.phase === 'plan') {
     const places = ['court', 'estates'].map((p) => ({ ...placePreview(s, p), actions: ACTION_ORDER.map((id) => actionPreview(s, id, p)) }));

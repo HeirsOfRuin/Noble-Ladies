@@ -6,8 +6,10 @@ import { CONFIG } from '../data/config.data.js';
 import { CAST } from '../data/cast.data.js';
 import { WANTS } from '../data/arcs.data.js';
 import { score, traitWords, wantStatus } from './derive.js';
+import { words } from './effects.js';
 import { lastWords } from './reflect.js';
-import { yearOf } from './clock.js';
+import { yearOf, actOf, actTitle, dateLabel, FIRST_TURN, turnOfKey } from './clock.js';
+import { HISTORY } from '../data/history.data.js';
 
 const repWord = (r) => (r >= 75 ? 'a lady of great good name' : r >= 55 ? 'a lady well spoken of' : r >= 35 ? 'a lady of middling report' : 'a lady much talked about, and not kindly');
 
@@ -26,7 +28,7 @@ export function epitaph(s) {
   const born = s.children.length, living = s.children.filter((c) => c.alive);
   if (!born) out.push('She had no children who lived to be baptised.');
   else {
-    out.push(`She bore ${born} ${born > 1 ? 'children' : 'child'}, of whom ${living.length || 'none'} ${living.length === 1 ? 'was' : 'were'} living at the end.`);
+    out.push(`She bore ${words(born)} ${born > 1 ? 'children' : 'child'}, ${born === 1 ? (living.length ? 'who was living at the end' : 'who did not live') : `of whom ${living.length ? words(living.length) : 'none'} ${living.length === 1 ? 'was' : 'were'} living at the end`}.`);
     for (const c of living.filter((c) => c.betrothed)) out.push(`${c.name} was promised to the house of ${c.betrothed.name.replace(/^the lord of /, '')}.`);
   }
   const B = s.flags.brecourt;
@@ -44,6 +46,8 @@ export function epitaph(s) {
   if (s.flags.followedQueen) out.push('She went with Queen Isabeau into exile at Tours, when few would.');
   else if (s.flags.leftQueen) out.push('When the queen was sent to Tours, she stayed at home.');
   if (s.flags.queenAnswered) out.push('At Troyes she asked the queen why, and the queen told her; she never repeated it.');
+  const T = { sworn: 'She swore to the treaty of Troyes with the rest, and kept her lands.', ill: 'She was ill on the day the oath to the English king was taken, and nobody came back to ask again.', dauphin: 'In the year of Troyes she wrote to the Dauphin at Bourges, and the letter was never found.' }[s.flags.troyes];
+  if (T) out.push(T);
   if (s.flags.raoulSaved) out.push('She kept her husband\'s oath to his brother-in-arms, Raoul de Fléchin, when it was dangerous to keep.');
   else if (s.flags.brokeContract) out.push('She refused her husband\'s brother-in-arms at the gate, and was spoken of for it.');
   const r = s.flags.remarried ? null : (s.husband?.regard ?? s.flags.lastRegard);
@@ -60,13 +64,30 @@ export function epitaph(s) {
   return out.filter(Boolean).join(' ');
 }
 
+/**
+ * How this life was made: act by act, what history did (fixed, the same in every
+ * game) beside what she chose (hers alone). Knight of Adalia's turning-points page,
+ * set to this game's theme: she changes her own fate, not history's.
+ */
+export function lifeMade(s) {
+  const acts = [];
+  const end = Math.min(s.turn, FIRST_TURN + 43);
+  for (let a = 2; a <= 4; a++) {
+    const keys = Object.keys(HISTORY).filter((k) => { const t = turnOfKey(k); return actOf(t) === a && t < end + 1 && !HISTORY[k].minor; });
+    const mine = (s.story || []).filter((e) => actOf(e.turn) === a).map((e) => ({ date: dateLabel(e.turn), memo: e.memo }));
+    if (!keys.length && !mine.length) continue;
+    acts.push({ act: a, title: actTitle(a), history: keys.map((k) => HISTORY[k].title), mine });
+  }
+  return { married: s.flags.firstHusband, acts };
+}
+
 export function finish(s, outcome) {
   s.over = true;
   s.outcome = s.outcome || outcome;
   s.phase = 'over';
   s.cards = [];
   const sc = score(s);
-  s.ending = { ...sc, epitaph: epitaph(s), lastWords: lastWords(s), want: wantStatus(s) };
+  s.ending = { ...sc, epitaph: epitaph(s), lastWords: lastWords(s), want: wantStatus(s), made: lifeMade(s) };
   return s;
 }
 

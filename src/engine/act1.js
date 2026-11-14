@@ -69,8 +69,8 @@ export function persuadeChance(s, c) {
 
 function stakeFor(s, c) {
   if (c.kind === 'gamble' || c.kind === 'dowry') return `Even chance: ${describeOps(c.win)}; otherwise ${describeOps(c.lose)}`;
-  if (c.kind === 'source') return `${c.reports} report${c.reports > 1 ? 's' : ''}, through ${viaWord(s, c.via)}${c.info ? ` · Information +${c.info}` : ''}`;
-  if (c.kind === 'persuade') return `${pct(persuadeChance(s, c))} chance, through ${viaWord(s, c.via)}${c.failRep ? ` · if it fails, Reputation ${c.failRep}` : ''}${c.rep ? ` · Reputation +${c.rep}` : ''}`;
+  if (c.kind === 'source') return `${c.reports} report${c.reports > 1 ? 's' : ''}, through ${viaWord(s, c.via)}${c.info ? ` · What you know +${c.info}` : ''}`;
+  if (c.kind === 'persuade') return `${pct(persuadeChance(s, c))} chance, through ${viaWord(s, c.via)}${c.failRep ? ` · if it fails, good name ${c.failRep}` : ''}${c.rep ? ` · Good name +${c.rep}` : ''}`;
   if (c.kind === 'prefer') return c.ops ? describeOps(c.ops) : '';
   return describeOps(c.ops);
 }
@@ -81,14 +81,17 @@ export function sceneView(s) {
     kind: 'scene', id: sc.id, when: sc.when, lesson: sc.lesson, age: ladyAge(s.turn),
     governess: sc.governess, text: sceneText(s, sc.text),
     reports: sc.id === 'choice' || sc.id === 'contract' ? s.act1.reports.map((r) => r.text) : [],
-    choices: sc.choices.map((c) => ({ label: sceneText(s, c.label), note: c.note || '', stake: stakeFor(s, c) })),
+    choices: sc.choices.map((c) => { const st = stakeFor(s, c); return { label: sceneText(s, c.label), note: c.note || '', stake: st && st[0].toUpperCase() + st.slice(1) }; }),
   };
 }
 
 function report(s, via, i, rng) {
   const n = s.npcs[via];
   const sx = s.act1.suitors[i % 2];
-  const trait = rng.pick(Object.keys(TRAITS));
+  // Never the same thing twice about the same man: a second report is about something else.
+  const told = new Set(s.act1.reports.filter((r) => r.suitor === sx.id).map((r) => r.trait));
+  const fresh = Object.keys(TRAITS).filter((k) => !told.has(k));
+  const trait = rng.pick(fresh.length ? fresh : Object.keys(TRAITS));
   const truth = sx[trait] >= 3 ? 'high' : 'low';
   const honest = rng.chance(n.rel);
   const claim = honest ? truth : truth === 'high' ? 'low' : 'high';

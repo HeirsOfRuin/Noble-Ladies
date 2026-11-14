@@ -75,10 +75,12 @@ export function childBeatCard(s, c) {
   if (c.placement === 'church' || (c.temper === 'bookish' && c.sex === 'son')) return { id: 'child_beat', title: `${n} wants the University`, lines: [],
     text: `${n} has outgrown every book in the house and two of Brother Robert's. ${H[0].toUpperCase() + H.slice(1)} wants to go to Paris, to the University, to the Collège de Navarre, where the King's own clerks are made. It costs money, and the students fight in the streets for whichever duke they think is right.`,
     choices: [
-      { label: 'Send him to Paris', note: 'A hundred and fifty livres a year, a room in the rue Saint-Jacques, and a clerk\'s career. He will not marry.', ops: [['purse', -150, `${n} at the University`], ['rep', 2], ['info', 6]], ...done, care: 10, placement: 'church' },
+      c.betrothed
+        ? { label: 'Send him to Paris for two years', note: `A hundred and fifty livres a year and a room in the rue Saint-Jacques. He is promised to ${c.betrothed.name}; he comes home to marry.`, ops: [['purse', -150, `${n} at the University`], ['rep', 2], ['info', 6]], ...done, care: 10 }
+        : { label: 'Send him to Paris', note: 'A hundred and fifty livres a year, a room in the rue Saint-Jacques, and a clerk\'s career. He will not marry.', ops: [['purse', -150, `${n} at the University`], ['rep', 2], ['info', 6]], ...done, care: 10, placement: 'church' },
       { label: 'Keep him home another year', note: 'He will read the same books again, and resent it.', ops: [], ...done, care: -5 },
     ] };
-  if (c.temper === 'devout' && c.sex === 'daughter' && c.placement !== 'nun') return { id: 'child_beat', title: `${n} asks for the veil`, lines: [],
+  if (c.temper === 'devout' && c.sex === 'daughter' && c.placement !== 'nun' && !c.betrothed) return { id: 'child_beat', title: `${n} asks for the veil`, lines: [],
     text: `${n} comes to you after vespers with ${c.placement === 'poissy' ? 'the prioress\'s letter already written' : 'her hands folded and her mind made up'}. She wants to take the veil at Poissy. She has thought about it, she says, for two years, and she would rather say her hours for this house than be married off to keep it.`,
     choices: [
       { label: 'Give your consent', note: 'A dowry to the priory, smaller than a husband\'s, and prayers for the house for her whole life. No match.', ops: [['purse', -300, `${n}'s dowry to Poissy`], ['rep', 4], ['trait', 'devout', 1], ['count', 'chapels', 1]], ...done, care: 10, placement: 'nun' },

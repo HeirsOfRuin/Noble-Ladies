@@ -97,8 +97,12 @@ export function historyTurn(s, rng, place) {
   }
 
   const h = HISTORY[key];
-  if (h) s.cards.unshift({ id: `history:${key}`, title: h.title, when: dateLabel(s.turn), history: true, text: h.text, lines, choices: [{ label: 'Continue', ops: [] }] });
-  else if (lines.length) s.cards.unshift({ id: `news:${key}`, title: 'News of the half-year', when: dateLabel(s.turn), text: '', lines, choices: [{ label: 'Continue', ops: [] }] });
+  // A minor turning point with nothing in it for her is told in the half-year's report, not on a card of its own.
+  if (h && !h.minor) s.cards.unshift({ id: `history:${key}`, title: h.title, when: dateLabel(s.turn), history: true, text: h.text, lines, choices: h.react ? h.react.map((c) => ({ ...c })) : [{ label: 'Continue', ops: [] }] });
+  else if (h) return { lines, world: { title: h.title, text: h.text } };
+  // Without a turning point, the half-year's news goes in the report: no card, no extra tap.
+  else return { lines };
+  return { lines: [] };
 
 }
 

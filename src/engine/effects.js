@@ -29,9 +29,13 @@ import { SWINGS } from '../data/history.data.js';
 import { addDebt, clearDebt, nextSwing } from './favours.js';
 import { grantOffice } from './offices.js';
 
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen'];
+/** Small counts in words, as a chronicler writes them: "three houses", not "3 houses". */
+export const words = (n) => WORDS[n] ?? String(n);
+export const Words = (n) => { const w = words(n); return w[0].toUpperCase() + w.slice(1); };
 export const clamp = (x, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, x));
 
-const STAT = { rep: 'Reputation', info: 'Information', hh: 'Household', health: 'Health' };
+const STAT = { rep: 'Good name', info: 'What you know', hh: 'House in order', health: 'Health' };
 export const TRAITS = {
   devout: ['devout', 'worldly'],
   bold: ['bold', 'careful'],
@@ -76,7 +80,7 @@ export function applyOps(s, ops = []) {
     }
     else if (k === 'gone') { const n = s.npcs[a]; if (n && n.alive) { n.alive = false; n.gone = 'story'; n.goneHow = b; s.pensions = s.pensions.filter((p) => p.from !== a); } }
     else if (k === 'betrothEldest') {
-      const c = s.children.filter((x) => x.alive && !x.betrothed).sort((x, y) => x.born - y.born)[0];
+      const c = s.children.filter((x) => x.alive && !x.betrothed && !['church', 'nun'].includes(x.placement)).sort((x, y) => x.born - y.born)[0];
       if (c) c.betrothed = { name: a, rank: b, faction: c2(op) };
     }
     else if (k === 'owe') addDebt(s, a, 'in', b, c);
@@ -95,16 +99,35 @@ export function applyOps(s, ops = []) {
 }
 
 const signed = (n) => (n > 0 ? `+${n}` : `${n}`);
+const favLabel = (f) => (f === 'queen' ? "The queen's favour" : `${FACTIONS[f].short} favour`);
+
+/** Her standing at a moment, for "what came of it" after a choice. */
+export function snapshot(s) {
+  return { money: s.money, rep: s.rep, info: s.info, hh: s.hh, health: s.health, lands: s.lands, fav: { ...s.fav },
+    trust: Object.fromEntries(Object.entries(s.npcs).map(([id, n]) => [id, n.trust])), regard: s.husband?.regard ?? null };
+}
+
+/** What changed between two snapshots, as short phrases in the same words the stakes use. */
+export function changes(a, b) {
+  const out = [];
+  if (b.money !== a.money) out.push(`${signed(b.money - a.money)} livres`);
+  for (const k of ['rep', 'info', 'hh', 'health']) if (b[k] !== a[k]) out.push(`${STAT[k]} ${signed(b[k] - a[k])}`);
+  for (const f of Object.keys(b.fav)) if (b.fav[f] !== a.fav[f]) out.push(`${favLabel(f)} ${signed(b.fav[f] - a.fav[f])}`);
+  if (b.lands !== a.lands) out.push(`${signed(b.lands - a.lands)} holding${Math.abs(b.lands - a.lands) > 1 ? 's' : ''}`);
+  for (const id of Object.keys(b.trust)) if (a.trust[id] !== undefined && b.trust[id] !== a.trust[id]) out.push(`${CAST[id].short} trusts you ${b.trust[id] > a.trust[id] ? 'more' : 'less'}`);
+  if (a.regard !== null && b.regard !== null && b.regard !== a.regard) out.push(`He thinks ${b.regard > a.regard ? 'more' : 'less'} of you`);
+  return out;
+}
 
 /** One short phrase per op, for "At stake" lines. Ops with no visible stake return null. */
 export function describeOp(op) {
   const [k, a, b] = op;
   if (k === 'purse') return `${signed(a)} livres`;
   if (k in STAT) return `${STAT[k]} ${signed(a)}`;
-  if (k === 'fav') return `${FACTIONS[a].short} favour ${signed(b)}`;
+  if (k === 'fav') return `${favLabel(a)} ${signed(b)}`;
   if (k === 'trust') return `${CAST[a].short} trusts you ${b > 0 ? 'more' : 'less'}`;
   if (k === 'use') return `${CAST[a].short} ${b > 0 ? 'needs you more' : 'needs you less'}`;
-  if (k === 'later') return 'Remembered later';
+  if (k === 'later' || k === 'flag') return 'Remembered later';
   if (k === 'dowry') return `Dowry ${signed(a)}`;
   if (k === 'trait') return `${b > 0 ? TRAITS[a][0] : TRAITS[a][1]}`;
   if (k === 'regard') return `He thinks ${a > 0 ? 'more' : 'less'} of you`;

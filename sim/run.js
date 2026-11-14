@@ -1,10 +1,10 @@
-// Batch runner. Copy to sim/run.js; the game plugs in through sim/adapter.js.
+// Batch runner; the game plugs in through sim/adapter.js.
 //
 //   node sim/run.js --runs=50                       one cell, adapter defaults
-//   node sim/run.js --runs=25 --by=difficulty,road --pool=start
-//                                                   a matrix: a row per difficulty x road,
-//                                                   every start pooled into each row
-//   node sim/run.js --difficulty=legate --opts='{"noTrade":true}'
+//   node sim/run.js --runs=100 --by=policy          a row per bot policy (sim/bot.js)
+//   node sim/run.js --runs=100 --by=policy,difficulty
+//                                                   a matrix: policy x difficulty
+//   node sim/run.js --policy=christine+deaf         one policy with all news ignored
 //   node sim/run.js --trace --seed=17               one game, the adapter's trace(state)
 //   node sim/run.js ... --json=out/run.json         for report.mjs
 //   node sim/run.js ... --metrics=win,turn          only these columns
