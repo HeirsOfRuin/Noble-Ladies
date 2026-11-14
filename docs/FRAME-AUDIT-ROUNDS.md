@@ -74,3 +74,22 @@ bot should come out ahead; the author's playtest decides.
 | E. Heraldry | Arms for every invented house, generated from the house's name, so the same house always bears the same arms (no save change), with the rule of tincture kept. Her own shield is her husband's arms impaling her father's, as a married woman's were. Shown on the House tab, beside her husband, and beside each child's betrothed house. Real princes are not drawn. Checked on a contact sheet: one roundel sat on a bend and vanished, fixed | `src/engine/heraldry.js` |
 | H. Sound | Made in code (after The Lists): two strokes of a parish bell when a half-year ends, a small chime on a choice, a low knell for a death or a turning point. On by default, a switch in Menu, remembered | `src/ui/sound.js` |
 | Found on the way | The same debt listed twice now says "twice"; the bundler does not follow `export ... from` (the Years tab threw until the import was made plain; the phone smoke now visits Years) | `turn.js`, `tools/smoke.mjs` |
+
+## Round 4: release kit (2026-11-14)
+The playbook's release kit (`game-release/scripts/setup.mjs`), run through its ten steps:
+
+| Step | Result |
+|---|---|
+| Update check | Clean: a new deploy reaches someone who already has the app |
+| Embed size | **480 x 820**, measured (no overflow, nothing wasted) |
+| Press art | Cover drawn from the game's own miniature and gilt rule; five shots driven through the real build (title, a story choice with its recall line, the plan with a warning, the House with her arms, the Years); `press-sheet.png` looked at, two shots fixed (the half-year report was covering them), the cover title fixed at listing size |
+| Page copy | `docs/itch/description.html`, `short-description.txt`, `ITCH.md`, every number from the build: 7 scenes, 44 half-years, 22 actions, 37 + 13 scenes; survival by difficulty re-measured after round 2 (christine bot, 300 runs: 88% / 81% / 78%), and the title screen's blurbs now say the same |
+| itch zip | `release/the-lady-of-saint-pol-web.zip`, 148 KB, index.html at the root, no service worker; a single-file download and an offline zip |
+| Pre-public | Clean: plays in a sandboxed frame with storage blocked and in a cross-origin frame; privacy and AI lines present; no unfilled fields |
+| Upload kit | `release/the-lady-of-saint-pol-itch-kit.zip` with START-HERE.txt |
+
+**Not done, and why.** The web version at heirsofruin.github.io/Noble-Ladies/
+deploys only from the default branch (`pages.yml`), and this work is on
+`ccr-a800e13a-5gntgt`: merging is the author's call. Pages may also need
+switching on once by hand in the repository settings. Uploading to itch is the
+author's (account, page, Public): the kit says what goes where.

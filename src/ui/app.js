@@ -47,8 +47,8 @@ function hint(id) {
 function hintDone(id) { if (!hintsSeen[id]) { hintsSeen = { ...hintsSeen, [id]: 1 }; lsSet(HINTS_KEY, JSON.stringify(hintsSeen)); } }
 let confirmNew = false; // New game over a game in progress asks first (Touchline lost a career to one tap)
 const BACKUP_KEY = `${SAVE_KEY}.previous`;
-// Measured survival for a careful player, 400 runs per level (docs/KILLGATE.md).
-const DIFF_NOTE = { easy: 'Lower costs and milder dangers. A careful lady lives to the end about nine times in ten.', normal: 'Prices and dangers as the period had them. About five in six careful ladies live to the end.', hard: 'Dearer, and more dangerous. About four in five careful ladies live to the end.' };    // what came of the last choice, shown above the next screen (playbook F5: Centennial Farm hid results)
+// Measured survival for a careful player (christine bot), 300 runs per level, 2026-11-14 (docs/FRAME-AUDIT-ROUNDS.md).
+const DIFF_NOTE = { easy: 'Lower costs and milder dangers. Nearly nine careful ladies in ten live to the end.', normal: 'Prices and dangers as the period had them. About four careful ladies in five live to the end.', hard: 'Dearer and more dangerous: those who live keep less. A little under four in five careful ladies live to the end.' };
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const num = (n) => Number(n).toLocaleString('en-GB');
