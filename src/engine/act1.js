@@ -3,6 +3,7 @@
 // the spring of 1401, after her eighteenth birthday (test/invariants.test.js
 // asserts both ages).
 
+import { BACKGROUNDS } from '../data/backgrounds.data.js';
 import { ACT1, ACT1_LATE } from '../data/act1.data.js';
 import { ACT1_CAST, CAST } from '../data/cast.data.js';
 import { CONFIG } from '../data/config.data.js';
@@ -157,6 +158,8 @@ function wedding(s, lines) {
   s.lands = h.lands; s.landsStart = h.lands;
   coin(s, CONFIG.startPurse, 'the household purse', FIRST_TURN - 1);
   coin(s, dowry, 'your dowry', FIRST_TURN - 1);
+  const bgPurse = BACKGROUNDS[s.background || 'beauvaisis'].purse;
+  if (bgPurse) coin(s, bgPurse, 'your father\'s gift, from the Parlement fees', FIRST_TURN - 1);
   s.place = 'court';
   const lean = h.lean === 'none' ? 'belongs to no party' : `is known as a friend of ${factionLabel(h.lean, FIRST_TURN)}`;
   s.cards.push({

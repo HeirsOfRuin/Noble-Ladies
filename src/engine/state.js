@@ -10,9 +10,11 @@
 import { CONFIG, DIFFICULTY } from '../data/config.data.js';
 import { CAST, SUITORS, LADY } from '../data/cast.data.js';
 import { streamFor } from './rng.js';
+import { applyOps } from './effects.js';
+import { BACKGROUNDS } from '../data/backgrounds.data.js';
 
 export const SAVE_KEY = 'the-lady-of-saint-pol.save.v1'; // never rename
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 export const CODE_PREFIX = 'LSP1.';
 
 const draw = (rng, v, dp = 0) => {
@@ -44,8 +46,9 @@ export function cleanName(name) {
   return n || LADY.name;
 }
 
-export function newGame({ seed = 1, difficulty = 'normal', name } = {}) {
+export function newGame({ seed = 1, difficulty = 'normal', name, background = 'beauvaisis' } = {}) {
   if (!DIFFICULTY[difficulty]) throw new Error(`unknown difficulty: ${difficulty}`);
+  if (!BACKGROUNDS[background]) throw new Error(`unknown background: ${background}`);
   const rng = streamFor(seed >>> 0, 0, 'setup');
   const npcs = {};
   for (const id of Object.keys(CAST)) npcs[id] = makeNpc(id, rng);
@@ -57,10 +60,11 @@ export function newGame({ seed = 1, difficulty = 'normal', name } = {}) {
   const suitors = [makeSuitor(a, rng), makeSuitor(b, rng)];
   const fatherPick = suitors[0].lands >= suitors[1].lands ? 0 : 1;
 
-  return {
+  const s = {
     v: SAVE_VERSION,
     seed: seed >>> 0,
     difficulty,
+    background,
     lady: { ...LADY, name: cleanName(name), title: `${cleanName(name)} de ${LADY.house}` },
     traits: { devout: 0, bold: 0, warm: 0 },
     want: null,
@@ -103,6 +107,11 @@ export function newGame({ seed = 1, difficulty = 'normal', name } = {}) {
     ending: null,
     nextId: 1,
   };
+  // Her family's start (src/data/backgrounds.data.js).
+  const bg = BACKGROUNDS[background];
+  applyOps(s, bg.ops);
+  if (bg.lawyer) s.npcs.lawyer.rel = Math.min(0.95, Math.round((s.npcs.lawyer.rel + bg.lawyer) * 100) / 100);
+  return s;
 }
 
 /** MIGRATIONS[v](save) returns the save at version v + 1. Add one per version bump. */
@@ -113,6 +122,8 @@ export const MIGRATIONS = {
   // v3 (2026-10-29): favours owed, household colours, play counters.
   // v4 (2026-10-29): offices kept by being at court. A v3 lady of the queen keeps her place.
   // v5 (2026-10-30): the story log behind "the last time" lines and the People tab's history.
+  // v6 (2026-11-14): her family's background. Every earlier lady was of the old Beauvaisis house.
+  5: (s) => ({ ...s, v: 6, background: 'beauvaisis' }),
   4: (s) => ({ ...s, v: 5, story: [] }),
   3: (s) => ({ ...s, v: 4, offices: s.flags?.queensLady ? [{ id: 'queen', label: 'a place among the queen\'s ladies', faction: 'queen', income: 150, absent: 0 }] : [] }),
   2: (s) => ({ ...s, v: 3, debts: [], colours: 'none', stats: { cards: 0 } }),

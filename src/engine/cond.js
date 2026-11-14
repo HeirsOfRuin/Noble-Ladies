@@ -18,6 +18,10 @@
 //   ['son']  ['children', op, n]
 //   ['beat', id]              that story beat has fired
 //   ['agincourt', fate]       killed | captured | survived | absent
+//   ['from', halfKey]         the half-year has come (for the lady's book)
+//   ['background', id]        her family's start
+
+import { turnOfKey } from './clock.js';
 
 const OPS = {
   '>=': (a, b) => a >= b, '<=': (a, b) => a <= b, '>': (a, b) => a > b, '<': (a, b) => a < b, '==': (a, b) => a === b,
@@ -59,6 +63,8 @@ export function test(s, c) {
     case 'children': return cmp(s.children.filter((x) => x.alive).length, a, b);
     case 'beat': return s.arcs?.[a] === 'done';
     case 'agincourt': return s.flags.agincourt === a;
+    case 'from': return s.turn >= turnOfKey(a);
+    case 'background': return (s.background || 'beauvaisis') === a;
     default: throw new Error(`unknown condition: ${k}`);
   }
 }
@@ -75,4 +81,4 @@ export function flagsRead(c, out = new Set()) {
   return out;
 }
 
-export const KNOWN = new Set(['flag', 'not', 'any', 'all', 'trust', 'use', 'alive', 'fav', 'rep', 'money', 'health', 'trait', 'want', 'husband', 'lean', 'temper', 'spending', 'regard', 'place', 'son', 'children', 'beat', 'agincourt']);
+export const KNOWN = new Set(['flag', 'not', 'any', 'all', 'trust', 'use', 'alive', 'fav', 'rep', 'money', 'health', 'trait', 'want', 'husband', 'lean', 'temper', 'spending', 'regard', 'place', 'son', 'children', 'beat', 'agincourt', 'from', 'background']);

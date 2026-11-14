@@ -150,3 +150,21 @@ test('a child promised in marriage never also goes to the Church or takes the ve
     }
   }
 });
+
+test('every entry in the lady\'s book opens in some game, and every background plays to an end', async () => {
+  const { codexView } = await import('../src/engine/turn.js');
+  const { CODEX } = await import('../src/data/codex.data.js');
+  const { BACKGROUND_ORDER } = await import('../src/data/backgrounds.data.js');
+  const seen = new Set();
+  for (const background of BACKGROUND_ORDER) {
+    for (let seed = 1; seed <= 4; seed++) {
+      let s = newGame({ seed, background });
+      for (let i = 0; !s.over && i < 3000; i++) s = advance(s, decide(s, 'christine')).state;
+      assert.ok(s.over && s.ending, `${background} seed ${seed} ended`);
+      assert.equal(s.background, background);
+      for (const e of codexView(s)) seen.add(e.id);
+    }
+  }
+  const missing = CODEX.filter((e) => !seen.has(e.id)).map((e) => e.id);
+  assert.deepEqual(missing, [], `never opened: ${missing.join(', ')}`);
+});

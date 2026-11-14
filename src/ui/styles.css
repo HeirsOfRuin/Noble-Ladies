@@ -162,3 +162,10 @@ h2.act-title { text-align: center; font-variant: small-caps; letter-spacing: .05
 .arms-head .shield { flex: none; }
 svg.shield { vertical-align: middle; }
 .year p { margin-bottom: .4em; }
+
+.bgs button { text-align: left; }
+.bgs button.on { border: 2px solid var(--rubric); }
+.bgs button small { display: block; margin-top: .3em; }
+.lives { font-size: .92em; }
+.map { margin: 0 0 1em; }
+.paris-map { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; }

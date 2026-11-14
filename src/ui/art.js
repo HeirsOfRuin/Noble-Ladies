@@ -78,3 +78,35 @@ export function miniature(size = 200) {
     </g>
   </svg>`;
 }
+
+/**
+ * Paris in 1400-1422, schematic: the Seine and its islands, the walls, and the
+ * places this game names, the walls coloured by who holds the city: the
+ * Burgundians' red cross of Saint Andrew, the Armagnacs' white sash, or the
+ * grey of a city still shared between the princes. Not to scale.
+ */
+export function parisMap(control, here, size = 300) {
+  const wall = control === 'bur' ? '#b3262c' : control === 'arm' ? '#f4f0e6' : '#8a7a5a';
+  const wallEdge = control === 'arm' ? '#7a6a4a' : '#3a2a18';
+  const label = control === 'bur' ? 'Held by the Burgundians' : control === 'arm' ? 'Held by the Armagnacs' : 'Shared between the princes';
+  const place = (x, y, name, anchor = 'start', dx = 6) => `<circle cx="${x}" cy="${y}" r="3.2" fill="#2a1f17"/><text x="${x + (anchor === 'end' ? -dx : dx)}" y="${y + 3.5}" text-anchor="${anchor}" class="pm-l">${name}</text>`;
+  return `<svg class="paris-map" width="${size}" height="${Math.round(size * 0.78)}" viewBox="0 0 300 234" role="img" aria-label="A map of Paris. ${label}.">
+    <style>.pm-l{font:9.5px 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;fill:#2a1f17}.pm-t{font:italic 9px Georgia,serif;fill:#6b5a48}</style>
+    <rect width="300" height="234" fill="#efe4c8"/>
+    <path d="M38 118 C40 50 110 22 170 26 C232 30 270 62 266 112 L262 128 L40 130 Z" fill="#e6d8b4" stroke="${wallEdge}" stroke-width="1"/>
+    <path d="M38 118 C40 50 110 22 170 26 C232 30 270 62 266 112" fill="none" stroke="${wall}" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M70 134 C78 184 130 206 168 204 C210 202 238 178 240 136 Z" fill="#e6d8b4" stroke="${wallEdge}" stroke-width="1"/>
+    <path d="M70 136 C78 184 130 206 168 204 C210 202 238 178 240 138" fill="none" stroke="${wall}" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M0 122 C60 118 100 132 150 128 C200 124 240 130 300 120 L300 140 C240 150 200 142 150 146 C100 150 60 140 0 142 Z" fill="#8fb0d6"/>
+    <path d="M122 129 C135 124 162 124 176 130 C162 140 135 141 122 136 Z" fill="#e6d8b4" stroke="#6b5a48" stroke-width=".8"/>
+    ${place(250, 98, 'Hôtel Saint-Pol', 'end')}
+    ${place(60, 112, 'The Louvre')}
+    ${place(150, 114, 'The Châtelet')}
+    ${place(120, 54, "Hôtel d'Artois")}
+    ${place(205, 78, 'Hôtel Barbette (the queen)', 'end')}
+    ${place(150, 133, 'Notre-Dame')}
+    ${place(150, 182, 'The University')}
+    ${here === 'court' ? `<g transform="translate(238 118)"><path d="M0 0 l5 -10 l5 10 z" fill="#2b4a7a"/><text x="-3" y="-1" text-anchor="end" class="pm-t">you</text></g>` : `<text x="14" y="22" class="pm-t">To your estates, a long day's ride or more</text><path d="M18 30 l-8 -8 m0 0 h6 m-6 0 v6" stroke="#6b5a48" fill="none"/>`}
+    <rect x="8" y="210" width="12" height="8" fill="${wall}" stroke="${wallEdge}" stroke-width=".8"/><text x="26" y="218" class="pm-l">The walls: ${control === 'bur' ? 'held by the Burgundians' : control === 'arm' ? 'held by the Armagnacs' : 'shared between the princes'}</text>
+  </svg>`;
+}

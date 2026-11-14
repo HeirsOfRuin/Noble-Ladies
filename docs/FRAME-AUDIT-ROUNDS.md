@@ -93,3 +93,23 @@ deploys only from the default branch (`pages.yml`), and this work is on
 `ccr-a800e13a-5gntgt`: merging is the author's call. Pages may also need
 switching on once by hand in the repository settings. Uploading to itch is the
 author's (account, page, Public): the kit says what goes where.
+
+## Round 5: expansion (2026-11-14)
+| Audit item | What changed | Where |
+|---|---|---|
+| G. More than one start | **Her father's house**, chosen on the title: an old house of the Beauvaisis (as before); a Picard house in Burgundy's shadow; a house in the Orléans service; a new house of the Parlement (more money, a better procureur, a smaller name). The two party houses count a little toward that party all game when Paris changes hands, so the start matters in 1418, not only in 1401. Save version 6, with a migration (earlier ladies are of the Beauvaisis) and a fixture | `backgrounds.data.js`, `state.js`, `derive.js tie()` |
+| F. A codex | **The lady's book**, under the Years: 18 entries (the Hôtel Saint-Pol, the king's illness, dowry and dower, the Court of Love, Orléans and Burgundy, New Year's gifts, Christine, the queen, lying-in and churching, badges, the Parlement, the Lombards, the Armagnacs, protection money, the Châtelet, brotherhood in arms, Poissy, Troyes), each opening when she comes to it; a test that every entry opens in some game | `codex.data.js`, `codexView` |
+| I. A map of Paris | On the House tab: the Seine and the Cité, the walls coloured by who holds the city (the Burgundian red, the Armagnac white, grey while shared), the places the game names, and where she is | `parisMap` in `art.js` |
+| J. The next generation | **Earlier lives**: each finished life is listed on the title page (name, grade, last line of the chronicle), kept in this browser. Playing on as her daughter was not built: a daughter born about 1402 cannot be seventeen in 1400, so it needs a new calendar and new history (1422 onward). That is a sequel's scope, for the author to decide | `app.js` |
+
+### Measured (150 runs per cell)
+| Policy | Beauvaisis | Picardy | Valois | Parlement |
+|---|---|---|---|---|
+| christine | 77 | 81.5 | 83 | 80 |
+| loyal_bur | 83 | 84 | 84 | 83 |
+| loyal_arm | 77 | 78 | 78 | 77 |
+| homebody | 72 | 73 | 72 | 72 |
+
+No start dominates or breaks; each is within about 6 points of the others, and
+survival stays 81-89% for careful play. A first start at a party house is a little
+richer in rewards when that party wins.

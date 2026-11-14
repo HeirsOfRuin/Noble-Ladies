@@ -7,9 +7,10 @@
 //  - A throw never leaves a dead button: busy is released in finally, and the
 //    error screen offers the save (Touchline lost a career to a greyed-out Continue).
 
-import { newGame, advance, view, houseView, peopleView, newsView, planProblem, planCost, chronicle } from '../engine/turn.js';
+import { newGame, advance, view, houseView, peopleView, newsView, planProblem, planCost, chronicle, codexView } from '../engine/turn.js';
+import { BACKGROUNDS, BACKGROUND_ORDER } from '../data/backgrounds.data.js';
 import { impaledSvg, shieldSvg } from '../engine/heraldry.js';
-import { artDefs, gildedInitial, giltRule, miniature } from './art.js';
+import { artDefs, gildedInitial, giltRule, miniature, parisMap } from './art.js';
 import { soundOn, setSound, halfYearBell, choiceChime, knell } from './sound.js';
 import { SAVE_KEY, serialize, deserialize, toCode, fromCode } from '../engine/state.js';
 import { STORAGE_OK, lsGet, lsSet } from './storage.js';
@@ -29,6 +30,17 @@ let picking = null;    // an action id waiting for its target
 let outcome = null;
 let difficulty = 'normal';
 let ladyName = 'Marguerite';
+let background = 'beauvaisis';
+// Past lives, kept in this browser only: a per-viewer record, not part of any save.
+const LIVES_KEY = 'the-lady-of-saint-pol.lives';
+function lives() { try { return JSON.parse(lsGet(LIVES_KEY) || '[]'); } catch { return []; } }
+function recordLife(s) {
+  const id = `${s.seed}:${s.lady.name}`;
+  const all = lives();
+  if (all.some((l) => l.id === id)) return;
+  all.unshift({ id, name: s.lady.title, grade: s.ending.grade, total: s.ending.total, outcome: s.outcome, line: s.ending.epitaph.split('. ').slice(-1)[0] });
+  lsSet(LIVES_KEY, JSON.stringify(all.slice(0, 12)));
+}
 let reloadNow = null;  // the service worker's reload, kept so the banner's button survives a render
 const HINTS_KEY = `${'the-lady-of-saint-pol'}.hints`;
 let hintsSeen = (() => { try { return JSON.parse(lsGet(HINTS_KEY) || '{}'); } catch { return {}; } })();
@@ -85,6 +97,8 @@ function title() {
         <label class="namefield">Her name <input id="lady-name" maxlength="24" value="${esc(ladyName)}" autocomplete="off" spellcheck="false"></label>
         <div class="chips" role="group" aria-label="Difficulty">${Object.entries(DIFFICULTY).map(([k, d]) => `<button data-diff="${k}" class="${difficulty === k ? 'on' : ''}">${esc(d.label)}</button>`).join('')}</div>
         <p class="hint">${esc(DIFF_NOTE[difficulty])}</p>
+        <p class="label">Her father's house</p>
+        <div class="stack bgs">${BACKGROUND_ORDER.map((k) => `<button data-bg="${k}" class="${background === k ? 'on' : ''}"><strong>${esc(BACKGROUNDS[k].label)}</strong>${background === k ? `<small>${esc(BACKGROUNDS[k].note)}</small>` : ''}</button>`).join('')}</div>
         ${confirmNew ? `<div class="box warnbox"><p>This replaces the game in progress (${esc(view(saved).date)}). It will be kept as a backup you can restore from this page.</p><div class="stack"><button class="primary" data-act="new-go">Start a new game</button><button data-act="new-cancel">Keep playing the old one</button></div></div>`
           : `<button ${saved ? '' : 'class="primary"'} data-act="new">New game</button>`}
         ${lsGet(BACKUP_KEY) ? '<button data-act="restore">Restore the previous game</button>' : ''}
@@ -92,6 +106,7 @@ function title() {
         ${install ? '<button data-act="install">Install on this device</button>' : ''}
       </div>
       <p class="hint">About an hour and a half for a whole life. The game saves itself after every choice.</p>
+      ${lives().length ? `<h2>Earlier lives</h2><p class="hint">Kept in this browser.</p><ul class="lives">${lives().map((l) => `<li><strong>${esc(l.name)}</strong>: ${esc(l.grade)} (${l.total}). <small>${esc(l.line)}</small></li>`).join('')}</ul>` : ''}
     </main>`;
 }
 
@@ -142,7 +157,7 @@ function outcomeBox() {
 }
 
 function playTab(v) {
-  if (v.over || state.over) return outcomeBox() + endingView();
+  if (v.over || state.over) { recordLife(state); return outcomeBox() + endingView(); }
   if (v.phase === 'scene') {
     const sc = v.scene;
     return `${outcomeBox()}<p class="kicker">${esc(sc.when)} · Lesson: ${esc(sc.lesson)}</p>
@@ -277,6 +292,7 @@ function houseTab() {
       <tr><td>${esc(h.exposure[0].label)} favour</td><td>${bar(v.fav.arm)}</td><td class="num">${v.fav.arm}</td></tr>
       <tr><td>Burgundy favour</td><td>${bar(v.fav.bur)}</td><td class="num">${v.fav.bur}</td></tr>
     </table>
+    <div class="map">${parisMap(h.control, h.place)}</div>
     <div class="box"><p class="label">If Paris changed hands tomorrow</p>
       <ul>${h.exposure.map((x) => `<li>To ${esc(x.label)} you are ${esc(x.word)}.</li>`).join('')}</ul>
       ${h.hedging ? '<p class="warn">You stand well with both parties. Either can find that out.</p>' : ''}
@@ -321,11 +337,18 @@ function newsTab() {
     <ul class="news">${ns.map((n) => `<li><small>${esc(n.date)} · ${esc(n.from)} (${esc(n.word)})${n.status === 'true' ? ' · <b>came true</b>' : n.status === 'false' ? ' · came to nothing' : ''}</small><p>${esc(n.text)}</p></li>`).join('')}</ul>`;
 }
 
+function bookSection() {
+  const es = codexView(state);
+  return `${giltRule()}<h2>The lady's book</h2><p class="hint">The things of her world, opened as she comes to them.</p>
+    ${es.map((e) => `<details class="between"><summary>${esc(e.title)}</summary><p class="small">${esc(e.text)}</p></details>`).join('')}`;
+}
+
 function yearsTab() {
   const ys = chronicle(state);
-  if (!ys.length) return '<h2>The years</h2><p class="empty">Nothing written yet. The chronicle begins with your marriage contract.</p>';
+  if (!ys.length) return `<h2>The years</h2><p class="empty">Nothing written yet. The chronicle begins with your marriage contract.</p>${bookSection()}`;
   return `<h2>The years</h2><p class="hint">Your life a year at a time, newest first: what history did, where you were, what you chose.</p>
-    ${ys.map((y) => `<div class="year"><p class="label">${y.year}</p><p>${esc(y.lines.join(' '))}</p></div>`).join(giltRule())}`;
+    ${ys.map((y) => `<div class="year"><p class="label">${y.year}</p><p>${esc(y.lines.join(' '))}</p></div>`).join(giltRule())}
+    ${bookSection()}`;
 }
 
 function menuTab() {
@@ -393,12 +416,13 @@ function step(input) {
 }
 
 app.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-diff],[data-act],[data-tab],[data-action],[data-choice],[data-place],[data-pick],[data-unpick],[data-target],[data-counsel],[data-colours]');
+  const t = e.target.closest('[data-bg],[data-diff],[data-act],[data-tab],[data-action],[data-choice],[data-place],[data-pick],[data-unpick],[data-target],[data-counsel],[data-colours]');
   if (!t || busy) return;
   busy = true;
   try {
     const d = t.dataset;
-    if (d.diff) { ladyName = document.getElementById('lady-name')?.value ?? ladyName; difficulty = d.diff; }
+    if (d.bg) { ladyName = document.getElementById('lady-name')?.value ?? ladyName; background = d.bg; }
+    else if (d.diff) { ladyName = document.getElementById('lady-name')?.value ?? ladyName; difficulty = d.diff; }
     else if (d.tab) { if (['house', 'people', 'news'].includes(tab) && d.tab !== tab) hintDone(tab); tab = d.tab; }
     else if (d.choice !== undefined) { const ch = view(state); const rec = step({ type: state.phase === 'scene' ? 'scene' : 'card', choice: Number(d.choice) }); outcome = { ...rec, chose: rec.chose || ch.scene?.choices[Number(d.choice)]?.label }; if (ch.card?.choices.length > 1) hintDone('card'); draft = null; if (!ch.card || ch.card.choices.length > 1) choiceChime(); sorrow(); }
     else if (d.place) { draft = { place: d.place, actions: draft.actions.filter((a) => view(state).plan.places.find((p) => p.place === d.place).actions.find((x) => x.id === a.id)?.ok) }; }
@@ -432,7 +456,7 @@ app.addEventListener('click', (e) => {
         else {
           const raw = lsGet(SAVE_KEY);
           if (raw && act === 'new-go') lsSet(BACKUP_KEY, raw);
-          state = newGame({ seed: (Math.random() * 2 ** 31) >>> 0, name: ladyName, difficulty }); tab = 'play'; modal = null; draft = null; outcome = null; confirmNew = false; save();
+          state = newGame({ seed: (Math.random() * 2 ** 31) >>> 0, name: ladyName, difficulty, background }); tab = 'play'; modal = null; draft = null; outcome = null; confirmNew = false; save();
         }
       }
       else if (act === 'new-cancel') { confirmNew = false; }

@@ -10,6 +10,7 @@ import { SWINGS, PLAGUE } from '../data/history.data.js';
 import { onBoard, controlAt, queenSideAt, between, keyOf, factionLabel, turnOfKey } from './clock.js';
 import { clamp, TRAITS } from './effects.js';
 import { WANTS } from '../data/arcs.data.js';
+import { BACKGROUNDS } from '../data/backgrounds.data.js';
 import { debtsIn } from './favours.js';
 import { officeTie } from './offices.js';
 
@@ -237,6 +238,7 @@ export function tie(s, f) {
   t += officeTie(s, f);                                 // she holds their office
   if (s.colours === f) t += 0.25;                       // her household wears their badge
   t += s.flags.exposedTo?.[f] || 0;                     // letters of hers that were opened
+  t += BACKGROUNDS[s.background || 'beauvaisis'].tie?.[f] || 0; // her father's people are known to be theirs
   return t;
 }
 

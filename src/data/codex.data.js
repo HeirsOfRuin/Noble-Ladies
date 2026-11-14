@@ -1,0 +1,43 @@
+// The lady's book: the period, an entry at a time, opened as she meets each
+// thing (audit F; after The Lists' lore book). Logic-free: `if` is a condition
+// (src/engine/cond.js). Each entry names things, places, prices and laws, not
+// feelings (docs/STYLE.md). Dates checked against the sources in README.md.
+
+export const CODEX = [
+  { id: 'saintpol', title: 'The Hôtel Saint-Pol', if: null,
+    text: 'The king\'s house in the east of Paris, by the Seine: a cluster of lodgings, galleries and gardens that Charles V put together from bought-up mansions, with a menagerie of lions and a cherry orchard. His son Charles VI lives there in his illness, and will die there.' },
+  { id: 'king', title: 'The king\'s illness', if: null,
+    text: 'In August 1392, in the forest near Le Mans, Charles VI drew his sword on his own escort and killed four men before he was held. The fits came back for the rest of his life, for weeks or months at a time, and between them he was lucid and king again. In the bad weeks he did not know the queen, and some said he believed he was made of glass.' },
+  { id: 'dower', title: 'Dowry and dower', if: ['from', '1401a'],
+    text: 'The dowry is what her family pays to his at the marriage. The dower is what she keeps if he dies first: by the custom of Paris, the use for life of half the lands he held when they married. A widow\'s dower was often the only thing she owned outright, and his heirs fought for it in the Parlement.' },
+  { id: 'court_love', title: 'The Court of Love', if: ['from', '1401a'],
+    text: 'Founded in February 1401 at the Hôtel d\'Artois, the Duke of Burgundy\'s Paris house, under the princes\' patronage: a company of poets and gentlemen who met to judge ballades and swore to honour women. Not every member kept the oath.' },
+  { id: 'factions', title: 'Orléans and Burgundy', if: ['from', '1401a'],
+    text: 'Louis, Duke of Orléans, the king\'s brother, and Philip, Duke of Burgundy, the king\'s uncle (and from 1404 Philip\'s son John), fought for the council and the king\'s money while the king was ill. Each had his badge: Orléans the porcupine and the knotted stick, Burgundy the carpenter\'s plane that would shave the stick smooth.' },
+  { id: 'gifts', title: 'New Year\'s gifts', if: ['from', '1401b'],
+    text: 'On the first of January the court gave étrennes: jewels, books, horses, greyhounds, plate. The princes\' accounts list them by the hundred. What one gave, and to whom, was read like a letter, and a gift received was a debt.' },
+  { id: 'christine', title: 'Christine de Pizan', if: ['from', '1401b'],
+    text: 'Born in Venice about 1364, brought to Paris as a child when her father became Charles V\'s astrologer, widowed at twenty-five with three children and her husband\'s debts. She wrote for her living: ballades, then books of advice, history and war, presented to the princes in copies she paid for herself.' },
+  { id: 'queen', title: 'Queen Isabeau', if: null,
+    text: 'Isabeau of Bavaria married Charles VI in 1385, at about fifteen. She bore him twelve children, and in his illness she sat in the council, which made her a power and a target. Burgundian pamphlets made her a byword; her household accounts show a woman buying books, birds and medicine for her children.' },
+  { id: 'churching', title: 'Lying-in and churching', if: ['children', '>=', 1],
+    text: 'After a birth a lady kept to her chamber, curtained, for about a month, receiving visitors in a great bed. Forty days on she was churched: she came to the church door with candles, was blessed and led in, and went back to her life. Most noble children were fed by a wet nurse, hired and watched.' },
+  { id: 'colours', title: 'Badges and colours', if: ['from', '1405a'],
+    text: 'Great men gave their badges and liveries to their followers, and a household that wore them was counted as theirs. From 1411 Paris wore the Burgundian cross of Saint Andrew; the Armagnacs wore a white sash. When the city changed masters, the wrong badge in the street could cost a life.' },
+  { id: 'parlement', title: 'The Parlement and the procureur', if: ['any', [['flag', 'caseBrecourt'], ['from', '1406a']]],
+    text: 'The Parlement of Paris, the king\'s sovereign court, sat in the palace on the Île de la Cité. A litigant\'s procureur kept the file and the deadlines; an advocate pleaded. Cases ran for years, through hearings, inquiries and appeals, and the judges noticed who had friends.' },
+  { id: 'lombards', title: 'The Lombards', if: ['from', '1405a'],
+    text: 'Italian merchant-bankers, many from Lucca and Florence, with houses in the street in Paris still named for them. They lent against plate and jewels, kept valuables in their strongrooms, and moved money by letter between cities. A fine levied on a house could not reach what was with them.' },
+  { id: 'armagnacs', title: 'The Armagnacs', if: ['from', '1410a'],
+    text: 'In 1410 the young Duke of Orléans married the daughter of Bernard, Count of Armagnac, a Gascon soldier with a hard army. His party took his name. In Paris "Armagnac" became an insult, and later a death sentence.' },
+  { id: 'appatis', title: 'Protection money', if: ['from', '1410b'],
+    text: 'In the war years every garrison lived off the country around it. Captains sent lists to the villages: pay the appatis, in money, grain or wine, and nothing will happen to you. Those who did not pay saw their barns burn. Letters of protection from a great lord were worth what that lord was worth that year.' },
+  { id: 'chatelet', title: 'The Châtelet', if: ['from', '1413a'],
+    text: 'The fortress at the north end of the Pont au Change, seat of the provost of Paris, his court and his prisons. Prisoners paid for their food, their bedding and the lightness of their chains. In 1413 the butchers filled it with the queen\'s people; in 1418 the mob broke in and killed the Armagnacs inside.' },
+  { id: 'brotherhood', title: 'Brotherhood in arms and ransoms', if: ['from', '1409a'],
+    text: 'Two knights could swear a contract of brotherhood in arms before a notary: to share the profits of war, to pay each other\'s ransoms, never to fight each other. A captured man\'s ransom was a debt like any other, paid in instalments, with hostages and bankers, and it could ruin a house.' },
+  { id: 'poissy', title: 'Poissy', if: ['from', '1408a'],
+    text: 'The royal Dominican priory of Saint-Louis at Poissy, west of Paris, founded by Philip the Fair. It schooled the daughters of great houses and took some of them for life: a daughter of Charles VI was vowed there as a child, and so was Christine de Pizan\'s daughter.' },
+  { id: 'troyes', title: 'The Treaty of Troyes', if: ['from', '1420a'],
+    text: 'Sealed on 21 May 1420 in the name of the mad king: Henry V of England was to marry Catherine of France, rule as regent, and be king after Charles VI, and the Dauphin Charles was disinherited. Nobles in the lands it governed were asked to swear to it.' },
+];

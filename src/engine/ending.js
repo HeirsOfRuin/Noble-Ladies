@@ -10,13 +10,15 @@ import { words } from './effects.js';
 import { lastWords } from './reflect.js';
 import { yearOf, actOf, actTitle, dateLabel, FIRST_TURN, turnOfKey } from './clock.js';
 import { HISTORY } from '../data/history.data.js';
+import { BACKGROUNDS } from '../data/backgrounds.data.js';
 
 const repWord = (r) => (r >= 75 ? 'a lady of great good name' : r >= 55 ? 'a lady well spoken of' : r >= 35 ? 'a lady of middling report' : 'a lady much talked about, and not kindly');
 
 export function epitaph(s) {
   const L = s.lady;
   const out = [];
-  out.push(`Item, of ${L.name} of the house of ${L.house}, born in the year ${CONFIG.birthYear}, married at eighteen to ${s.flags.firstHusband}.`);
+  const of = BACKGROUNDS[s.background || 'beauvaisis'].of;
+  out.push(`Item, of ${L.name} of the house of ${L.house}${of ? `, ${of}` : ''}, born in the year ${CONFIG.birthYear}, married at eighteen to ${s.flags.firstHusband}.`);
   if (s.want) out.push(`She wanted ${WANTS[s.want].chronicle}${wantStatus(s).achieved ? ', and had it' : ', and did not have it'}.`);
   const a = s.flags.agincourt;
   if (a === 'killed') out.push('Her lord fell at Agincourt with the flower of France.');

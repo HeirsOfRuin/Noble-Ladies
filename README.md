@@ -15,7 +15,7 @@ keeping-in-touch scenes, favours owed, letters that can be opened, offices kept
 by being in Paris, children with their own upbringings. What came of each choice
 is shown; standing at court is part of the legacy; a Years tab keeps the
 chronicle; generated heraldry; a manuscript look drawn in SVG; quiet sound made in
-code. About 95-100 minutes a run.
+code. Four family starts, the lady's book, a map of Paris. About 95-100 minutes a run.
 
 ## Play as an app
 

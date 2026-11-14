@@ -36,7 +36,14 @@ import { CAST } from '../data/cast.data.js';
 
 export { newGame };
 import { chronicle } from './chronicle.js';
+import { CODEX } from '../data/codex.data.js';
+import { test as condTest } from './cond.js';
 export { chronicle };
+
+/** The lady's book: the entries she has come to, in the book's order. */
+export function codexView(s) {
+  return CODEX.filter((e) => condTest(s, e.if)).map((e) => ({ id: e.id, title: e.title, text: e.text }));
+}
 
 const MULTI = new Set(['gift', 'letter', 'distance']); // may be taken twice in a half-year, for different people
 
@@ -326,6 +333,7 @@ export function houseView(s) {
   return {
     lady: s.lady, age: ladyAge(Math.min(s.turn, LAST_TURN)), lands: s.lands, landsStart: s.landsStart,
     husbandHouse: h?.short || s.flags.husbandShort || null,
+    control: controlAt(Math.min(s.turn, LAST_TURN)), place: s.place,
     husband: h ? { name: h.name, short: h.short, status: h.status, lean: h.lean === 'none' ? 'no party' : factionLabel(h.lean, s.turn), heed: heedWord(s), ransom: h.ransom, traits: { competence: h.competence, loyalty: h.loyalty, temper: h.temper, spending: h.spending } } : null,
     widowed: s.widowed, counsel: s.counsel, counselOptions: COUNSEL,
     children: s.children.map((c) => ({ id: c.id, name: c.name, sex: c.sex, age: childAge(s, c), alive: c.alive, care: c.care, betrothed: c.betrothed, risk: childRisk(s, c) })),

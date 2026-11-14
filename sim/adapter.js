@@ -5,11 +5,11 @@ import { newGame, advance } from '../src/engine/turn.js';
 import { FIRST_TURN, LAST_TURN, yearOf } from '../src/engine/clock.js';
 import { decide, POLICIES } from './bot.js';
 
-export const axes = { policy: POLICIES, difficulty: ['easy', 'normal', 'hard'] };
-export const defaults = { policy: 'christine', difficulty: 'normal' };
+export const axes = { policy: POLICIES, difficulty: ['easy', 'normal', 'hard'], background: ['beauvaisis', 'picardy', 'valois', 'parlement'] };
+export const defaults = { policy: 'christine', difficulty: 'normal', background: 'beauvaisis' };
 
 export function play(seed, opts = {}) {
-  let s = newGame({ seed, difficulty: opts.difficulty || 'normal' });
+  let s = newGame({ seed, difficulty: opts.difficulty || 'normal', background: opts.background || 'beauvaisis' });
   for (let guard = 0; !s.over && guard < 5000; guard++) s = advance(s, decide(s, opts.policy || 'christine')).state;
   return s;
 }
